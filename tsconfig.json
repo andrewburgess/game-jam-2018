@@ -1,0 +1,40 @@
+{
+    "compilerOptions": {
+        "allowJs": false,
+        "allowSyntheticDefaultImports": false,
+        "experimentalDecorators": true,
+        "lib": [
+            "dom",
+            "esnext.asynciterable",
+            "es5",
+            "es6",
+            "es7",
+            "es2017"
+        ],
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noUnusedLocals": true,
+        "preserveSymlinks": true,
+        "pretty": true,
+        "skipLibCheck": true,
+        "sourceMap": true,
+        "strictNullChecks": true,
+        "suppressImplicitAnyIndexErrors": true,
+        "target": "es6",
+        "typeRoots": [
+            "./node_modules/@types",
+            "./phaser3-docs/typescript",
+            "./src/types"
+        ]
+    },
+    "exclude": [
+        "node_modules"
+    ],
+    "include": [
+        "**/*.ts",
+        "**/*.tsx"
+    ]
+}
