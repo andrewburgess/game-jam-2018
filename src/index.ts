@@ -3,12 +3,13 @@ import { debounce } from "lodash"
 import * as Phaser from "phaser"
 
 import Loading from "./scenes/Loading"
+import Menu from "./scenes/Menu"
 
 const log = debug("game")
 
 const GameConfiguration: GameConfig = {
     height: window.innerHeight,
-    scene: [Loading],
+    scene: [Loading, Menu],
     type: Phaser.AUTO,
     width: window.innerWidth
 }
