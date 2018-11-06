@@ -12,7 +12,7 @@ const GameConfiguration: GameConfig = {
         gamepad: true
     },
     scene: [Loading, Menu, BlocksTest, MovementTest],
-    type: Phaser.AUTO,
+    type: Phaser.CANVAS,
     width: 1000
 }
 
