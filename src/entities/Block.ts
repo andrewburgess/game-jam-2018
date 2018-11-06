@@ -1,25 +1,26 @@
 import * as debug from "debug"
 import * as Phaser from "phaser"
 
-const BLOCK_SIZE = 32
+export const BLOCK_SIZE = 32
 
 const log = debug("game:entities:Block")
 
-class Block extends Phaser.GameObjects.Rectangle {
-    constructor(scene: Phaser.Scene, x: number, y: number) {
+export class Block extends Phaser.GameObjects.Rectangle {
+    private color: Phaser.Display.Color
+
+    constructor(scene: Phaser.Scene, x: number, y: number, color: string | Phaser.Display.Color = "#ffffff") {
         super(scene, x, y, BLOCK_SIZE, BLOCK_SIZE)
 
-        this.setFillStyle(0xff0000, 1)
+        this.color = typeof color === "string" ? Phaser.Display.Color.HexStringToColor(color) : color
+
+        this.setFillStyle(this.color.color, 1)
         this.isFilled = true
 
-        this.setStrokeStyle(0x990000, 1)
+        this.setStrokeStyle(1, this.color.clone().darken(50).color)
         this.isStroked = true
-        this.lineWidth = 2
 
         this.type = "Block"
 
         log("constructed")
     }
 }
-
-export default Block
