@@ -11,14 +11,49 @@ import * as asset_player_projectile from "../assets/player_projectile.png"
 
 const log = debug("game:scenes:movementTest")
 
-// TODO(tristan): unify supported keyboard buttons and supported gamepad buttons to the same game actions
+class VirtualKey {
+    private keyboard_button: Phaser.Input.Keyboard.Key | undefined
+    private gamepad_button: Phaser.Input.Gamepad.Button | undefined
+    private is_down: boolean
+    private was_down: boolean
+
+    constructor(keyboard_button: Phaser.Input.Keyboard.Key) {
+        this.keyboard_button = keyboard_button
+        this.is_down = false
+        this.was_down = false
+    }
+
+    private poll() {
+        var prev: boolean = this.is_down
+        var cur: boolean = (this.keyboard_button == undefined ? false : this.keyboard_button.isDown) ||
+            (this.gamepad_button == undefined ? false : this.gamepad_button.pressed)
+
+        this.was_down = prev
+        this.is_down = cur
+    }
+
+    public isDown() {
+        this.poll()
+        return this.is_down
+    }
+
+    public isUniquelyDown() {
+        this.poll()
+        return this.is_down && !this.was_down
+    }
+
+    public setGamepadButton(button: Phaser.Input.Gamepad.Button) {
+        this.gamepad_button = button
+    }
+}
+
 type GameController = {
-    up?: Phaser.Input.Keyboard.Key
-    down?: Phaser.Input.Keyboard.Key
-    left?: Phaser.Input.Keyboard.Key
-    right?: Phaser.Input.Keyboard.Key
-    actionA?: Phaser.Input.Keyboard.Key
-    actionB?: Phaser.Input.Keyboard.Key
+    up?: VirtualKey
+    down?: VirtualKey
+    left?: VirtualKey
+    right?: VirtualKey
+    actionLB?: VirtualKey
+    actionRB?: VirtualKey
 }
 
 class MovementTest extends Phaser.Scene {
@@ -63,13 +98,24 @@ class MovementTest extends Phaser.Scene {
         const midY = this.cameras.main.height / 2
 
         this.controller = {
-            up: this.input.keyboard.addKey("W"),
-            down: this.input.keyboard.addKey("S"),
-            left: this.input.keyboard.addKey("A"),
-            right: this.input.keyboard.addKey("D"),
-            actionA: this.input.keyboard.addKey("LEFT"),
-            actionB: this.input.keyboard.addKey("RIGHT"),
+            up: new VirtualKey(this.input.keyboard.addKey("W")),
+            left: new VirtualKey(this.input.keyboard.addKey("A")),
+            down: new VirtualKey(this.input.keyboard.addKey("S")),
+            right: new VirtualKey(this.input.keyboard.addKey("D")),
+            actionLB: new VirtualKey(this.input.keyboard.addKey("LEFT")),
+            actionRB: new VirtualKey(this.input.keyboard.addKey("RIGHT"))
         }
+
+        this.input.gamepad.once('down', (pad: Phaser.Input.Gamepad.Gamepad, button: Phaser.Input.Gamepad.Button, index: number) => {
+            // TODO(tristan): some better way to do this other than guesstimating button indicies?
+            // TODO(tristan): add gamepad axis range
+            this.controller.up!.setGamepadButton(pad.buttons[12])
+            this.controller.left!.setGamepadButton(pad.buttons[14])
+            this.controller.down!.setGamepadButton(pad.buttons[13])
+            this.controller.right!.setGamepadButton(pad.buttons[15])
+            this.controller.actionLB!.setGamepadButton(pad.buttons[4])
+            this.controller.actionRB!.setGamepadButton(pad.buttons[5])
+        }, this);
 
         this.add.image(midX, midY, "asset_background")
 
@@ -97,21 +143,20 @@ class MovementTest extends Phaser.Scene {
     }
 
     public update(time, delta) {
-        if (this.controller.left!.isDown) {
+        if (this.controller.left!.isDown()) {
             this.player.setAccelerationX(-1500)
-        } else if (this.controller.right!.isDown) {
+        } else if (this.controller.right!.isDown()) {
             this.player.setAccelerationX(1500)
         } else {
             this.player.setAccelerationX(0)
         }
 
-        if (Phaser.Input.Keyboard.JustDown(this.controller.actionA!)) {
+        if (this.controller.actionLB!.isUniquelyDown()) {
             var p_proj: Phaser.Physics.Arcade.Body = this.player_projectiles.create(this.player.x - this.player.width + 15, this.player.y - this.player.height, 'asset_player_projectile')
             p_proj.setVelocityY(-1050)
-            p_proj.onWorldBounds = true
         }
 
-        if (Phaser.Input.Keyboard.JustDown(this.controller.actionB!)) {
+        if (this.controller.actionRB!.isUniquelyDown()) {
             var p_proj: Phaser.Physics.Arcade.Body = this.player_projectiles.create(this.player.x + this.player.width - 15, this.player.y - this.player.height, 'asset_player_projectile')
             p_proj.setVelocityY(-1050)
         }

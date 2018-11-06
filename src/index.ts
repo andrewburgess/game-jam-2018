@@ -10,6 +10,9 @@ const log = debug("game")
 
 const GameConfiguration: GameConfig = {
     height: window.innerHeight,
+    input: {
+        gamepad: true
+    },
     scene: [MovementTest],
     type: Phaser.AUTO,
     width: window.innerWidth
