@@ -1,0 +1,26 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended",
+        "tslint-config-prettier"
+    ],
+    "linterOptions": {
+        "exclude": [
+            "node_modules",
+            "dist"
+        ]
+    },
+    "rules": {
+        "max-classes-per-file": false,
+        "no-console": [true, "debug", "log"],
+        "ordered-imports": [
+            true,
+            {
+                "grouped-imports": true,
+                "import-sources-order": "lowercase-last",
+                "named-imports-order": "lowercase-last"
+            }
+        ],
+        "variable-name": [true, "ban-keywords", "check-format", "allow-pascal-case"]
+    }
+}
