@@ -1,12 +1,14 @@
 import * as debug from "debug"
 import * as Phaser from "phaser"
 
-const log = debug("game:scenes:menu")
+import { Scenes } from "./"
+
+const log = debug(`game:scenes:${Scenes.Menu}`)
 
 class Menu extends Phaser.Scene {
     constructor() {
         super({
-            key: "menu"
+            key: Scenes.Menu
         })
 
         log("constructed")

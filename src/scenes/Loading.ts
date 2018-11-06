@@ -1,14 +1,16 @@
 import * as debug from "debug"
 import * as Phaser from "phaser"
 
-const log = debug("game:scenes:loading")
+import { Assets, Files } from "../assets"
+
+import { Scenes } from "./"
+
+const log = debug(`game:scenes:${Scenes.Loading}`)
 
 class Loading extends Phaser.Scene {
-    private loadInterval: number
-
     constructor() {
         super({
-            key: "loading"
+            key: Scenes.Loading
         })
 
         log("constructed")
@@ -17,6 +19,15 @@ class Loading extends Phaser.Scene {
     public preload() {
         log("preload")
 
+        this.createProgressBar()
+        this.loadAssets()
+
+        this.load.once("complete", () => {
+            this.scene.start(Scenes.MovementTest)
+        })
+    }
+
+    private createProgressBar() {
         const progressBar = this.add.graphics()
         const progressBox = this.add.graphics()
 
@@ -38,34 +49,27 @@ class Loading extends Phaser.Scene {
         })
         loadingText.setOrigin(0.5, 0.5)
 
-        let progress = 0
-        this.loadInterval = window.setInterval(() => {
-            log("load progress")
-            progress++
+        const updateProgress = (progress: number) => {
+            log(`load progress: ${progress}`)
             progressBar.clear()
             progressBar.fillStyle(0xffffff, 1)
-            progressBar.fillRect(width / 2 - 300 / 2, height / 2 - 250 / 2, 300 * (progress / 5), 30)
-        }, 1000)
+            progressBar.fillRect(width / 2 - 300 / 2, height / 2 - 250 / 2, 300 * progress, 30)
+        }
 
-        this.sys.events.once("shutdown", () => {
-            log("sys.shutdown")
-            progressBar.destroy()
-            progressBox.destroy()
-            loadingText.destroy()
-
-            window.clearInterval(this.loadInterval)
+        this.load.on("progress", updateProgress)
+        this.load.once("complete", () => {
+            this.load.off("progress", updateProgress, null, false)
         })
     }
 
-    public create() {
-        log("create")
-
-        window.setTimeout(() => {
-            this.scene.start("menu", { testing: true })
-        }, 5800)
+    private loadAssets() {
+        this.load.image(Assets.Background, Files.BACKGROUND)
+        this.load.spritesheet(Assets.Player, Files.PLAYER, {
+            frameHeight: 32,
+            frameWidth: 40
+        })
+        this.load.image(Assets.Projectile, Files.PROJECTILE)
     }
-
-    public update() { }
 }
 
 export default Loading
