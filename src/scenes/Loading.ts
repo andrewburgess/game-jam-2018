@@ -65,7 +65,7 @@ class Loading extends Phaser.Scene {
         }, 5800)
     }
 
-    public update() {}
+    public update() { }
 }
 
 export default Loading

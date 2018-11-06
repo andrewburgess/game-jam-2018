@@ -4,12 +4,13 @@ import * as Phaser from "phaser"
 
 import Loading from "./scenes/Loading"
 import Menu from "./scenes/Menu"
+import MovementTest from "./scenes/MovementTest";
 
 const log = debug("game")
 
 const GameConfiguration: GameConfig = {
     height: window.innerHeight,
-    scene: [Loading, Menu],
+    scene: [MovementTest],
     type: Phaser.AUTO,
     width: window.innerWidth
 }
