@@ -216,6 +216,34 @@ class MovementTest extends Phaser.Scene {
             this
         )
 
+        this.add.particles(Assets.ParticleEngineThrust).createEmitter({
+            angle: 90,
+            blendMode: Phaser.BlendModes.ADD,
+            follow: this.player,
+            followOffset: { x: 10, y: 20 },
+            lifespan: {
+                onEmit: () => {
+                    return Math.max(250, Phaser.Math.Percent(this.player.body.velocity.length(), 0, 300) * 1000)
+                }
+            },
+            scale: { start: 0.25, end: 0.0 },
+            speed: 100
+        })
+
+        this.add.particles(Assets.ParticleEngineThrust).createEmitter({
+            angle: 90,
+            blendMode: Phaser.BlendModes.ADD,
+            follow: this.player,
+            followOffset: { x: -10, y: 20 },
+            lifespan: {
+                onEmit: () => {
+                    return Math.max(250, Phaser.Math.Percent(this.player.body.velocity.length(), 0, 300) * 1000)
+                }
+            },
+            scale: { start: 0.25, end: 0.0 },
+            speed: 100
+        })
+
         log("created")
     }
 
