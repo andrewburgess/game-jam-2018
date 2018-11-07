@@ -1,3 +1,8 @@
+import * as debug from "debug"
+import * as Phaser from "phaser"
+
+const log = debug("game:GameInput::UnifiedController")
+
 interface IUnifiedController {
     up?: VirtualKey
     down?: VirtualKey
@@ -18,9 +23,12 @@ export default class UnifiedController implements IUnifiedController {
     private plugin: Phaser.Input.InputPlugin
 
     constructor(plugin: Phaser.Input.InputPlugin) {
+        log("constructing")
+
         this.plugin = plugin
 
         // TODO(tristan): worth keeping init out of constructor?
+        // TODO(tristan): something fancy with action <--> key map configs?
         this.up = new VirtualKey(plugin.keyboard.addKey("W"))
         this.down = new VirtualKey(plugin.keyboard.addKey("S"))
         this.left = new VirtualKey(plugin.keyboard.addKey("A"))
@@ -36,6 +44,8 @@ export default class UnifiedController implements IUnifiedController {
             },
             this
         )
+
+        log("constructed")
     }
 
     private initGamepadButtons(pad: Phaser.Input.Gamepad.Gamepad) {
