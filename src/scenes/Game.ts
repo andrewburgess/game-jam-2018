@@ -1,8 +1,9 @@
 import * as debug from "debug"
+import { clamp } from "lodash"
 import * as Phaser from "phaser"
 
 import { BLOCK_SIZE } from "../entities/Block"
-import { Piece, createPiece, Shape } from "../entities/Piece"
+import { Piece, createPiece } from "../entities/Piece"
 
 import { Scenes } from "./"
 
@@ -13,6 +14,7 @@ export interface IGameInitialization {
 }
 
 enum Direction {
+    DOWN,
     LEFT,
     RIGHT
 }
@@ -102,6 +104,7 @@ export default class Game extends Phaser.Scene {
 
         this.currentPiece = piece
         this.currentPiece.setGravity(false)
+        this.pieceDirection = Direction.RIGHT
 
         this.currentTween = this.tweens.add({
             completeDelay: 100,
@@ -124,47 +127,60 @@ export default class Game extends Phaser.Scene {
         }
 
         this.currentTween = this.tweens.add({
-            completeDelay: 100,
-            onComplete: () => this.onTweenComplete(),
             props: {
                 x: {
                     duration: this.getMoveDuration(),
                     ease: "Power1",
-                    value: this.pieceDirection === Direction.LEFT ? `-=${BLOCK_SIZE}` : `+=${BLOCK_SIZE}`
+                    value: {
+                        getEnd: (target: Piece, key: string, value: number) => {
+                            const touchingLeft = this.currentPiece.x <= BLOCK_SIZE + BLOCK_SIZE / 2
+                            const touchingRight =
+                                this.currentPiece.x + this.currentPiece.width >=
+                                this.cameras.main.width - BLOCK_SIZE / 2
+
+                            if (
+                                (touchingLeft && this.pieceDirection === Direction.LEFT) ||
+                                (touchingRight && this.pieceDirection === Direction.RIGHT)
+                            ) {
+                                this.pieceDirection = Direction.DOWN
+                            }
+
+                            if (this.pieceDirection === Direction.DOWN) {
+                                return value
+                            }
+
+                            return this.pieceDirection === Direction.LEFT ? value - BLOCK_SIZE : value + BLOCK_SIZE
+                        },
+                        getStart: (target: Piece, key: string) => {
+                            return target[key]
+                        }
+                    }
+                },
+                y: {
+                    duration: this.getMoveDuration(),
+                    ease: "Power1",
+                    getEnd: (target: Piece, key: string, value: number) => {
+                        if (this.pieceDirection !== Direction.DOWN) {
+                            return value
+                        }
+
+                        const touchingLeft = this.currentPiece.x <= BLOCK_SIZE + BLOCK_SIZE / 2
+                        this.pieceDirection = touchingLeft ? Direction.RIGHT : Direction.LEFT
+
+                        return value + BLOCK_SIZE
+                    },
+                    getStart: (target: Piece, key: string) => {
+                        return target[key]
+                    }
                 }
             },
+            repeat: -1,
+            repeatDelay: 10,
             targets: this.currentPiece
         })
     }
 
     private getMoveDuration() {
-        return 1000 / (this.level / 1.5)
-    }
-
-    private onTweenComplete() {
-        log(`currentPiece.x = ${this.currentPiece.x}`)
-        const touchingLeft = this.currentPiece.x <= BLOCK_SIZE + BLOCK_SIZE / 2
-        const touchingRight = this.currentPiece.x + this.currentPiece.width >= this.cameras.main.width - BLOCK_SIZE / 2
-        if (touchingLeft || touchingRight) {
-            this.pieceDirection = touchingLeft ? Direction.RIGHT : Direction.LEFT
-            this.currentTween.stop()
-
-            this.currentTween = this.tweens.add({
-                completeDelay: 100,
-                onComplete: () => this.createTween(),
-                props: {
-                    y: {
-                        duration: this.getMoveDuration(),
-                        ease: "Power1",
-                        value: `+=${BLOCK_SIZE}`
-                    }
-                },
-                targets: this.currentPiece
-            })
-
-            return
-        }
-
-        this.createTween()
+        return clamp(1000 / (this.level / 1.5), 10, 600)
     }
 }
