@@ -18,5 +18,7 @@ export class IPiece extends Piece {
         this.add(new Block(this.scene, BLOCK_SIZE, 0, this.color))
         this.add(new Block(this.scene, BLOCK_SIZE * 2, 0, this.color))
         this.add(new Block(this.scene, BLOCK_SIZE * 3, 0, this.color))
+
+        this.setSize(BLOCK_SIZE * 4, BLOCK_SIZE)
     }
 }
