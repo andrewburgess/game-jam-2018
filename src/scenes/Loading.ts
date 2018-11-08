@@ -2,7 +2,6 @@ import * as debug from "debug"
 import * as Phaser from "phaser"
 
 import { Assets, Files } from "../assets"
-import { Piece } from "../entities/Piece"
 
 import { Scenes } from "./"
 
@@ -21,7 +20,6 @@ class Loading extends Phaser.Scene {
         log("preload")
 
         this.createProgressBar()
-        this.generatePieces()
         this.loadAssets()
 
         this.load.once("complete", () => {
@@ -62,10 +60,6 @@ class Loading extends Phaser.Scene {
         this.load.once("complete", () => {
             this.load.off("progress", updateProgress, null, false)
         })
-    }
-
-    private generatePieces() {
-        Piece.generateTextures(this.add.graphics())
     }
 
     private loadAssets() {
