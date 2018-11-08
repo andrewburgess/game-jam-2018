@@ -2,7 +2,7 @@ import * as debug from "debug"
 import { clamp } from "lodash"
 import * as Phaser from "phaser"
 
-import { BLOCK_SIZE } from "../entities/Block"
+import { BLOCK_SIZE, Block } from "../entities/Block"
 import { Piece, createPiece } from "../entities/Piece"
 
 import { Scenes } from "./"
@@ -92,13 +92,44 @@ export default class Game extends Phaser.Scene {
 
         this.level = config.level
 
+        const test = createPiece(this, BLOCK_SIZE * 4, BLOCK_SIZE * 6)
+        this.add.existing(test)
+        this.blocks.addMultiple(test.getBlocks())
+        test.setGravity(false)
+
+        this.physics.world.on(
+            "collide",
+            (main: Phaser.GameObjects.GameObject, other: Phaser.GameObjects.GameObject) => {
+                if (main.type === "Block" && other.type === "Block") {
+                    const block = main as Block
+                    const otherBlock = other as Block
+
+                    if (block.piece !== otherBlock.piece) {
+                        let firstX = block.piece.x / BLOCK_SIZE
+                        if (Math.round(firstX) > firstX) {
+                            firstX = firstX + 1
+                        }
+
+                        let secondX = otherBlock.piece.x / BLOCK_SIZE
+                        if (Math.round(secondX) > secondX) {
+                            secondX = secondX + 1
+                        }
+
+                        block.piece.setPosition(Math.floor(firstX) * BLOCK_SIZE, block.piece.y)
+                        otherBlock.piece.setPosition(Math.floor(secondX) * BLOCK_SIZE, otherBlock.piece.y)
+                        this.currentTween.pause()
+                    }
+                }
+            }
+        )
+
         this.createNewFallingPiece()
     }
 
     private createNewFallingPiece() {
         log("createNewFallingPiece")
 
-        const piece = createPiece(this, this.cameras.main.width / 2 - BLOCK_SIZE * 2, BLOCK_SIZE)
+        const piece = createPiece(this, BLOCK_SIZE * 4, BLOCK_SIZE)
         this.add.existing(piece)
         this.blocks.addMultiple(piece.getBlocks())
 

@@ -10,12 +10,14 @@ const log = debug("game:entities:Piece")
 
 export abstract class Piece extends Phaser.GameObjects.Container {
     public blocks: Phaser.Physics.Arcade.Group
+    public scene: Phaser.Scene
 
     protected color: Phaser.Display.Color
     protected shape: Shape
 
     constructor(scene: Phaser.Scene, x: number, y: number) {
         super(scene, x, y)
+        this.scene = scene
 
         log("constructed")
     }

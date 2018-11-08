@@ -14,10 +14,10 @@ export class IPiece extends Piece {
     }
 
     public build() {
-        this.add(new Block(this.scene, 0, 0, this.color))
-        this.add(new Block(this.scene, BLOCK_SIZE, 0, this.color))
-        this.add(new Block(this.scene, BLOCK_SIZE * 2, 0, this.color))
-        this.add(new Block(this.scene, BLOCK_SIZE * 3, 0, this.color))
+        this.add(new Block(this, 0, 0, this.color))
+        this.add(new Block(this, BLOCK_SIZE, 0, this.color))
+        this.add(new Block(this, BLOCK_SIZE * 2, 0, this.color))
+        this.add(new Block(this, BLOCK_SIZE * 3, 0, this.color))
 
         this.setSize(BLOCK_SIZE * 4, BLOCK_SIZE)
     }
