@@ -64,6 +64,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     public update(time: number, delta: number) {
         log("updating")
 
+        const gunPosX: number = this.x + this.width - 15
+        const gunPosY: number = this.y - this.height
+
+        const beamPosX: number = this.x - this.width + 15
+        const beamPosY: number = this.y - this.height
+
         if (this.controller.left!.isDown()) {
             this.setAccelerationX(this.controller.left!.getMagnitude() * -1500)
         } else if (this.controller.right!.isDown()) {
@@ -73,15 +79,17 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         }
 
         if (this.controller.actionLB!.isUniquelyDown()) {
-            // this.beam = new Beam(this.scene, this.x, this.y)
+            this.beam = new Beam(this.scene, beamPosX, beamPosY)
         } else if (this.controller.actionLB!.isDown()) {
-            // this.beam.update(time, delta)
-        } else {
-            // this.beam.destroy()
+            this.beam.update(time, delta)
+            this.beam.x = beamPosX
+            this.beam.y = beamPosY
+        } else if (this.beam) {
+            this.beam.destroy()
         }
 
         if (this.controller.actionRB!.isUniquelyDown()) {
-            const pProj: Projectile = new Projectile(this.scene, this.x + this.width - 15, this.y - this.height)
+            const pProj: Projectile = new Projectile(this.scene, gunPosX, gunPosY)
             this.projectiles.add(pProj)
             pProj.setVelocityY(-1050)
         }
