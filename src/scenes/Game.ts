@@ -65,9 +65,9 @@ export default class Game extends Phaser.Scene {
      */
     private pieceDirection: Direction
 
-    constructor() {
+    constructor(inKey: string = Scenes.Game) {
         super({
-            key: Scenes.Game,
+            key: inKey,
             physics: {
                 arcade: {
                     // debug: true,

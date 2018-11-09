@@ -4,12 +4,14 @@ import * as Phaser from "phaser"
 import UnifiedController from "../GameInput"
 
 import { Assets } from "../assets"
+import { Beam } from "../entities/Beam"
 import { Projectile } from "../entities/Projectile"
 
 const log = debug("game:entities:Player")
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
     public projectiles: Phaser.Physics.Arcade.Group
+    public beam: Beam
     private controller: UnifiedController
 
     constructor(scene: Phaser.Scene, x: number, y: number) {
@@ -71,9 +73,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         }
 
         if (this.controller.actionLB!.isUniquelyDown()) {
-            const pProj: Projectile = new Projectile(this.scene, this.x - this.width + 15, this.y - this.height)
-            this.projectiles.add(pProj)
-            pProj.setVelocityY(-1050)
+            // this.beam = new Beam(this.scene, this.x, this.y)
+        } else if (this.controller.actionLB!.isDown()) {
+            // this.beam.update(time, delta)
+        } else {
+            // this.beam.destroy()
         }
 
         if (this.controller.actionRB!.isUniquelyDown()) {

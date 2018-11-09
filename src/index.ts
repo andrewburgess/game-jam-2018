@@ -1,5 +1,6 @@
 import * as Phaser from "phaser"
 
+import BeamTest from "./scenes/BeamTest"
 import BlocksTest from "./scenes/BlocksTest"
 import Game from "./scenes/Game"
 import GameUI from "./scenes/GameUI"
@@ -13,7 +14,7 @@ const GameConfiguration: GameConfig = {
     input: {
         gamepad: true
     },
-    scene: [Loading, Menu, BlocksTest, MovementTest, Game, GameUI],
+    scene: [Loading, Menu, BeamTest, BlocksTest, MovementTest, Game, GameUI],
     type: Phaser.CANVAS,
     width: 1000
 }

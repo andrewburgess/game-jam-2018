@@ -24,11 +24,16 @@ class Menu extends Phaser.Scene {
     public create(data: any) {
         log("create", data)
 
-        const blocksTest = this.add.image(0, -200, Assets.BlocksTest).setInteractive()
-        const movementTest = this.add.image(0, 0, Assets.MovementTest).setInteractive()
+        const beamTest = this.add.image(0, -250, Assets.BeamTest).setInteractive()
+        const blocksTest = this.add.image(0, -100, Assets.BlocksTest).setInteractive()
+        const movementTest = this.add.image(0, 50, Assets.MovementTest).setInteractive()
         const gameButton = this.add.image(0, 200, Assets.GameButton).setInteractive()
 
-        this.add.container(this.centerX(), this.centerY(), [blocksTest, movementTest, gameButton])
+        this.add.container(this.centerX(), this.centerY(), [beamTest, blocksTest, movementTest, gameButton])
+
+        beamTest.once("pointerup", () => {
+            this.scene.start(Scenes.BeamTest)
+        })
 
         blocksTest.once("pointerup", () => {
             this.scene.start(Scenes.BlocksTest)

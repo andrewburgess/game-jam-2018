@@ -64,6 +64,7 @@ class Loading extends Phaser.Scene {
 
     private loadAssets() {
         this.load.image(Assets.Background, Files.BACKGROUND)
+        this.load.image(Assets.BeamTest, Files.BEAM_TEST)
         this.load.image(Assets.BlocksTest, Files.BLOCKS_TEST)
         this.load.image(Assets.GameButton, Files.GAME_BUTTON)
         this.load.image(Assets.MovementTest, Files.MOVEMENT_TEST)
