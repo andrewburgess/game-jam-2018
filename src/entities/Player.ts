@@ -86,7 +86,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
             this.beam.x = beamPosX
             this.beam.y = beamPosY
         } else if (this.beam) {
-            this.beam.elements.clear(true, true)
+            this.beam.removeAll(true)
+            this.beam.latched = false
         }
 
         if (this.controller.actionRB!.isUniquelyDown()) {
@@ -116,6 +117,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
             boundary,
             (collidedBoundary: Phaser.Physics.Arcade.Sprite, beamElem: Phaser.Physics.Arcade.Sprite) => {
                 if (collidedBoundary.body.bottom >= beamElem.body.top) {
+                    // TODO(tristan): breakage animation?
                     this.beam.elements.clear(true, true)
                 }
             },

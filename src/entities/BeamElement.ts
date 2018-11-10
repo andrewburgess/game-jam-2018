@@ -14,6 +14,7 @@ export class BeamElement extends Phaser.GameObjects.Rectangle {
 
     private color: Phaser.Display.Color
 
+    // TODO(tristan): particle effects for beam elements?
     constructor(beam: Beam, x: number, y: number, color: string | Phaser.Display.Color = "#ffffff") {
         log("constructing")
 
