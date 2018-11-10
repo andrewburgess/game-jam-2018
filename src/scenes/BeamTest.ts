@@ -30,10 +30,13 @@ class BeamTest extends Game.default {
         const worldTop: Phaser.Physics.Arcade.Sprite = this.physics.add.staticSprite(16, -16, "world_top")
         worldTop.setSize(this.physics.world.bounds.width, worldTop.height)
         this.player.destroyProjectilesOnCollisionWith(worldTop)
+        this.player.destroyBeamOnCollisionWith(worldTop)
 
         super.create({
             level: 10
         } as Game.IGameInitialization)
+
+        this.player.beam.addPieceLatchChecks(this.currentPiece)
 
         log("created")
     }

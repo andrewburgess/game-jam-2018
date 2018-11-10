@@ -21,6 +21,15 @@ enum Direction {
 
 export default class Game extends Phaser.Scene {
     /**
+     * The currently falling piece.
+     *
+     * @protected
+     * @type {Piece}
+     * @memberof Game
+     */
+    protected currentPiece: Piece
+
+    /**
      * All individual blocks on the game board
      *
      * @private
@@ -28,15 +37,6 @@ export default class Game extends Phaser.Scene {
      * @memberof Game
      */
     private blocks: Phaser.Physics.Arcade.Group
-
-    /**
-     * The currently falling piece.
-     *
-     * @private
-     * @type {Piece}
-     * @memberof Game
-     */
-    private currentPiece: Piece
 
     /**
      * Current piece tween
@@ -82,7 +82,7 @@ export default class Game extends Phaser.Scene {
     public create(config: IGameInitialization) {
         log("create")
 
-        this.physics.world.setBounds(0, 0, this.cameras.main.width, this.cameras.main.height, false, false, false, true)
+        // this.physics.world.setBounds(0, 0, this.cameras.main.width, this.cameras.main.height, false, false, false, true)
         this.blocks = this.physics.add.group({
             bounceX: 0.5,
             bounceY: 0.5,

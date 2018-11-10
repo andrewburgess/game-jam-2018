@@ -58,12 +58,15 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
             speed: 100
         })
 
+        const beamPosX: number = this.x - this.width + 15
+        const beamPosY: number = this.y - this.height
+
+        this.beam = new Beam(this.scene, beamPosX, beamPosY)
+
         log("constructed")
     }
 
     public update(time: number, delta: number) {
-        log("updating")
-
         const gunPosX: number = this.x + this.width - 15
         const gunPosY: number = this.y - this.height
 
@@ -78,14 +81,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
             this.setAccelerationX(0)
         }
 
-        if (this.controller.actionLB!.isUniquelyDown()) {
-            this.beam = new Beam(this.scene, beamPosX, beamPosY)
-        } else if (this.controller.actionLB!.isDown()) {
+        if (this.controller.actionLB!.isDown()) {
             this.beam.update(time, delta)
             this.beam.x = beamPosX
             this.beam.y = beamPosY
         } else if (this.beam) {
-            this.beam.destroy()
+            this.beam.elements.clear(true, true)
         }
 
         if (this.controller.actionRB!.isUniquelyDown()) {
@@ -93,8 +94,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
             this.projectiles.add(pProj)
             pProj.setVelocityY(-1050)
         }
-
-        log("updated")
     }
 
     public destroyProjectilesOnCollisionWith(boundary: Phaser.Physics.Arcade.Sprite) {
@@ -104,6 +103,20 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
             (collidedBoundary: Phaser.Physics.Arcade.Sprite, playerProjectile: Phaser.Physics.Arcade.Sprite) => {
                 if (collidedBoundary.body.bottom >= playerProjectile.body.bottom) {
                     playerProjectile.destroy()
+                }
+            },
+            undefined,
+            this
+        )
+    }
+
+    public destroyBeamOnCollisionWith(boundary: Phaser.Physics.Arcade.Sprite) {
+        this.scene.physics.add.overlap(
+            this.beam.elements,
+            boundary,
+            (collidedBoundary: Phaser.Physics.Arcade.Sprite, beamElem: Phaser.Physics.Arcade.Sprite) => {
+                if (collidedBoundary.body.bottom >= beamElem.body.top) {
+                    this.beam.elements.clear(true, true)
                 }
             },
             undefined,

@@ -35,12 +35,8 @@ export class BeamElement extends Phaser.GameObjects.Rectangle {
     }
 
     public update() {
-        log("updating")
-
         if (this.body.touching) {
             log(`touching: ${this.body.touching}`)
         }
-
-        log("updated")
     }
 }
