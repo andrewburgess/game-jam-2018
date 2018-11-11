@@ -3,7 +3,7 @@ import { clamp } from "lodash"
 import * as Phaser from "phaser"
 
 import { BLOCK_SIZE, Block } from "../entities/Block"
-import { Piece, createPiece } from "../entities/Piece"
+import { Direction, Piece, createPiece } from "../entities/Piece"
 
 import { Scenes } from "./"
 
@@ -11,12 +11,6 @@ const log = debug(`game:scenes:${Scenes.Game}`)
 
 export interface IGameInitialization {
     level: number
-}
-
-enum Direction {
-    DOWN,
-    LEFT,
-    RIGHT
 }
 
 export default class Game extends Phaser.Scene {
@@ -55,15 +49,6 @@ export default class Game extends Phaser.Scene {
      * @memberof Game
      */
     private level: number
-
-    /**
-     * Direction the current piece is moving
-     *
-     * @private
-     * @type {Direction.RIGHT}
-     * @memberof Game
-     */
-    private pieceDirection: Direction
 
     constructor(inKey: string = Scenes.Game) {
         super({
@@ -126,6 +111,10 @@ export default class Game extends Phaser.Scene {
         this.createNewFallingPiece()
     }
 
+    public update(time: number, delta: number) {
+        log(`time: ${time}, delta: ${delta}`)
+    }
+
     private createNewFallingPiece() {
         log("createNewFallingPiece")
 
@@ -135,7 +124,6 @@ export default class Game extends Phaser.Scene {
 
         this.currentPiece = piece
         this.currentPiece.setGravity(false)
-        this.pieceDirection = Direction.RIGHT
 
         this.currentTween = this.tweens.add({
             completeDelay: 100,
@@ -170,17 +158,19 @@ export default class Game extends Phaser.Scene {
                                 this.cameras.main.width - BLOCK_SIZE / 2
 
                             if (
-                                (touchingLeft && this.pieceDirection === Direction.LEFT) ||
-                                (touchingRight && this.pieceDirection === Direction.RIGHT)
+                                (touchingLeft && this.currentPiece.direction === Direction.LEFT) ||
+                                (touchingRight && this.currentPiece.direction === Direction.RIGHT)
                             ) {
-                                this.pieceDirection = Direction.DOWN
+                                this.currentPiece.direction = Direction.DOWN
                             }
 
-                            if (this.pieceDirection === Direction.DOWN) {
+                            if (this.currentPiece.direction === Direction.DOWN) {
                                 return value
                             }
 
-                            return this.pieceDirection === Direction.LEFT ? value - BLOCK_SIZE : value + BLOCK_SIZE
+                            return this.currentPiece.direction === Direction.LEFT
+                                ? value - BLOCK_SIZE
+                                : value + BLOCK_SIZE
                         },
                         getStart: (target: Piece, key: string) => {
                             return target[key]
@@ -191,12 +181,12 @@ export default class Game extends Phaser.Scene {
                     duration: this.getMoveDuration(),
                     ease: "Power1",
                     getEnd: (target: Piece, key: string, value: number) => {
-                        if (this.pieceDirection !== Direction.DOWN) {
+                        if (this.currentPiece.direction !== Direction.DOWN) {
                             return value
                         }
 
                         const touchingLeft = this.currentPiece.x <= BLOCK_SIZE + BLOCK_SIZE / 2
-                        this.pieceDirection = touchingLeft ? Direction.RIGHT : Direction.LEFT
+                        this.currentPiece.direction = touchingLeft ? Direction.RIGHT : Direction.LEFT
 
                         return value + BLOCK_SIZE
                     },
