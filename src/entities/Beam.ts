@@ -7,48 +7,32 @@ import { Piece } from "./Piece"
 
 const log = debug("game:entities:Beam")
 
+const BEAM_UPDATE_DELTA = 100.0
+
+export interface IBeamUpdateResult {
+    resourcesConsumed: number
+}
+
 export class Beam extends Phaser.GameObjects.Container {
     public elements: Phaser.Physics.Arcade.Group
-    public delta: number
     public latched: boolean
     public scene: Phaser.Scene
     private beamTop: BeamElement
     private latchedTo: Piece
+    private updateDelta: number
 
     constructor(scene: Phaser.Scene, x: number, y: number) {
         log("constructing")
 
         super(scene, x, y)
         this.scene = scene
-        this.delta = 0.0
+
+        this.updateDelta = 0.0
+
         this.elements = new Phaser.Physics.Arcade.Group(this.scene.physics.world, this.scene)
         this.scene.add.existing(this)
 
         log("constructed")
-    }
-
-    public getElements(): BeamElement[] {
-        return this.getAll() as BeamElement[]
-    }
-
-    public update(time: number, delta: number) {
-        this.delta += delta
-
-        // TODO(tristan): maybe give piece ship velocity if let go in mid-space?
-        if (this.delta > 100.0) {
-            if (this.latched) {
-                this.retractBeam()
-            } else {
-                this.extendBeam()
-            }
-            this.delta = 0.0
-        }
-
-        if (this.latched) {
-            const latchAlignOffsetX: number = this.x - this.latchedTo.width / 2 + BEAM_ELEMENT_WIDTH / 2
-            const latchAlignOffsetY: number = this.y - this.height - this.latchedTo.height / 2 - BEAM_ELEMENT_HEIGHT / 2
-            this.latchedTo.setPosition(latchAlignOffsetX, latchAlignOffsetY)
-        }
     }
 
     public addPieceLatchChecks(piece: Piece) {
@@ -64,6 +48,52 @@ export class Beam extends Phaser.GameObjects.Container {
             undefined,
             this
         )
+    }
+
+    public destroyOnCollisionWith(boundary: Phaser.Physics.Arcade.Sprite) {
+        this.scene.physics.add.overlap(
+            this.elements,
+            boundary,
+            (collidedBoundary: Phaser.Physics.Arcade.Sprite, beamElem: Phaser.Physics.Arcade.Sprite) => {
+                if (collidedBoundary.body.bottom >= beamElem.body.top) {
+                    // TODO(tristan): breakage animation?
+                    this.elements.clear(true, true)
+                }
+            },
+            undefined,
+            this
+        )
+    }
+
+    public getElements(): BeamElement[] {
+        return this.getAll() as BeamElement[]
+    }
+
+    public update(time: number, delta: number): IBeamUpdateResult {
+        const updateResult: IBeamUpdateResult = {
+            resourcesConsumed: 0
+        }
+
+        this.updateDelta += delta
+
+        // TODO(tristan): maybe give piece ship velocity if let go in mid-space?
+        if (this.updateDelta > BEAM_UPDATE_DELTA) {
+            if (this.latched) {
+                this.retractBeam()
+            } else {
+                this.extendBeam()
+                updateResult.resourcesConsumed++
+            }
+            this.updateDelta = 0.0
+        }
+
+        if (this.latched) {
+            const latchAlignOffsetX: number = this.x - this.latchedTo.width / 2 + BEAM_ELEMENT_WIDTH / 2
+            const latchAlignOffsetY: number = this.y - this.height - this.latchedTo.height / 2 - BEAM_ELEMENT_HEIGHT / 2
+            this.latchedTo.setPosition(latchAlignOffsetX, latchAlignOffsetY)
+        }
+
+        return updateResult
     }
 
     private extendBeam() {
@@ -90,8 +120,6 @@ export class Beam extends Phaser.GameObjects.Container {
 
         this.elements.add(beamElem)
         beamElem.body.setAllowGravity(false)
-
-        this.delta = 0.0
     }
 
     private retractBeam() {

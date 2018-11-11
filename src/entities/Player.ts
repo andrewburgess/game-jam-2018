@@ -4,15 +4,22 @@ import * as Phaser from "phaser"
 import UnifiedController from "../GameInput"
 
 import { Assets } from "../assets"
-import { Beam } from "../entities/Beam"
-import { Projectile } from "../entities/Projectile"
+import { Beam, IBeamUpdateResult } from "../entities/Beam"
+import { Projectiles } from "../entities/Projectiles"
 
 const log = debug("game:entities:Player")
 
+const BEAM_RESOURCES_LIMIT = 50
+const BEAM_RESOURCES_TEXT = "Beam Resources: "
+const BEAM_RESOURCE_GEN_DELTA = 500.0
+
 export class Player extends Phaser.Physics.Arcade.Sprite {
-    public projectiles: Phaser.Physics.Arcade.Group
+    public projectiles: Projectiles
     public beam: Beam
     private controller: UnifiedController
+    private beamResourcesText: Phaser.GameObjects.Text
+    private beamResources: number
+    private beamResourceGenDelta: number
 
     constructor(scene: Phaser.Scene, x: number, y: number) {
         log("constructing")
@@ -27,8 +34,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         this.setScale(3)
         this.setMaxVelocity(550)
         this.setCollideWorldBounds(true)
-
-        this.projectiles = this.scene.physics.add.group({})
 
         this.scene.add.particles(Assets.ParticleEngineThrust).createEmitter({
             angle: 90,
@@ -61,17 +66,28 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         const beamPosX: number = this.x - this.width + 15
         const beamPosY: number = this.y - this.height
 
+        // TODO(tristan): beam resource UI and update system
         this.beam = new Beam(this.scene, beamPosX, beamPosY)
+
+        this.beamResourceGenDelta = 0.0
+        this.beamResources = BEAM_RESOURCES_LIMIT
+        this.beamResourcesText = this.scene.add.text(5, 5, BEAM_RESOURCES_TEXT + this.beamResources)
+
+        this.projectiles = new Projectiles(this.scene, this.width - 15, -this.height)
 
         log("constructed")
     }
 
     public update(time: number, delta: number) {
-        const gunPosX: number = this.x + this.width - 15
-        const gunPosY: number = this.y - this.height
+        this.beamResourceGenDelta += delta
 
         const beamPosX: number = this.x - this.width + 15
         const beamPosY: number = this.y - this.height
+
+        if (this.beamResourceGenDelta > BEAM_RESOURCE_GEN_DELTA) {
+            this.beamResources = Math.min(this.beamResources + 1, BEAM_RESOURCES_LIMIT)
+            this.beamResourceGenDelta = 0
+        }
 
         if (this.controller.left!.isDown()) {
             this.setAccelerationX(this.controller.left!.getMagnitude() * -1500)
@@ -82,7 +98,13 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         }
 
         if (this.controller.actionLB!.isDown()) {
-            this.beam.update(time, delta)
+            if (this.beamResources > 0) {
+                const updateResult: IBeamUpdateResult = this.beam.update(time, delta)
+                this.beamResources -= updateResult.resourcesConsumed
+            } else {
+                // TODO(tristan): breakgae animation?
+                this.beam.elements.clear(true, true)
+            }
             this.beam.x = beamPosX
             this.beam.y = beamPosY
         } else if (this.beam) {
@@ -91,38 +113,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         }
 
         if (this.controller.actionRB!.isUniquelyDown()) {
-            const pProj: Projectile = new Projectile(this.scene, gunPosX, gunPosY)
-            this.projectiles.add(pProj)
-            pProj.setVelocityY(-1050)
+            this.projectiles.createProjectile(this.x, this.y, 0, -1050)
         }
-    }
 
-    public destroyProjectilesOnCollisionWith(boundary: Phaser.Physics.Arcade.Sprite) {
-        this.scene.physics.add.overlap(
-            this.projectiles,
-            boundary,
-            (collidedBoundary: Phaser.Physics.Arcade.Sprite, playerProjectile: Phaser.Physics.Arcade.Sprite) => {
-                if (collidedBoundary.body.bottom >= playerProjectile.body.bottom) {
-                    playerProjectile.destroy()
-                }
-            },
-            undefined,
-            this
-        )
-    }
-
-    public destroyBeamOnCollisionWith(boundary: Phaser.Physics.Arcade.Sprite) {
-        this.scene.physics.add.overlap(
-            this.beam.elements,
-            boundary,
-            (collidedBoundary: Phaser.Physics.Arcade.Sprite, beamElem: Phaser.Physics.Arcade.Sprite) => {
-                if (collidedBoundary.body.bottom >= beamElem.body.top) {
-                    // TODO(tristan): breakage animation?
-                    this.beam.elements.clear(true, true)
-                }
-            },
-            undefined,
-            this
-        )
+        this.beamResourcesText.text = BEAM_RESOURCES_TEXT + this.beamResources
     }
 }
