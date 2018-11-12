@@ -8,7 +8,6 @@ export const BLOCK_SIZE = 32
 const log = debug("game:entities:Block")
 
 export class Block extends Phaser.GameObjects.Rectangle {
-    public body: Phaser.Physics.Arcade.Body
     public piece: Piece
 
     private color: Phaser.Display.Color
@@ -28,16 +27,6 @@ export class Block extends Phaser.GameObjects.Rectangle {
 
         this.type = "Block"
 
-        this.scene.physics.add.existing(this)
-        this.body.setCollideWorldBounds(true)
-        this.body.onCollide = true
-
         log("constructed")
-    }
-
-    public update() {
-        if (this.body.touching) {
-            log(`touching: ${this.body.touching}`)
-        }
     }
 }

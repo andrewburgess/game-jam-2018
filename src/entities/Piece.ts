@@ -1,12 +1,12 @@
 import * as debug from "debug"
-import { each, isUndefined, sample } from "lodash"
+import { isUndefined, sample } from "lodash"
 import * as Phaser from "phaser"
 
 import { BLOCK_SIZE, Block } from "./Block"
 
 const log = debug("game:entities:Piece")
 
-export enum Direction {
+export enum MoveState {
     DOWN,
     LEFT,
     RIGHT,
@@ -23,26 +23,31 @@ export enum Shape {
     Z
 }
 
+export interface IPieceConfiguration {
+    level?: number
+    shape?: Shape
+}
+
 const ShapeValues = Object.keys(Shape)
     .map((n) => Number.parseInt(n, 10))
     .filter((n) => !Number.isNaN(n))
 
 export class Piece extends Phaser.GameObjects.Container {
-    public blocks: Phaser.Physics.Arcade.Group
-    public direction: Direction
     public scene: Phaser.Scene
 
-    protected color: Phaser.Display.Color
-    protected shape: Shape
+    private color: Phaser.Display.Color
+    private level: number
+    private moveState: MoveState
+    private shape: Shape
 
-    constructor(scene: Phaser.Scene, x: number, y: number, shape: Shape, direction: Direction) {
+    constructor(scene: Phaser.Scene, x: number, y: number, config: IPieceConfiguration) {
         super(scene, x, y)
-        this.direction = direction
+        this.moveState = MoveState.DOWN
+        this.level = config.level || 1
         this.scene = scene
-        this.shape = shape
+        this.shape = config.shape || Shape.I
 
         this.build()
-        this.setupPhysics()
 
         log("constructed")
     }
@@ -51,18 +56,8 @@ export class Piece extends Phaser.GameObjects.Container {
         return this.getAll() as Block[]
     }
 
-    public setGravity(enabled: boolean) {
-        each(this.getBlocks(), (block) => block.body.setAllowGravity(enabled))
-    }
-
-    public update(time: number, delta: number) {
-        const blocks = this.getBlocks()
-        log("update")
-        for (const block of blocks) {
-            if (block.body.touching.none === false) {
-                log("woah")
-            }
-        }
+    public onActivate() {
+        log("onActivate")
     }
 
     private build() {
@@ -134,24 +129,18 @@ export class Piece extends Phaser.GameObjects.Container {
                 throw new TypeError(`unknown piece shape ${this.shape}`)
         }
     }
-
-    private setupPhysics() {
-        this.blocks = new Phaser.Physics.Arcade.Group(this.scene.physics.world, this.scene)
-        this.blocks.addMultiple(this.getBlocks())
-    }
 }
 
-export function createPiece(scene: Phaser.Scene, x: number, y: number, shape?: Shape, direction?: Direction) {
+export function createPiece(scene: Phaser.Scene, x: number, y: number, config: IPieceConfiguration = {}) {
     let index: number
-    if (isUndefined(shape)) {
+    if (isUndefined(config.shape)) {
         index = sample(ShapeValues)!
     } else {
-        index = shape
+        index = config.shape
     }
 
-    if (isUndefined(direction)) {
-        direction = Direction.RIGHT
-    }
-
-    return new Piece(scene, x, y, index as Shape, direction)
+    return new Piece(scene, x, y, {
+        level: config.level,
+        shape: index as Shape
+    })
 }

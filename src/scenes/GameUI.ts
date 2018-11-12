@@ -21,11 +21,6 @@ export default class GameUI extends Phaser.Scene {
 
         const pieceOutline = this.add.graphics()
         pieceOutline.lineStyle(2, 0xff0000, 1)
-        pieceOutline.strokeRect(
-            this.cameras.main.width / 2 - BLOCK_SIZE * 3,
-            BLOCK_SIZE / 4,
-            BLOCK_SIZE * 5,
-            BLOCK_SIZE * 2 + BLOCK_SIZE / 2
-        )
+        pieceOutline.strokeRect(BLOCK_SIZE / 2, BLOCK_SIZE * 3, BLOCK_SIZE * 4, 2)
     }
 }

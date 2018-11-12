@@ -1,9 +1,10 @@
 import * as debug from "debug"
-import { clamp } from "lodash"
+import { each, range } from "lodash"
 import * as Phaser from "phaser"
 
-import { BLOCK_SIZE, Block } from "../entities/Block"
-import { Direction, Piece, createPiece } from "../entities/Piece"
+import { BLOCK_SIZE } from "../entities/Block"
+import { Board, BOARD_WIDTH, BOARD_HEIGHT } from "../entities/Board"
+import { Piece, createPiece } from "../entities/Piece"
 
 import { Scenes } from "./"
 
@@ -14,32 +15,16 @@ export interface IGameInitialization {
 }
 
 export default class Game extends Phaser.Scene {
+    private board: Board
+
     /**
      * The currently falling piece.
      *
-     * @protected
+     * @private
      * @type {Piece}
      * @memberof Game
      */
-    protected currentPiece: Piece
-
-    /**
-     * All individual blocks on the game board
-     *
-     * @private
-     * @type {Phaser.Physics.Arcade.Group}
-     * @memberof Game
-     */
-    private blocks: Phaser.Physics.Arcade.Group
-
-    /**
-     * Current piece tween
-     *
-     * @private
-     * @type {Phaser.Tweens.Tween}
-     * @memberof Game
-     */
-    private currentTween: Phaser.Tweens.Tween
+    private currentPiece?: Piece
 
     /**
      * The level number (at least 1), which influences how fast pieces move
@@ -50,12 +35,21 @@ export default class Game extends Phaser.Scene {
      */
     private level: number
 
+    /**
+     * The next piece to spawn
+     *
+     * @private
+     * @type {Piece}
+     * @memberof Game
+     */
+    private nextPiece?: Piece
+
     constructor(inKey: string = Scenes.Game) {
         super({
             key: inKey,
             physics: {
                 arcade: {
-                    // debug: true,
+                    debug: true,
                     gravity: { y: 300 }
                 }
             }
@@ -65,143 +59,84 @@ export default class Game extends Phaser.Scene {
     }
 
     public create(config: IGameInitialization) {
-        log("create")
+        log(`create level ${config.level}`)
 
-        // this.physics.world.setBounds(0, 0, this.cameras.main.width, this.cameras.main.height, false, false, false, true)
-        this.blocks = this.physics.add.group({
-            bounceX: 0.5,
-            bounceY: 0.5,
-            collideWorldBounds: true
-        })
-        this.physics.add.collider(this.blocks, this.blocks)
-
+        this.board = new Board()
         this.level = config.level
 
-        const test = createPiece(this, BLOCK_SIZE * 4, BLOCK_SIZE * 6)
-        this.add.existing(test)
-        this.blocks.addMultiple(test.getBlocks())
-        test.setGravity(false)
+        if (window.localStorage && window.localStorage.getItem("debug")) {
+            this.drawBoard()
+        }
 
-        this.physics.world.on(
-            "collide",
-            (main: Phaser.GameObjects.GameObject, other: Phaser.GameObjects.GameObject) => {
-                if (main.type === "Block" && other.type === "Block") {
-                    const block = main as Block
-                    const otherBlock = other as Block
+        this.spawnNextPiece()
+    }
 
-                    if (block.piece !== otherBlock.piece) {
-                        let firstX = block.piece.x / BLOCK_SIZE
-                        if (Math.round(firstX) > firstX) {
-                            firstX = firstX + 1
-                        }
-
-                        let secondX = otherBlock.piece.x / BLOCK_SIZE
-                        if (Math.round(secondX) > secondX) {
-                            secondX = secondX + 1
-                        }
-
-                        block.piece.setPosition(Math.floor(firstX) * BLOCK_SIZE, block.piece.y)
-                        otherBlock.piece.setPosition(Math.floor(secondX) * BLOCK_SIZE, otherBlock.piece.y)
-                        this.currentTween.pause()
-                    }
-                }
-            }
-        )
-
-        this.createNewFallingPiece()
+    public getLevel() {
+        return this.level
     }
 
     public update(time: number, delta: number) {
-        log(`time: ${time}, delta: ${delta}`)
-    }
-
-    private createNewFallingPiece() {
-        log("createNewFallingPiece")
-
-        const piece = createPiece(this, BLOCK_SIZE * 4, BLOCK_SIZE)
-        this.add.existing(piece)
-        this.blocks.addMultiple(piece.getBlocks())
-
-        this.currentPiece = piece
-        this.currentPiece.setGravity(false)
-
-        this.currentTween = this.tweens.add({
-            completeDelay: 100,
-            delay: 1000,
-            onComplete: () => this.createTween(),
-            props: {
-                y: {
-                    duration: this.getMoveDuration(),
-                    ease: "Power1",
-                    value: BLOCK_SIZE * 4
-                }
-            },
-            targets: this.currentPiece
-        })
-    }
-
-    private createTween() {
-        if (this.currentTween) {
-            this.currentTween.stop()
+        if (!this.currentPiece) {
+            return
         }
 
-        this.currentTween = this.tweens.add({
-            props: {
-                x: {
-                    duration: this.getMoveDuration(),
-                    ease: "Power1",
-                    value: {
-                        getEnd: (target: Piece, key: string, value: number) => {
-                            const touchingLeft = this.currentPiece.x <= BLOCK_SIZE + BLOCK_SIZE / 2
-                            const touchingRight =
-                                this.currentPiece.x + this.currentPiece.width >=
-                                this.cameras.main.width - BLOCK_SIZE / 2
-
-                            if (
-                                (touchingLeft && this.currentPiece.direction === Direction.LEFT) ||
-                                (touchingRight && this.currentPiece.direction === Direction.RIGHT)
-                            ) {
-                                this.currentPiece.direction = Direction.DOWN
-                            }
-
-                            if (this.currentPiece.direction === Direction.DOWN) {
-                                return value
-                            }
-
-                            return this.currentPiece.direction === Direction.LEFT
-                                ? value - BLOCK_SIZE
-                                : value + BLOCK_SIZE
-                        },
-                        getStart: (target: Piece, key: string) => {
-                            return target[key]
-                        }
-                    }
-                },
-                y: {
-                    duration: this.getMoveDuration(),
-                    ease: "Power1",
-                    getEnd: (target: Piece, key: string, value: number) => {
-                        if (this.currentPiece.direction !== Direction.DOWN) {
-                            return value
-                        }
-
-                        const touchingLeft = this.currentPiece.x <= BLOCK_SIZE + BLOCK_SIZE / 2
-                        this.currentPiece.direction = touchingLeft ? Direction.RIGHT : Direction.LEFT
-
-                        return value + BLOCK_SIZE
-                    },
-                    getStart: (target: Piece, key: string) => {
-                        return target[key]
-                    }
-                }
-            },
-            repeat: -1,
-            repeatDelay: 10,
-            targets: this.currentPiece
-        })
+        this.currentPiece.update(time, delta)
     }
 
-    private getMoveDuration() {
-        return clamp(1000 / (this.level / 1.5), 10, 600)
+    private activateNextPiece() {
+        log("activate next piece")
+
+        if (!this.nextPiece) {
+            throw new Error("no next piece?")
+        }
+
+        this.currentPiece = this.nextPiece
+        if (!this.board.canPieceMoveTo(this.currentPiece, 0, 0)) {
+            // The player loses!
+            log("you loser")
+            throw new Error("loser loser loser")
+        }
+
+        this.currentPiece.onActivate()
+
+        setTimeout(() => {
+            this.spawnNextPiece()
+        }, 1000)
+    }
+
+    private spawnNextPiece() {
+        log("spawn next piece")
+
+        this.nextPiece = createPiece(this, BLOCK_SIZE, BLOCK_SIZE, {
+            level: this.level
+        })
+        this.add.existing(this.nextPiece)
+    }
+
+    private drawBoard() {
+        each(range(BOARD_WIDTH), (x) =>
+            this.add.line(
+                BLOCK_SIZE / 2,
+                this.cameras.main.height / 2,
+                x * BLOCK_SIZE,
+                0,
+                x * BLOCK_SIZE,
+                this.cameras.main.height,
+                0xff0000,
+                0.3
+            )
+        )
+        each(range(BOARD_HEIGHT), (y) =>
+            this.add.line(
+                this.cameras.main.width / 2,
+                BLOCK_SIZE / 2,
+                0,
+                y * BLOCK_SIZE,
+                this.cameras.main.width,
+                y * BLOCK_SIZE,
+                0xff0000,
+                0.3
+            )
+        )
     }
 }
