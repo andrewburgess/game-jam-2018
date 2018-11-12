@@ -173,10 +173,21 @@ export class Piece extends Phaser.GameObjects.Container {
                 break
         }
 
-        if (!this.scene.board.canPieceMoveTo(this, newLocation.x, newLocation.y)) {
+        const canMoveToNewLocation = this.scene.board.canPieceMoveTo(this, newLocation.x, newLocation.y)
+
+        if (!canMoveToNewLocation && direction === Direction.DOWN) {
+            // If we can't move and we also can't move down anymore, then it is considered "settled", and we can
+            // activate the next piece on the board
             this.tween.stop()
             this.scene.onPieceSettled()
             return
+        }
+
+        if (!canMoveToNewLocation) {
+            // We can't move our piece left or right anymore, so let's switch the direction, but force the piece to
+            // move down one block
+            this.direction = direction === Direction.LEFT ? Direction.RIGHT : Direction.LEFT
+            return this.movePiece(Direction.DOWN)
         }
 
         log(`move piece ${this.shape} ${newLocation.x},${newLocation.y}`)
