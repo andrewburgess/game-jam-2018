@@ -3,7 +3,7 @@ import { each, range } from "lodash"
 import * as Phaser from "phaser"
 
 import { BLOCK_SIZE } from "../entities/Block"
-import { Board, BOARD_WIDTH, BOARD_HEIGHT } from "../entities/Board"
+import { BOARD_HEIGHT, BOARD_WIDTH, Board } from "../entities/Board"
 import { Piece, createPiece } from "../entities/Piece"
 
 import { Scenes } from "./"
@@ -15,7 +15,7 @@ export interface IGameInitialization {
 }
 
 export default class Game extends Phaser.Scene {
-    private board: Board
+    public board: Board
 
     /**
      * The currently falling piece.
@@ -69,18 +69,14 @@ export default class Game extends Phaser.Scene {
         }
 
         this.spawnNextPiece()
+
+        setTimeout(() => {
+            this.activateNextPiece()
+        }, 1500)
     }
 
     public getLevel() {
         return this.level
-    }
-
-    public update(time: number, delta: number) {
-        if (!this.currentPiece) {
-            return
-        }
-
-        this.currentPiece.update(time, delta)
     }
 
     private activateNextPiece() {
@@ -101,7 +97,7 @@ export default class Game extends Phaser.Scene {
 
         setTimeout(() => {
             this.spawnNextPiece()
-        }, 1000)
+        }, 2000)
     }
 
     private spawnNextPiece() {
@@ -114,26 +110,26 @@ export default class Game extends Phaser.Scene {
     }
 
     private drawBoard() {
-        each(range(BOARD_WIDTH), (x) =>
+        each(range(BOARD_WIDTH + 1), (x) =>
             this.add.line(
                 BLOCK_SIZE / 2,
                 this.cameras.main.height / 2,
                 x * BLOCK_SIZE,
-                0,
+                BLOCK_SIZE * 2,
                 x * BLOCK_SIZE,
-                this.cameras.main.height,
-                0xff0000,
+                this.cameras.main.height - BLOCK_SIZE,
+                0x0000ff,
                 0.3
             )
         )
-        each(range(BOARD_HEIGHT), (y) =>
+        each(range(BOARD_HEIGHT + 1), (y) =>
             this.add.line(
                 this.cameras.main.width / 2,
-                BLOCK_SIZE / 2,
                 0,
-                y * BLOCK_SIZE,
+                0,
+                BLOCK_SIZE * 3 + BLOCK_SIZE / 2 + y * BLOCK_SIZE,
                 this.cameras.main.width,
-                y * BLOCK_SIZE,
+                BLOCK_SIZE * 3 + BLOCK_SIZE / 2 + y * BLOCK_SIZE,
                 0xff0000,
                 0.3
             )

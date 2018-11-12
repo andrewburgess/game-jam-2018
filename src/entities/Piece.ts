@@ -1,16 +1,17 @@
 import * as debug from "debug"
-import { isUndefined, sample } from "lodash"
+import { clamp, isUndefined, sample } from "lodash"
 import * as Phaser from "phaser"
+
+import Game from "../scenes/Game"
 
 import { BLOCK_SIZE, Block } from "./Block"
 
 const log = debug("game:entities:Piece")
 
-export enum MoveState {
-    DOWN,
+export enum Direction {
     LEFT,
-    RIGHT,
-    UP
+    DOWN,
+    RIGHT
 }
 
 export enum Shape {
@@ -33,16 +34,17 @@ const ShapeValues = Object.keys(Shape)
     .filter((n) => !Number.isNaN(n))
 
 export class Piece extends Phaser.GameObjects.Container {
-    public scene: Phaser.Scene
+    public location: Phaser.Math.Vector2
+    public scene: Game
 
     private color: Phaser.Display.Color
+    private direction: Direction
     private level: number
-    private moveState: MoveState
     private shape: Shape
+    private tween: Phaser.Tweens.Tween
 
-    constructor(scene: Phaser.Scene, x: number, y: number, config: IPieceConfiguration) {
+    constructor(scene: Game, x: number, y: number, config: IPieceConfiguration) {
         super(scene, x, y)
-        this.moveState = MoveState.DOWN
         this.level = config.level || 1
         this.scene = scene
         this.shape = config.shape || Shape.I
@@ -58,6 +60,22 @@ export class Piece extends Phaser.GameObjects.Container {
 
     public onActivate() {
         log("onActivate")
+
+        this.direction = Direction.RIGHT
+        this.location = new Phaser.Math.Vector2(0, 0)
+
+        // Tween to start position
+        this.tween = this.scene.tweens.add({
+            onComplete: this.movePiece.bind(this),
+            props: {
+                y: {
+                    duration: this.getMoveDuration(),
+                    ease: "Quad.easeInOut",
+                    value: this.y + BLOCK_SIZE * 3
+                }
+            },
+            targets: this
+        })
     }
 
     private build() {
@@ -129,9 +147,74 @@ export class Piece extends Phaser.GameObjects.Container {
                 throw new TypeError(`unknown piece shape ${this.shape}`)
         }
     }
+
+    private getMoveDuration() {
+        return clamp(1000 / (this.level / 1.5), 10, 600)
+    }
+
+    private movePiece(direction?: Direction) {
+        this.tween.stop()
+
+        if (isUndefined(direction)) {
+            direction = this.direction
+        }
+
+        const newLocation = new Phaser.Math.Vector2(this.location.x, this.location.y)
+        switch (direction) {
+            case Direction.DOWN:
+                newLocation.y++
+                break
+            case Direction.LEFT:
+                newLocation.x--
+                break
+            case Direction.RIGHT:
+                newLocation.x++
+                break
+        }
+
+        if (!this.scene.board.canPieceMoveTo(this, newLocation.x, newLocation.y)) {
+            log("can't move")
+            return
+        }
+
+        this.tween = this.scene.tweens.add({
+            onComplete: this.onMoveComplete.bind(this, newLocation),
+            props: {
+                x: {
+                    duration: this.getMoveDuration(),
+                    ease: "Quad.easeInOut",
+                    value: `+=${(newLocation.x - this.location.x) * BLOCK_SIZE}`
+                },
+                y: {
+                    duration: this.getMoveDuration(),
+                    ease: "Quad.easeInOut",
+                    value: `+=${(newLocation.y - this.location.y) * BLOCK_SIZE}`
+                }
+            },
+            targets: this
+        })
+    }
+
+    private onMoveComplete(newLocation: Phaser.Math.Vector2) {
+        log("on move complete")
+
+        this.scene.board.updateLocation(this, this.location, newLocation)
+        this.location.x = newLocation.x
+        this.location.y = newLocation.y
+
+        if (this.direction === Direction.LEFT && this.scene.board.touchingLeft(this)) {
+            this.direction = Direction.RIGHT
+            this.movePiece(Direction.DOWN)
+        } else if (this.direction === Direction.RIGHT && this.scene.board.touchingRight(this)) {
+            this.direction = Direction.LEFT
+            this.movePiece(Direction.DOWN)
+        } else {
+            this.movePiece()
+        }
+    }
 }
 
-export function createPiece(scene: Phaser.Scene, x: number, y: number, config: IPieceConfiguration = {}) {
+export function createPiece(scene: Game, x: number, y: number, config: IPieceConfiguration = {}) {
     let index: number
     if (isUndefined(config.shape)) {
         index = sample(ShapeValues)!
