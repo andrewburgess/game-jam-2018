@@ -66,7 +66,10 @@ export class Piece extends Phaser.GameObjects.Container {
 
         // Tween to start position
         this.tween = this.scene.tweens.add({
-            onComplete: this.movePiece.bind(this),
+            onComplete: () => {
+                this.scene.onPieceActivated()
+                this.movePiece()
+            },
             props: {
                 y: {
                     duration: this.getMoveDuration(),
@@ -153,8 +156,6 @@ export class Piece extends Phaser.GameObjects.Container {
     }
 
     private movePiece(direction?: Direction) {
-        this.tween.stop()
-
         if (isUndefined(direction)) {
             direction = this.direction
         }
@@ -173,12 +174,15 @@ export class Piece extends Phaser.GameObjects.Container {
         }
 
         if (!this.scene.board.canPieceMoveTo(this, newLocation.x, newLocation.y)) {
-            log("can't move")
+            this.tween.stop()
+            this.scene.onPieceSettled()
             return
         }
 
+        log(`move piece ${this.shape} ${newLocation.x},${newLocation.y}`)
+
         this.tween = this.scene.tweens.add({
-            onComplete: this.onMoveComplete.bind(this, newLocation),
+            onComplete: () => this.onMoveComplete(newLocation),
             props: {
                 x: {
                     duration: this.getMoveDuration(),

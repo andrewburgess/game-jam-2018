@@ -4,11 +4,13 @@ import * as Phaser from "phaser"
 
 import { BLOCK_SIZE } from "../entities/Block"
 import { BOARD_HEIGHT, BOARD_WIDTH, Board } from "../entities/Board"
-import { Piece, createPiece } from "../entities/Piece"
+import { Piece, Shape, createPiece } from "../entities/Piece"
 
 import { Scenes } from "./"
 
 const log = debug(`game:scenes:${Scenes.Game}`)
+
+const list: Shape[] = []
 
 export interface IGameInitialization {
     level: number
@@ -79,6 +81,14 @@ export default class Game extends Phaser.Scene {
         return this.level
     }
 
+    public onPieceActivated() {
+        this.spawnNextPiece()
+    }
+
+    public onPieceSettled() {
+        this.activateNextPiece()
+    }
+
     private activateNextPiece() {
         log("activate next piece")
 
@@ -94,17 +104,14 @@ export default class Game extends Phaser.Scene {
         }
 
         this.currentPiece.onActivate()
-
-        setTimeout(() => {
-            this.spawnNextPiece()
-        }, 2000)
     }
 
     private spawnNextPiece() {
         log("spawn next piece")
 
         this.nextPiece = createPiece(this, BLOCK_SIZE, BLOCK_SIZE, {
-            level: this.level
+            level: this.level,
+            shape: list.length > 0 ? list.shift() : undefined
         })
         this.add.existing(this.nextPiece)
     }
