@@ -12,13 +12,12 @@ import MovementTest from "./scenes/MovementTest"
 
 const GameConfiguration: GameConfig = {
     backgroundColor: "#6495ED",
-    height: BLOCK_SIZE * (BOARD_HEIGHT + 1),
+    height: BLOCK_SIZE * BOARD_HEIGHT + 150,
     input: {
         gamepad: true
     },
     scene: [Loading, Menu, BeamTest, BlocksTest, MovementTest, Game, GameUI],
-    type: Phaser.CANVAS,
-    width: BLOCK_SIZE * BOARD_WIDTH
+    width: BLOCK_SIZE * BOARD_WIDTH + BLOCK_SIZE
 }
 
 const start = () => new Phaser.Game(GameConfiguration)
