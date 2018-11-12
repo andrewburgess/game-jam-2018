@@ -7,7 +7,6 @@ import Game from "./scenes/Game"
 import GameUI from "./scenes/GameUI"
 import Loading from "./scenes/Loading"
 import Menu from "./scenes/Menu"
-import MovementTest from "./scenes/MovementTest"
 
 const GameConfiguration: GameConfig = {
     backgroundColor: "#6495ED",
@@ -15,7 +14,7 @@ const GameConfiguration: GameConfig = {
     input: {
         gamepad: true
     },
-    scene: [Loading, Menu, BeamTest, MovementTest, Game, GameUI],
+    scene: [Loading, Menu, BeamTest, Game, GameUI],
     width: BLOCK_SIZE * BOARD_WIDTH + BLOCK_SIZE
 }
 
