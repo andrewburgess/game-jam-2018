@@ -10,32 +10,37 @@ export const BOARD_HEIGHT = 22
 export const BOARD_WIDTH = 20
 
 export class Board extends Phaser.GameObjects.Container {
-    private cells: Array<Array<Block | null>>
+    private cells: Array<Array<Piece | null>>
 
     constructor(scene: Game, x: number, y: number) {
         super(scene, x, y)
         this.cells = map(range(BOARD_WIDTH), () => map(range(BOARD_HEIGHT), () => null))
     }
 
-    public canPieceMoveTo(piece: Piece, x: number, y: number): boolean {
-        const blocks = piece.getBlocks()
+    public canPieceMoveTo(piece: Piece, x: number, y: number, angle?: number) {
+        if (angle === undefined) {
+            angle = piece.actualAngle
+        }
 
-        return every(blocks, (block: Block) => {
-            const blockX = block.x / BLOCK_SIZE + piece.offset.x
-            const blockY = block.y / BLOCK_SIZE + piece.offset.y
-
+        const blockCoordinates = piece.getBlockLocations(angle)
+        return every(blockCoordinates, (coordinates) => {
             // Position to move to is out of bounds
-            if (x + blockX >= BOARD_WIDTH || y + blockY >= BOARD_HEIGHT) {
+            if (
+                x + coordinates.x >= BOARD_WIDTH ||
+                y + coordinates.y >= BOARD_HEIGHT ||
+                x + coordinates.x < 0 ||
+                y + coordinates.y < 0
+            ) {
                 return false
             }
 
-            const cell = this.cells[x + blockX][y + blockY]
-            if (!cell) {
+            const cell = this.cells[x + coordinates.x][y + coordinates.y]
+            if (cell === null) {
                 // Cell is empty, this block can move there
                 return true
             }
 
-            if (cell.piece === block.piece) {
+            if (cell === piece) {
                 // Cell is occupied, but it's occupied by a block from the same
                 // piece, so it will move
                 return true
@@ -47,42 +52,30 @@ export class Board extends Phaser.GameObjects.Container {
     }
 
     public touchingBottom(piece: Piece) {
-        return some(piece.getBlocks(), (block) => {
-            const blockY = block.y / BLOCK_SIZE + piece.offset.y
-
-            return piece.location.y + blockY === BOARD_HEIGHT - 1
-        })
+        return some(piece.getBlockLocations(), (coordinate) => piece.location.y + coordinate.y === BOARD_HEIGHT - 1)
     }
 
     public touchingLeft(piece: Piece) {
-        return some(piece.getBlocks(), (block) => {
-            const blockX = block.x / BLOCK_SIZE + piece.offset.x
-
-            return piece.location.x + blockX === 0
-        })
+        return some(piece.getBlockLocations(), (coordinate) => piece.location.x + coordinate.x === 0)
     }
 
     public touchingRight(piece: Piece) {
-        return some(piece.getBlocks(), (block) => {
-            const blockX = block.x / BLOCK_SIZE + piece.offset.x
-
-            return piece.location.x + blockX === BOARD_WIDTH - 1
-        })
+        return some(piece.getBlockLocations(), (coordinate) => piece.location.x + coordinate.x === BOARD_WIDTH - 1)
     }
 
-    public updateLocation(piece: Piece, oldLocation: Phaser.Math.Vector2, newLocation: Phaser.Math.Vector2) {
-        each(piece.getBlocks(), (block) => {
-            const blockX = block.x / BLOCK_SIZE + piece.offset.x
-            const blockY = block.y / BLOCK_SIZE + piece.offset.y
-
-            this.cells[blockX + oldLocation.x][blockY + oldLocation.y] = null
+    public updateLocation(
+        piece: Piece,
+        oldLocation: Phaser.Math.Vector2,
+        newLocation: Phaser.Math.Vector2,
+        oldAngle: number,
+        newAngle: number
+    ) {
+        each(piece.getBlockLocations(oldAngle), (coordinate) => {
+            this.cells[coordinate.x + oldLocation.x][coordinate.y + oldLocation.y] = null
         })
 
-        each(piece.getBlocks(), (block) => {
-            const blockX = block.x / BLOCK_SIZE + piece.offset.x
-            const blockY = block.y / BLOCK_SIZE + piece.offset.x
-
-            this.cells[blockX + newLocation.x][blockY + newLocation.y] = block
+        each(piece.getBlockLocations(newAngle), (coordinate) => {
+            this.cells[coordinate.x + newLocation.x][coordinate.y + newLocation.y] = piece
         })
     }
 
@@ -92,11 +85,11 @@ export class Board extends Phaser.GameObjects.Container {
                 new Phaser.GameObjects.Line(
                     this.scene,
                     BLOCK_SIZE / 2,
-                    this.height / 2,
-                    x * BLOCK_SIZE,
-                    0,
-                    x * BLOCK_SIZE,
-                    this.height,
+                    ((BOARD_HEIGHT + 2) * BLOCK_SIZE) / 2,
+                    (x - 1) * BLOCK_SIZE,
+                    -BLOCK_SIZE,
+                    (x - 1) * BLOCK_SIZE,
+                    (BOARD_HEIGHT + 2) * BLOCK_SIZE,
                     0x0000ff,
                     0.3
                 )
@@ -106,12 +99,12 @@ export class Board extends Phaser.GameObjects.Container {
             this.add(
                 new Phaser.GameObjects.Line(
                     this.scene,
-                    this.width / 2,
+                    ((BOARD_WIDTH + 2) * BLOCK_SIZE) / 2,
                     BLOCK_SIZE / 2,
-                    0,
-                    y * BLOCK_SIZE,
-                    this.width,
-                    y * BLOCK_SIZE,
+                    -BLOCK_SIZE,
+                    (y - 1) * BLOCK_SIZE,
+                    (BOARD_WIDTH + 2) * BLOCK_SIZE,
+                    (y - 1) * BLOCK_SIZE,
                     0xff0000,
                     0.3
                 )

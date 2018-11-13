@@ -4,13 +4,13 @@ import * as Phaser from "phaser"
 import UnifiedController from "../GameInput"
 import { BLOCK_SIZE } from "../entities/Block"
 import { Board } from "../entities/Board"
-import { Piece, RotateDirection, Shape, createPiece } from "../entities/Piece"
+import { Piece, RotateDirection, Shape, createPiece, Direction } from "../entities/Piece"
 
 import { Scenes } from "./"
 
 const log = debug(`game:scenes:${Scenes.Game}`)
 
-const list: Shape[] = [Shape.J]
+const list: Shape[] = [Shape.I, Shape.J, Shape.L, Shape.I, Shape.J, Shape.L]
 
 export interface IGameInitialization {
     level: number
@@ -65,7 +65,7 @@ export default class Game extends Phaser.Scene {
     public create(config: IGameInitialization) {
         log(`create level ${config.level}`)
 
-        this.board = new Board(this, 0, 0)
+        this.board = new Board(this, BLOCK_SIZE, BLOCK_SIZE * 4)
         this.level = config.level
         this.controller = new UnifiedController(this.input)
 
@@ -89,6 +89,14 @@ export default class Game extends Phaser.Scene {
 
         if (this.controller.space!.isDown() && !this.currentPiece.isRotating()) {
             this.currentPiece.rotate(RotateDirection.CLOCKWISE)
+        }
+
+        if (this.controller.left!.isDown()) {
+            this.currentPiece.direction = Direction.LEFT
+        } else if (this.controller.right!.isDown()) {
+            this.currentPiece.direction = Direction.RIGHT
+        } else if (this.controller.down!.isDown()) {
+            this.currentPiece.direction = Direction.DOWN
         }
     }
 
@@ -124,13 +132,13 @@ export default class Game extends Phaser.Scene {
     private spawnNextPiece() {
         log("spawn next piece")
 
-        this.nextPiece = createPiece(this, 0, 0, {
+        this.nextPiece = createPiece(this, 0, -3 * BLOCK_SIZE, {
             level: this.level,
             shape: list.length > 0 ? list.shift() : undefined
         })
         this.nextPiece.setPosition(
-            BLOCK_SIZE + this.nextPiece.offset.x * BLOCK_SIZE,
-            BLOCK_SIZE + this.nextPiece.offset.y * BLOCK_SIZE
+            this.nextPiece.offset.x * BLOCK_SIZE,
+            this.nextPiece.offset.y * BLOCK_SIZE + -3 * BLOCK_SIZE
         )
         this.board.add(this.nextPiece)
     }
