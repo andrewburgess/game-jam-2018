@@ -10,6 +10,7 @@ interface IUnifiedController {
     right?: VirtualKey
     actionLB?: VirtualKey
     actionRB?: VirtualKey
+    space?: VirtualKey
 }
 
 export default class UnifiedController implements IUnifiedController {
@@ -19,6 +20,7 @@ export default class UnifiedController implements IUnifiedController {
     public right?: VirtualKey
     public actionLB?: VirtualKey
     public actionRB?: VirtualKey
+    public space?: VirtualKey
 
     private plugin: Phaser.Input.InputPlugin
 
@@ -35,6 +37,7 @@ export default class UnifiedController implements IUnifiedController {
         this.right = new VirtualKey(plugin.keyboard.addKey("D"))
         this.actionLB = new VirtualKey(plugin.keyboard.addKey("LEFT"))
         this.actionRB = new VirtualKey(plugin.keyboard.addKey("RIGHT"))
+        this.space = new VirtualKey(plugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE))
 
         this.plugin.gamepad.once(
             "down",

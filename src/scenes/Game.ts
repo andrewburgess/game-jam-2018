@@ -1,16 +1,16 @@
 import * as debug from "debug"
-import { each, range } from "lodash"
 import * as Phaser from "phaser"
 
+import UnifiedController from "../GameInput"
 import { BLOCK_SIZE } from "../entities/Block"
-import { BOARD_HEIGHT, BOARD_WIDTH, Board } from "../entities/Board"
-import { Piece, Shape, createPiece } from "../entities/Piece"
+import { Board } from "../entities/Board"
+import { Piece, RotateDirection, Shape, createPiece } from "../entities/Piece"
 
 import { Scenes } from "./"
 
 const log = debug(`game:scenes:${Scenes.Game}`)
 
-const list: Shape[] = []
+const list: Shape[] = [Shape.J]
 
 export interface IGameInitialization {
     level: number
@@ -18,6 +18,8 @@ export interface IGameInitialization {
 
 export default class Game extends Phaser.Scene {
     public board: Board
+
+    private controller: UnifiedController
 
     /**
      * The currently falling piece.
@@ -63,11 +65,14 @@ export default class Game extends Phaser.Scene {
     public create(config: IGameInitialization) {
         log(`create level ${config.level}`)
 
-        this.board = new Board()
+        this.board = new Board(this, 0, 0)
         this.level = config.level
+        this.controller = new UnifiedController(this.input)
+
+        this.add.existing(this.board)
 
         if (window.localStorage && window.localStorage.getItem("debug")) {
-            this.drawBoard()
+            this.board.drawBoard()
         }
 
         this.spawnNextPiece()
@@ -75,6 +80,16 @@ export default class Game extends Phaser.Scene {
         setTimeout(() => {
             this.activateNextPiece()
         }, 1500)
+    }
+
+    public update(time: number, delta: number) {
+        if (!this.currentPiece) {
+            return
+        }
+
+        if (this.controller.space!.isDown() && !this.currentPiece.isRotating()) {
+            this.currentPiece.rotate(RotateDirection.CLOCKWISE)
+        }
     }
 
     public getLevel() {
@@ -109,37 +124,14 @@ export default class Game extends Phaser.Scene {
     private spawnNextPiece() {
         log("spawn next piece")
 
-        this.nextPiece = createPiece(this, BLOCK_SIZE, BLOCK_SIZE, {
+        this.nextPiece = createPiece(this, 0, 0, {
             level: this.level,
             shape: list.length > 0 ? list.shift() : undefined
         })
-        this.add.existing(this.nextPiece)
-    }
-
-    private drawBoard() {
-        each(range(BOARD_WIDTH + 1), (x) =>
-            this.add.line(
-                BLOCK_SIZE / 2,
-                this.cameras.main.height / 2,
-                x * BLOCK_SIZE,
-                BLOCK_SIZE * 2,
-                x * BLOCK_SIZE,
-                this.cameras.main.height - BLOCK_SIZE,
-                0x0000ff,
-                0.3
-            )
+        this.nextPiece.setPosition(
+            BLOCK_SIZE + this.nextPiece.offset.x * BLOCK_SIZE,
+            BLOCK_SIZE + this.nextPiece.offset.y * BLOCK_SIZE
         )
-        each(range(BOARD_HEIGHT + 1), (y) =>
-            this.add.line(
-                this.cameras.main.width / 2,
-                0,
-                0,
-                BLOCK_SIZE * 3 + BLOCK_SIZE / 2 + y * BLOCK_SIZE,
-                this.cameras.main.width,
-                BLOCK_SIZE * 3 + BLOCK_SIZE / 2 + y * BLOCK_SIZE,
-                0xff0000,
-                0.3
-            )
-        )
+        this.board.add(this.nextPiece)
     }
 }

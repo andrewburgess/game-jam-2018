@@ -14,6 +14,11 @@ export enum Direction {
     RIGHT
 }
 
+export enum RotateDirection {
+    CLOCKWISE,
+    COUNTER_CLOCKWISE
+}
+
 export enum Shape {
     I,
     J,
@@ -35,17 +40,21 @@ const ShapeValues = Object.keys(Shape)
 
 export class Piece extends Phaser.GameObjects.Container {
     public location: Phaser.Math.Vector2
+    public offset: Phaser.Math.Vector2
     public scene: Game
 
     private color: Phaser.Display.Color
     private direction: Direction
     private level: number
+    private rotating: boolean
     private shape: Shape
     private tween: Phaser.Tweens.Tween
 
     constructor(scene: Game, x: number, y: number, config: IPieceConfiguration) {
         super(scene, x, y)
+        this.rotating = false
         this.level = config.level || 1
+        this.offset = Phaser.Math.Vector2.ZERO
         this.scene = scene
         this.shape = config.shape || Shape.I
 
@@ -56,6 +65,10 @@ export class Piece extends Phaser.GameObjects.Container {
 
     public getBlocks(): Block[] {
         return this.getAll() as Block[]
+    }
+
+    public isRotating() {
+        return this.rotating
     }
 
     public onActivate() {
@@ -81,25 +94,48 @@ export class Piece extends Phaser.GameObjects.Container {
         })
     }
 
+    public rotate(direction: RotateDirection) {
+        this.rotating = true
+
+        const angle = (direction === RotateDirection.CLOCKWISE ? this.angle + 90 : this.angle - 90) % 360
+
+        this.tween = this.scene.tweens.add({
+            onComplete: () => {
+                this.rotating = false
+                this.movePiece()
+            },
+            props: {
+                angle: {
+                    duration: 250,
+                    ease: "Quad.easeInOut",
+                    value: angle
+                }
+            },
+            targets: this
+        })
+    }
+
     private build() {
         switch (this.shape) {
             case Shape.I:
                 this.color = Phaser.Display.Color.HexStringToColor("#00FFFF")
+                this.add(new Block(this, BLOCK_SIZE * -1, 0, this.color))
                 this.add(new Block(this, 0, 0, this.color))
                 this.add(new Block(this, BLOCK_SIZE, 0, this.color))
                 this.add(new Block(this, BLOCK_SIZE * 2, 0, this.color))
-                this.add(new Block(this, BLOCK_SIZE * 3, 0, this.color))
 
                 this.setSize(BLOCK_SIZE * 4, BLOCK_SIZE)
+                this.offset = new Phaser.Math.Vector2(1, 0)
                 break
             case Shape.J:
                 this.color = Phaser.Display.Color.HexStringToColor("#0000FF")
+                this.add(new Block(this, BLOCK_SIZE * -1, BLOCK_SIZE * -1, this.color))
+                this.add(new Block(this, BLOCK_SIZE * -1, 0, this.color))
                 this.add(new Block(this, 0, 0, this.color))
-                this.add(new Block(this, 0, BLOCK_SIZE, this.color))
-                this.add(new Block(this, BLOCK_SIZE, BLOCK_SIZE, this.color))
-                this.add(new Block(this, BLOCK_SIZE * 2, BLOCK_SIZE, this.color))
+                this.add(new Block(this, BLOCK_SIZE, 0, this.color))
 
                 this.setSize(BLOCK_SIZE * 3, BLOCK_SIZE * 2)
+                this.offset = new Phaser.Math.Vector2(1, 1)
                 break
             case Shape.L:
                 this.color = Phaser.Display.Color.HexStringToColor("#FF8800")
@@ -155,7 +191,11 @@ export class Piece extends Phaser.GameObjects.Container {
         return clamp(1000 / (this.level / 1.5), 10, 600)
     }
 
-    private movePiece(direction?: Direction) {
+    private movePiece(direction?: Direction): void {
+        if (this.isRotating()) {
+            return
+        }
+
         if (isUndefined(direction)) {
             direction = this.direction
         }
