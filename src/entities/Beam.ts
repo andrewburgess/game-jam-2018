@@ -1,135 +1,90 @@
 import * as debug from "debug"
 import * as Phaser from "phaser"
 
-import { BEAM_ELEMENT_HEIGHT, BEAM_ELEMENT_WIDTH, BeamElement } from "./BeamElement"
-import { Block } from "./Block"
+import { BLOCK_SIZE } from "./Block"
 import { Piece } from "./Piece"
+import { Player } from "./Player"
 
 const log = debug("game:entities:Beam")
 
+const BEAM_RESOURCES_TEXT = "Beam Resources: "
+const BEAM_RESOURCE_GEN_DELTA = 500.0
 const BEAM_UPDATE_DELTA = 100.0
 
-export interface IBeamUpdateResult {
-    resourcesConsumed: number
-}
-
-export class Beam extends Phaser.GameObjects.Container {
-    public elements: Phaser.Physics.Arcade.Group
-    public latched: boolean
+export class Beam extends Phaser.GameObjects.Sprite {
     public scene: Phaser.Scene
-    private beamTop: BeamElement
-    private latchedTo: Piece
+    private player: Player
+    private resourceGenDelta: number
+    private resourceLimit: number
+    private resources: number
+    private resourcesText: Phaser.GameObjects.Text
     private updateDelta: number
 
-    constructor(scene: Phaser.Scene, x: number, y: number) {
+    constructor(scene: Phaser.Scene, player: Player, startingResources: number) {
         log("constructing")
 
-        super(scene, x, y)
+        const x: number = player.x - player.width + 15
+        const y: number = player.y - player.height
+        // TODO(tristan): make semi-transparent blue cone sprite texture to represent the beam
+        super(scene, x, y, "")
         this.scene = scene
 
+        this.player = player
+        this.resourceGenDelta = BEAM_RESOURCE_GEN_DELTA
+        this.resources = this.resourceLimit = startingResources
+        this.resourcesText = this.scene.add.text(
+            this.scene.cameras.main.width - 200,
+            5,
+            BEAM_RESOURCES_TEXT + this.resources
+        )
         this.updateDelta = 0.0
 
-        this.elements = new Phaser.Physics.Arcade.Group(this.scene.physics.world, this.scene)
         this.scene.add.existing(this)
 
         log("constructed")
     }
 
-    public addPieceLatchChecks(piece: Piece) {
-        this.scene.physics.add.overlap(
-            this.elements,
-            piece.blocks,
-            (beamElem: BeamElement, pieceBlock: Block) => {
-                pieceBlock.piece.setPosition(beamElem.x, beamElem.y)
-                pieceBlock.piece.setScale(1.25)
-                this.latched = true
-                this.latchedTo = piece
-            },
-            undefined,
-            this
-        )
-    }
+    public update(time: number, delta: number, currentPiece: Piece) {
+        this.updateDelta += delta
+        this.resourceGenDelta += delta
 
-    public destroyOnCollisionWith(boundary: Phaser.Physics.Arcade.Sprite) {
-        this.scene.physics.add.overlap(
-            this.elements,
-            boundary,
-            (collidedBoundary: Phaser.Physics.Arcade.Sprite, beamElem: Phaser.Physics.Arcade.Sprite) => {
-                if (collidedBoundary.body.bottom >= beamElem.body.top) {
-                    // TODO(tristan): breakage animation?
-                    this.elements.clear(true, true)
-                }
-            },
-            undefined,
-            this
-        )
-    }
-
-    public getElements(): BeamElement[] {
-        return this.getAll() as BeamElement[]
-    }
-
-    public update(time: number, delta: number): IBeamUpdateResult {
-        const updateResult: IBeamUpdateResult = {
-            resourcesConsumed: 0
+        if (this.resourceGenDelta > BEAM_RESOURCE_GEN_DELTA) {
+            this.resources = Math.min(this.resources + 1, this.resourceLimit)
+            this.resourceGenDelta = 0
         }
 
-        this.updateDelta += delta
+        this.updateBeamPosition()
 
-        // TODO(tristan): maybe give piece ship velocity if let go in mid-space?
         if (this.updateDelta > BEAM_UPDATE_DELTA) {
-            if (this.latched) {
-                this.retractBeam()
+            if (this.canPull(currentPiece)) {
+                this.pull(currentPiece)
             } else {
-                this.extendBeam()
-                updateResult.resourcesConsumed++
+                this.resources--
             }
             this.updateDelta = 0.0
         }
 
-        if (this.latched) {
-            const latchAlignOffsetX: number = this.x - this.latchedTo.width / 2 + BEAM_ELEMENT_WIDTH / 2
-            const latchAlignOffsetY: number = this.y - this.height - this.latchedTo.height / 2 - BEAM_ELEMENT_HEIGHT / 2
-            this.latchedTo.setPosition(latchAlignOffsetX, latchAlignOffsetY)
-        }
-
-        return updateResult
+        this.resourcesText.text = BEAM_RESOURCES_TEXT + this.resources
     }
 
-    private extendBeam() {
-        const beamElem: BeamElement = new BeamElement(
-            this,
-            0,
-            -BEAM_ELEMENT_HEIGHT * this.elements.getLength(),
-            new Phaser.Display.Color(
-                Phaser.Math.Between(0, 150),
-                Phaser.Math.Between(0, 75),
-                Phaser.Math.Between(125, 255)
-            )
-        )
-
-        this.beamTop = beamElem
-
-        if (this.length === 0) {
+    private canPull(piece: Piece): boolean {
+        if (piece && (this.x >= piece.x && this.x <= piece.x + piece.width)) {
+            return true
             // TODO(tristan): https://answers.unity.com/questions/760532/how-to-warpdistort-a-2d-sprite.html
-            // Warp initial beam element into cone-ish shape to look like the beam is coming out of the ship
+            // Warp space in front of beam into cone-ish shape to look like the beam is coming out of the ship
+        } else {
+            return false
         }
-
-        this.add(beamElem)
-        this.setSize(BEAM_ELEMENT_WIDTH, BEAM_ELEMENT_HEIGHT * this.length)
-
-        this.elements.add(beamElem)
-        beamElem.body.setAllowGravity(false)
     }
 
-    private retractBeam() {
-        if (this.length >= 5) {
-            this.remove(this.beamTop)
-            this.beamTop = this.getAt(this.length - 1) as BeamElement
-            this.setSize(BEAM_ELEMENT_WIDTH, BEAM_ELEMENT_HEIGHT * this.length)
-            this.elements.clear()
-            this.elements.add(this.beamTop)
-            this.beamTop.body.setAllowGravity(false)
-        }
+    private pull(piece: Piece) {
+        piece.setX(this.x - piece.width / 2)
+        piece.setY(piece.y + BLOCK_SIZE)
+    }
+
+    private updateBeamPosition() {
+        const beamPosX: number = this.player.x - this.player.width + 15
+        const beamPosY: number = this.player.y - this.player.height
+        this.setPosition(beamPosX, beamPosY)
     }
 }
