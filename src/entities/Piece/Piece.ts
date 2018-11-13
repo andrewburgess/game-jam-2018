@@ -19,12 +19,12 @@ export abstract class Piece extends Phaser.GameObjects.Container {
      * @memberof Piece
      */
     public actualAngle: number
-    public direction: Direction
     public location: Phaser.Math.Vector2
-    public offset: Phaser.Math.Vector2
+    public pivot: Phaser.Math.Vector2
     public scene: Game
 
     protected color: Phaser.Display.Color
+    protected direction: Direction
     protected level: number
     protected rotating: boolean
     protected shape: Shape
@@ -35,11 +35,11 @@ export abstract class Piece extends Phaser.GameObjects.Container {
         this.actualAngle = 0
         this.rotating = false
         this.level = config.level || 1
-        this.offset = Phaser.Math.Vector2.ZERO
         this.scene = scene
         this.shape = config.shape || Shape.I
 
         this.build()
+        this.location = this.pivot.clone()
 
         log("constructed")
     }
@@ -58,7 +58,6 @@ export abstract class Piece extends Phaser.GameObjects.Container {
         log("onActivate")
 
         this.direction = Direction.RIGHT
-        this.location = new Phaser.Math.Vector2(0, 0)
 
         // Tween to start position
         this.scene.tweens.add({
@@ -165,12 +164,12 @@ export abstract class Piece extends Phaser.GameObjects.Container {
                 x: {
                     duration: this.getMoveDuration(),
                     ease: "Quad.easeInOut",
-                    value: (this.offset.x + newLocation.x) * BLOCK_SIZE
+                    value: newLocation.x * BLOCK_SIZE
                 },
                 y: {
                     duration: this.getMoveDuration(),
                     ease: "Quad.easeInOut",
-                    value: (this.offset.y + newLocation.y) * BLOCK_SIZE
+                    value: newLocation.y * BLOCK_SIZE
                 }
             },
             targets: this

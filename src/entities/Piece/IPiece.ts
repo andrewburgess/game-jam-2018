@@ -10,14 +10,14 @@ export class IPiece extends Piece {
     public getBlockLocations(angle: number = this.actualAngle): Phaser.Math.Vector2[] {
         switch (angle) {
             case 0:
-                return [new Vector2(0, 0), new Vector2(1, 0), new Vector2(2, 0), new Vector2(3, 0)]
+                return [new Vector2(-1, 0), new Vector2(0, 0), new Vector2(1, 0), new Vector2(2, 0)]
             case -180:
             case 180:
-                return [new Vector2(-1, 0), new Vector2(0, 0), new Vector2(1, 0), new Vector2(2, 0)]
+                return [new Vector2(-2, 0), new Vector2(-1, 0), new Vector2(0, 0), new Vector2(1, 0)]
             case 90:
-                return [new Vector2(1, -1), new Vector2(1, 0), new Vector2(1, 1), new Vector2(1, 2)]
+                return [new Vector2(0, -1), new Vector2(0, 0), new Vector2(0, 1), new Vector2(0, 2)]
             case -90:
-                return [new Vector2(1, -2), new Vector2(1, -1), new Vector2(1, 0), new Vector2(1, 1)]
+                return [new Vector2(0, -2), new Vector2(0, -1), new Vector2(0, 0), new Vector2(0, 1)]
             default:
                 throw new Error(`invalid angle ${angle}`)
         }
@@ -31,6 +31,6 @@ export class IPiece extends Piece {
         this.add(new Block(this, BLOCK_SIZE * 2, 0, this.color))
 
         this.setSize(BLOCK_SIZE * 4, BLOCK_SIZE)
-        this.offset = new Phaser.Math.Vector2(1, 0)
+        this.pivot = new Phaser.Math.Vector2(1, 0)
     }
 }

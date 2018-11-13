@@ -4,13 +4,13 @@ import * as Phaser from "phaser"
 import UnifiedController from "../GameInput"
 import { BLOCK_SIZE } from "../entities/Block"
 import { Board } from "../entities/Board"
-import { Piece, RotateDirection, Shape, createPiece, Direction } from "../entities/Piece"
+import { Direction, Piece, RotateDirection, Shape, createPiece } from "../entities/Piece"
 
 import { Scenes } from "./"
 
 const log = debug(`game:scenes:${Scenes.Game}`)
 
-const list: Shape[] = [Shape.I, Shape.J, Shape.L, Shape.I, Shape.J, Shape.L]
+const list: Shape[] = []
 
 export interface IGameInitialization {
     level: number
@@ -91,14 +91,6 @@ export default class Game extends Phaser.Scene {
         if (this.controller.space!.isDown() && !this.currentPiece.isRotating()) {
             this.currentPiece.rotate(RotateDirection.CLOCKWISE)
         }
-
-        if (this.controller.left!.isDown()) {
-            this.currentPiece.direction = Direction.LEFT
-        } else if (this.controller.right!.isDown()) {
-            this.currentPiece.direction = Direction.RIGHT
-        } else if (this.controller.down!.isDown()) {
-            this.currentPiece.direction = Direction.DOWN
-        }
     }
 
     public getLevel() {
@@ -117,11 +109,11 @@ export default class Game extends Phaser.Scene {
         log("activate next piece")
 
         if (!this.nextPiece) {
-            throw new Error("no next piece?")
+            throw new Error("nso next piece?")
         }
 
         this.currentPiece = this.nextPiece
-        if (!this.board.canPieceMoveTo(this.currentPiece, 0, 0)) {
+        if (!this.board.canPieceMoveTo(this.currentPiece, this.currentPiece.location.x, this.currentPiece.location.y)) {
             // The player loses!
             log("you loser")
             throw new Error("loser loser loser")
@@ -138,8 +130,8 @@ export default class Game extends Phaser.Scene {
             shape: list.length > 0 ? list.shift() : undefined
         })
         this.nextPiece.setPosition(
-            this.nextPiece.offset.x * BLOCK_SIZE,
-            this.nextPiece.offset.y * BLOCK_SIZE + -3 * BLOCK_SIZE
+            this.nextPiece.location.x * BLOCK_SIZE,
+            this.nextPiece.location.y * BLOCK_SIZE + -3 * BLOCK_SIZE
         )
         this.board.add(this.nextPiece)
     }
