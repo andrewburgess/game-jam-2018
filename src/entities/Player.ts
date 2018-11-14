@@ -4,7 +4,7 @@ import * as Phaser from "phaser"
 import UnifiedController from "../GameInput"
 
 import { Assets } from "../assets"
-import { Beam, IBeamUpdateResult } from "../entities/Beam"
+import { Beam } from "../entities/Beam"
 import { Piece } from "../entities/Piece"
 import { Projectiles } from "../entities/Projectiles"
 
@@ -75,9 +75,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
             this.setAccelerationX(0)
         }
 
-        if (this.controller.actionLB!.isDown() && currentPiece) {
-            this.beam.update(time, delta, currentPiece!)
+        let beamActiveAttempt: boolean = false
+        if (this.controller.actionLB!.isDown()) {
+            beamActiveAttempt = true
         }
+        this.beam.update(time, delta, beamActiveAttempt, currentPiece!)
 
         if (this.controller.actionRB!.isUniquelyDown()) {
             this.projectiles.createProjectile(this.x, this.y, 0, -1050)
