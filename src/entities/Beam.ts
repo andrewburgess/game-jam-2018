@@ -3,7 +3,8 @@ import { isUndefined } from "lodash"
 import * as Phaser from "phaser"
 
 import { Assets } from "../assets"
-import { Piece } from "../entities/Piece"
+
+import { Piece } from "./Piece"
 
 const log = debug("game:entities:Beam")
 
@@ -21,7 +22,7 @@ export class Beam extends Phaser.GameObjects.Sprite {
     private resourcesText: Phaser.GameObjects.Text
     private updateDelta: number
 
-    constructor(scene: Phaser.Scene, x: number, y: number, startingResources: number) {
+    constructor(scene: Phaser.Scene, x: number, y: number, startingResources: integer) {
         log("constructing")
 
         super(scene, x, y, Assets.Beam)
@@ -98,20 +99,12 @@ export class Beam extends Phaser.GameObjects.Sprite {
             this.resourceConsumeDelta = 0.0
         }
 
-        log(`tristan test: ${this.x}, ${this.width}, ${this.y}, ${this.height}, ${piece.x}, ${piece.y}`)
-
-        const pieceWithinBeamBounds: boolean =
-            piece.x >= this.parentContainer.x + this.leftEdgeXOffset() &&
-            piece.x <= this.parentContainer.x + this.rightEdgeXOffset()
-
-        return pieceWithinBeamBounds
-    }
-
-    private leftEdgeXOffset() {
-        return -this.width / 2
-    }
-
-    private rightEdgeXOffset() {
-        return this.width / 2
+        const piecePLeft = piece.x - piece.width / 2
+        const piecePRight = piece.x + piece.width / 2
+        return (
+            this.parentContainer.body.hitTest(piecePLeft, this.parentContainer.y) ||
+            this.parentContainer.body.hitTest(piece.x, this.parentContainer.y) ||
+            this.parentContainer.body.hitTest(piecePRight, this.parentContainer.y)
+        )
     }
 }

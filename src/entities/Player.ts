@@ -2,17 +2,18 @@ import * as debug from "debug"
 import * as Phaser from "phaser"
 
 import UnifiedController from "../GameInput"
-
 import { Assets } from "../assets"
-import { Beam } from "../entities/Beam"
-import { Piece } from "../entities/Piece"
-import { PROJECTILE_STANDARD_VELOCITY, Projectiles } from "../entities/Projectiles"
+
+import { Beam } from "./Beam"
+import { Piece } from "./Piece"
+import { PROJECTILE_STANDARD_VELOCITY, Projectiles } from "./Projectiles"
 
 const log = debug("game:entities:Player")
 
 const PLAYER_BEAM_STARTING_RESOURCES = 100
 const PLAYER_MAX_VELOCITY = 550
 const PLAYER_MOVEMENT_ACCELERATION_SCALE = 1500
+const PLAYER_PROJECTILES_STARTING_RESOURCES = 20
 const PLAYER_SCALE = 3
 
 export class Player extends Phaser.GameObjects.Container {
@@ -74,7 +75,7 @@ export class Player extends Phaser.GameObjects.Container {
         this.beam = new Beam(scene, 0, this.topEdgeYOffset(), PLAYER_BEAM_STARTING_RESOURCES)
         this.add(this.beam)
         this.controller = new UnifiedController(this.scene.input)
-        this.projectiles = new Projectiles(scene, 20, this.topEdgeYOffset())
+        this.projectiles = new Projectiles(scene, 20, this.topEdgeYOffset(), PLAYER_PROJECTILES_STARTING_RESOURCES)
 
         log("constructed")
     }
@@ -92,11 +93,12 @@ export class Player extends Phaser.GameObjects.Container {
         if (this.controller.actionLB!.isDown()) {
             beamActiveAttempt = true
         }
-        this.beam.update(time, delta, beamActiveAttempt, currentPiece!)
+        this.beam.update(time, delta, beamActiveAttempt, currentPiece)
 
         if (this.controller.actionRB!.isUniquelyDown()) {
             this.projectiles.createProjectile(this.x, this.y, 0, PROJECTILE_STANDARD_VELOCITY)
         }
+        this.projectiles.update(time, delta, currentPiece)
     }
 
     private topEdgeYOffset() {
