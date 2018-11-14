@@ -32,7 +32,9 @@ class Menu extends Phaser.Scene {
             this.scene.start(Scenes.Game, {
                 level: 1
             } as IGameInitialization)
-            this.scene.start(Scenes.GameUI)
+            this.scene.start(Scenes.GameUI, {
+                level: 1
+            } as IGameInitialization)
         })
     }
 

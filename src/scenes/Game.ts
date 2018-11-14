@@ -80,12 +80,28 @@ export default class Game extends Phaser.Scene {
         log(`create level ${config.level}`)
 
         this.level = Levels[config.level]
-        this.board = new Board(this, BLOCK_SIZE, BLOCK_SIZE * 4, this.level)
+
+        this.cameras.main.setZoom(this.level.zoom)
+
+        const boardHeight = this.level.height * BLOCK_SIZE
+        const boardWidth = this.level.width * BLOCK_SIZE
+        this.board = new Board(
+            this,
+            this.cameras.main.centerX - boardWidth / 2,
+            this.cameras.main.centerY - boardHeight / 2,
+            this.level
+        )
         this.controller = new UnifiedController(this.input)
 
-        this.add.image(this.centerX(), this.centerY(), Assets.Background)
+        this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, Assets.Background)
 
-        this.player = new Player(this, this.centerX(), this.cameras.main.height)
+        this.board.add(
+            new Phaser.GameObjects.Graphics(this)
+                .lineStyle(2, 0xff0000, 1)
+                .strokeRect((-1 * BLOCK_SIZE) / 2, -1 * BLOCK_SIZE, BLOCK_SIZE * 4, 2)
+        )
+
+        this.player = new Player(this, this.cameras.main.centerX, this.cameras.main.height)
 
         const worldTop: Phaser.Physics.Arcade.Sprite = this.physics.add.staticSprite(16, -16, "world_top")
         worldTop.setSize(this.physics.world.bounds.width, worldTop.height)
@@ -147,14 +163,6 @@ export default class Game extends Phaser.Scene {
         }
 
         this.currentPiece.onActivate()
-    }
-
-    private centerX() {
-        return this.cameras.main.width / 2
-    }
-
-    private centerY() {
-        return this.cameras.main.height / 2
     }
 
     private spawnNextPiece() {

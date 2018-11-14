@@ -23,7 +23,7 @@ export class Player extends Phaser.GameObjects.Container {
     constructor(scene: Phaser.Scene, x: number, y: number) {
         log("constructing")
 
-        const playerSprite: Phaser.Physics.Arcade.Sprite = new Phaser.Physics.Arcade.Sprite(scene, 0, 0, Assets.Player)
+        const playerSprite = new Phaser.Physics.Arcade.Sprite(scene, 0, 0, Assets.Player)
         playerSprite.setScale(PLAYER_SCALE)
 
         super(scene, x, y, [playerSprite])
