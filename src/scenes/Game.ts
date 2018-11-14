@@ -23,17 +23,16 @@ export interface IGameInitialization {
 export default class Game extends Phaser.Scene {
     public board: Board
 
+    private controller: UnifiedController
+
     /**
      * The currently falling piece.
-     * NOTE(tristan): protected for now while we have dev scenes that derive from Game
      *
-     * @protected
+     * @private
      * @type {Piece}
      * @memberof Game
      */
-    protected currentPiece?: Piece
-
-    private controller: UnifiedController
+    private currentPiece?: Piece
 
     /**
      * The level number (at least 1), which influences how fast pieces move

@@ -11,7 +11,7 @@ const log = debug("game:entities:Beam")
 
 const BEAM_RESOURCES_TEXT = "Beam Resources: "
 const BEAM_RESOURCE_GEN_DELTA = 250.0
-const BEAM_RESOURCE_CONSUME_DELTA = 100.0
+const BEAM_RESOURCE_CONSUME_DELTA = 75.0
 const BEAM_UPDATE_DELTA = 250.0
 
 export class Beam extends Phaser.GameObjects.Sprite {
@@ -31,6 +31,7 @@ export class Beam extends Phaser.GameObjects.Sprite {
         this.scene = scene
 
         this.player = player
+
         this.resourceConsumeDelta = 0.0
         this.resourceGenDelta = 0.0
         this.resources = this.resourceLimit = startingResources
@@ -73,15 +74,13 @@ export class Beam extends Phaser.GameObjects.Sprite {
                     if (currentPiece.isBeingBeamed()) {
                         log("beam finished")
                         currentPiece.setBeingBeamed(false)
-                        currentPiece.resumeMove()
                     }
                 }
             } else {
-                this.setVisible(false)
                 if (currentPiece.isBeingBeamed()) {
                     currentPiece.setBeingBeamed(false)
-                    currentPiece.resumeMove()
                 }
+                this.setVisible(false)
             }
         }
 
@@ -95,7 +94,6 @@ export class Beam extends Phaser.GameObjects.Sprite {
         }
 
         if (this.updateDelta > BEAM_UPDATE_DELTA) {
-            piece.beam()
             this.updateDelta = 0.0
         }
     }
@@ -116,7 +114,7 @@ export class Beam extends Phaser.GameObjects.Sprite {
 
     private updateBeamPosition() {
         const beamPosX: number = this.player.x
-        const beamPosY: number = this.player.y - this.player.height / 2 - this.height
+        const beamPosY: number = this.player.y - this.height + 25
         this.setPosition(beamPosX, beamPosY)
     }
 }

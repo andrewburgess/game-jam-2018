@@ -29,7 +29,7 @@ export abstract class Piece extends Phaser.GameObjects.Container {
     protected level: number
     protected rotating: boolean
     protected shape: Shape
-    protected tween: Phaser.Tweens.Tween
+    protected tween?: Phaser.Tweens.Tween
 
     constructor(scene: Game, x: number, y: number, config: IPieceConfiguration) {
         super(scene, x, y)
@@ -47,43 +47,6 @@ export abstract class Piece extends Phaser.GameObjects.Container {
     }
 
     public abstract getBlockLocations(angle?: number): Phaser.Math.Vector2[]
-
-    public beam(): void {
-        const oldLocation = this.location.clone()
-        // NOTE(tristan): this assumes that beaming always pulls the piece down only
-        const newLocation = new Phaser.Math.Vector2(this.location.x, this.location.y + 1)
-
-        const canMoveToNewLocation = this.scene.board.canPieceMoveTo(this, newLocation.x, newLocation.y)
-
-        if (!canMoveToNewLocation) {
-            // If we can't move and we also can't move down anymore, then it is considered "settled", and we can
-            // activate the next piece on the board
-            this.tween.stop()
-            this.scene.onPieceSettled()
-            return
-        }
-
-        log(`beam piece ${this.shape} ${newLocation.x},${newLocation.y}`)
-
-        this.location = newLocation
-        this.scene.board.updateLocation(this, oldLocation, newLocation, this.actualAngle, this.actualAngle)
-
-        this.tween = this.scene.tweens.add({
-            props: {
-                x: {
-                    duration: this.getMoveDuration(),
-                    ease: "Quad.easeInOut",
-                    value: newLocation.x * BLOCK_SIZE
-                },
-                y: {
-                    duration: this.getMoveDuration(),
-                    ease: "Quad.easeInOut",
-                    value: newLocation.y * BLOCK_SIZE
-                }
-            },
-            targets: this
-        })
-    }
 
     public getBlocks(): Block[] {
         return this.getAll() as Block[]
@@ -170,7 +133,7 @@ export abstract class Piece extends Phaser.GameObjects.Container {
 
     private move(direction?: Direction): void {
         if (this.isBeingBeamed()) {
-            return
+            direction = Direction.DOWN
         }
 
         if (isUndefined(direction)) {
@@ -178,7 +141,7 @@ export abstract class Piece extends Phaser.GameObjects.Container {
         }
 
         const oldLocation = this.location.clone()
-        const newLocation = new Phaser.Math.Vector2(this.location.x, this.location.y)
+        const newLocation = new Phaser.Math.Vector2(Math.floor(this.location.x), Math.floor(this.location.y))
         switch (direction) {
             case Direction.DOWN:
                 newLocation.y++
@@ -196,7 +159,7 @@ export abstract class Piece extends Phaser.GameObjects.Container {
         if (!canMoveToNewLocation && direction === Direction.DOWN) {
             // If we can't move and we also can't move down anymore, then it is considered "settled", and we can
             // activate the next piece on the board
-            this.tween.stop()
+            this.tween!.stop()
             this.scene.onPieceSettled()
             return
         }

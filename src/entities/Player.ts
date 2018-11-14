@@ -10,7 +10,7 @@ import { Projectiles } from "../entities/Projectiles"
 
 const log = debug("game:entities:Player")
 
-const PLAYER_BEAM_STARTING_RESOURCES = 5
+const PLAYER_BEAM_STARTING_RESOURCES = 100
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
     public beam: Beam
@@ -60,8 +60,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         })
 
         this.beam = new Beam(this.scene, this, PLAYER_BEAM_STARTING_RESOURCES)
-
         this.projectiles = new Projectiles(this.scene, this.width - 15, -this.height)
+        // TODO(tristan): simplify posiitoning of child objects by adding to a container
+        /*this.parentContainer = new Phaser.GameObjects.Container(scene, x, y)
+        this.parentContainer.add(this.beam)
+        this.parentContainer.add(this.projectiles)*/
 
         log("constructed")
     }
