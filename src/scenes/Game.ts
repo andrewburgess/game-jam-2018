@@ -9,6 +9,7 @@ import { Piece, RotateDirection, Shape, createPiece } from "../entities/Piece/"
 import { Player } from "../entities/Player"
 
 import { Assets } from "../assets"
+import { ILevel, Levels } from "../levels"
 
 import { Scenes } from "./"
 
@@ -35,13 +36,13 @@ export default class Game extends Phaser.Scene {
     private currentPiece?: Piece
 
     /**
-     * The level number (at least 1), which influences how fast pieces move
+     * The level configuration of the game
      *
      * @private
-     * @type {number}
+     * @type {ILevel}
      * @memberof Game
      */
-    private level: number
+    private level: ILevel
 
     /**
      * The next piece to spawn
@@ -78,8 +79,8 @@ export default class Game extends Phaser.Scene {
     public create(config: IGameInitialization) {
         log(`create level ${config.level}`)
 
-        this.board = new Board(this, BLOCK_SIZE, BLOCK_SIZE * 4)
-        this.level = config.level
+        this.level = Levels[config.level]
+        this.board = new Board(this, BLOCK_SIZE, BLOCK_SIZE * 4, this.level)
         this.controller = new UnifiedController(this.input)
 
         this.add.image(this.centerX(), this.centerY(), Assets.Background)

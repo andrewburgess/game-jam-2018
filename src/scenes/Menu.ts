@@ -30,7 +30,7 @@ class Menu extends Phaser.Scene {
 
         gameButton.once("pointerup", () => {
             this.scene.start(Scenes.Game, {
-                level: 10
+                level: 1
             } as IGameInitialization)
             this.scene.start(Scenes.GameUI)
         })

@@ -1,20 +1,21 @@
 import { each, every, map, range, some } from "lodash"
 import * as Phaser from "phaser"
 
+import { ILevel } from "../levels"
 import Game from "../scenes/Game"
 
-import { BLOCK_SIZE, Block } from "./Block"
+import { BLOCK_SIZE } from "./Block"
 import { Piece } from "./Piece"
-
-export const BOARD_HEIGHT = 22
-export const BOARD_WIDTH = 20
 
 export class Board extends Phaser.GameObjects.Container {
     private cells: Array<Array<Piece | null>>
+    private level: ILevel
 
-    constructor(scene: Game, x: number, y: number) {
+    constructor(scene: Game, x: number, y: number, level: ILevel) {
         super(scene, x, y)
-        this.cells = map(range(BOARD_WIDTH), () => map(range(BOARD_HEIGHT), () => null))
+
+        this.level = level
+        this.cells = map(range(level.width), () => map(range(level.height), () => null))
     }
 
     public canPieceMoveTo(piece: Piece, x: number, y: number, angle?: number) {
@@ -26,8 +27,8 @@ export class Board extends Phaser.GameObjects.Container {
         return every(blockCoordinates, (coordinates) => {
             // Position to move to is out of bounds
             if (
-                x + coordinates.x >= BOARD_WIDTH ||
-                y + coordinates.y >= BOARD_HEIGHT ||
+                x + coordinates.x >= this.level.width ||
+                y + coordinates.y >= this.level.height ||
                 x + coordinates.x < 0 ||
                 y + coordinates.y < 0
             ) {
@@ -52,7 +53,10 @@ export class Board extends Phaser.GameObjects.Container {
     }
 
     public touchingBottom(piece: Piece) {
-        return some(piece.getBlockLocations(), (coordinate) => piece.location.y + coordinate.y === BOARD_HEIGHT - 1)
+        return some(
+            piece.getBlockLocations(),
+            (coordinate) => piece.location.y + coordinate.y === this.level.height - 1
+        )
     }
 
     public touchingLeft(piece: Piece) {
@@ -60,7 +64,7 @@ export class Board extends Phaser.GameObjects.Container {
     }
 
     public touchingRight(piece: Piece) {
-        return some(piece.getBlockLocations(), (coordinate) => piece.location.x + coordinate.x === BOARD_WIDTH - 1)
+        return some(piece.getBlockLocations(), (coordinate) => piece.location.x + coordinate.x === this.level.width - 1)
     }
 
     public updateLocation(
@@ -80,30 +84,30 @@ export class Board extends Phaser.GameObjects.Container {
     }
 
     public drawBoard() {
-        each(range(BOARD_WIDTH + 1), (x) =>
+        each(range(this.level.width + 1), (x) =>
             this.add(
                 new Phaser.GameObjects.Line(
                     this.scene,
                     BLOCK_SIZE / 2,
-                    ((BOARD_HEIGHT + 2) * BLOCK_SIZE) / 2,
+                    ((this.level.height + 2) * BLOCK_SIZE) / 2,
                     (x - 1) * BLOCK_SIZE,
                     -BLOCK_SIZE,
                     (x - 1) * BLOCK_SIZE,
-                    (BOARD_HEIGHT + 2) * BLOCK_SIZE,
+                    (this.level.height + 2) * BLOCK_SIZE,
                     0x0000ff,
                     0.3
                 )
             )
         )
-        each(range(BOARD_HEIGHT + 1), (y) =>
+        each(range(this.level.height + 1), (y) =>
             this.add(
                 new Phaser.GameObjects.Line(
                     this.scene,
-                    ((BOARD_WIDTH + 2) * BLOCK_SIZE) / 2,
+                    ((this.level.width + 2) * BLOCK_SIZE) / 2,
                     BLOCK_SIZE / 2,
                     -BLOCK_SIZE,
                     (y - 1) * BLOCK_SIZE,
-                    (BOARD_WIDTH + 2) * BLOCK_SIZE,
+                    (this.level.width + 2) * BLOCK_SIZE,
                     (y - 1) * BLOCK_SIZE,
                     0xff0000,
                     0.3

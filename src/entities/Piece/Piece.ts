@@ -2,8 +2,8 @@ import * as debug from "debug"
 import { clamp, isUndefined } from "lodash"
 import * as Phaser from "phaser"
 
+import { ILevel } from "../../levels"
 import Game from "../../scenes/Game"
-
 import { BLOCK_SIZE, Block } from "../Block"
 
 import { Direction, IPieceConfiguration, RotateDirection, Shape } from "./"
@@ -26,7 +26,7 @@ export abstract class Piece extends Phaser.GameObjects.Container {
     protected beingBeamed: boolean
     protected color: Phaser.Display.Color
     protected direction: Direction
-    protected level: number
+    protected level: ILevel
     protected rotating: boolean
     protected shape: Shape
     protected tween?: Phaser.Tweens.Tween
@@ -36,7 +36,7 @@ export abstract class Piece extends Phaser.GameObjects.Container {
         this.actualAngle = 0
         this.beingBeamed = false
         this.rotating = false
-        this.level = config.level || 1
+        this.level = config.level
         this.scene = scene
         this.shape = config.shape || Shape.I
 
@@ -128,7 +128,7 @@ export abstract class Piece extends Phaser.GameObjects.Container {
     protected abstract build(): void
 
     private getMoveDuration() {
-        return clamp(1000 / (this.level / 1.5), 10, 600)
+        return this.level.speed / (this.isBeingBeamed() ? 4 : 1)
     }
 
     private move(direction?: Direction): void {

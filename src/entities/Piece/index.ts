@@ -1,5 +1,6 @@
 import { sample } from "lodash"
 
+import { ILevel } from "../../levels"
 import Game from "../../scenes/Game"
 
 import { IPiece } from "./IPiece"
@@ -35,7 +36,7 @@ export enum Shape {
 export { Piece }
 
 export interface IPieceConfiguration {
-    level?: number
+    level: ILevel
     shape?: Shape
 }
 
@@ -43,7 +44,7 @@ const ShapeValues = Object.keys(Shape)
     .map((n) => Number.parseInt(n, 10))
     .filter((n) => !Number.isNaN(n))
 
-export function createPiece(scene: Game, x: number, y: number, config: IPieceConfiguration = {}) {
+export function createPiece(scene: Game, x: number, y: number, config: IPieceConfiguration) {
     let index: number
     if (config.shape === undefined) {
         index = sample(ShapeValues)!
