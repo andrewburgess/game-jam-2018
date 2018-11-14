@@ -27,7 +27,6 @@ export class Beam extends Phaser.GameObjects.Sprite {
     constructor(scene: Phaser.Scene, player: Player, startingResources: number) {
         log("constructing")
 
-        // TODO(tristan): make semi-transparent blue cone sprite texture to represent the beam
         super(scene, player.x, player.y, Assets.Beam)
         this.scene = scene
 
@@ -111,13 +110,8 @@ export class Beam extends Phaser.GameObjects.Sprite {
             this.resourceConsumeDelta = 0.0
         }
 
-        if (piece && piece.x <= this.x + this.width && piece.x >= this.x - this.width) {
-            return true
-            // TODO(tristan): https://answers.unity.com/questions/760532/how-to-warpdistort-a-2d-sprite.html
-            // Warp space in front of beam into cone-ish shape to look like the beam is coming out of the ship
-        } else {
-            return false
-        }
+        const pieceWithinBeamBounds: boolean = piece.x <= this.x + this.width / 2 && piece.x >= this.x - this.width / 2
+        return pieceWithinBeamBounds
     }
 
     private updateBeamPosition() {

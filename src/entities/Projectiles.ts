@@ -3,7 +3,7 @@ import * as Phaser from "phaser"
 
 import { Projectile } from "./Projectile"
 
-const log = debug("game:entities:Beam")
+const log = debug("game:entities:Projectiles")
 
 export class Projectiles extends Phaser.GameObjects.Container {
     public elements: Phaser.Physics.Arcade.Group

@@ -10,7 +10,7 @@ import { Projectiles } from "../entities/Projectiles"
 
 const log = debug("game:entities:Player")
 
-const PLAYER_BEAM_STARTING_RESOURCES = 50
+const PLAYER_BEAM_STARTING_RESOURCES = 5
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
     public beam: Beam

@@ -1,13 +1,16 @@
 import * as debug from "debug"
+import { isUndefined } from "lodash"
 import * as Phaser from "phaser"
 
 import UnifiedController from "../GameInput"
 import { BLOCK_SIZE } from "../entities/Block"
 import { Board } from "../entities/Board"
-import { Direction, Piece, RotateDirection, Shape, createPiece } from "../entities/Piece/"
+import { Piece, RotateDirection, Shape, createPiece } from "../entities/Piece/"
+import { Player } from "../entities/Player"
+
+import { Assets } from "../assets"
 
 import { Scenes } from "./"
-import { isUndefined } from "util"
 
 const log = debug(`game:scenes:${Scenes.Game}`)
 
@@ -50,6 +53,15 @@ export default class Game extends Phaser.Scene {
      */
     private nextPiece?: Piece
 
+    /**
+     * The player of the game
+     *
+     * @private
+     * @type {Player}
+     * @memberof Game
+     */
+    private player: Player
+
     constructor(inKey: string = Scenes.Game) {
         super({
             key: inKey,
@@ -71,6 +83,14 @@ export default class Game extends Phaser.Scene {
         this.level = config.level
         this.controller = new UnifiedController(this.input)
 
+        this.add.image(this.centerX(), this.centerY(), Assets.Background)
+
+        this.player = new Player(this, this.centerX(), this.cameras.main.height)
+
+        const worldTop: Phaser.Physics.Arcade.Sprite = this.physics.add.staticSprite(16, -16, "world_top")
+        worldTop.setSize(this.physics.world.bounds.width, worldTop.height)
+        this.player.projectiles.destroyOnCollisionWith(worldTop)
+
         this.add.existing(this.board)
 
         if (window.localStorage && window.localStorage.getItem("debug")) {
@@ -88,6 +108,8 @@ export default class Game extends Phaser.Scene {
         if (!this.currentPiece) {
             return
         }
+
+        this.player.update(time, delta, this.currentPiece!)
 
         if (this.controller.space!.isDown() && !this.currentPiece.isRotating()) {
             this.currentPiece.rotate(RotateDirection.CLOCKWISE)
@@ -125,6 +147,14 @@ export default class Game extends Phaser.Scene {
         }
 
         this.currentPiece.onActivate()
+    }
+
+    private centerX() {
+        return this.cameras.main.width / 2
+    }
+
+    private centerY() {
+        return this.cameras.main.height / 2
     }
 
     private spawnNextPiece() {

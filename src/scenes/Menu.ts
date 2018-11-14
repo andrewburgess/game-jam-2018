@@ -24,18 +24,13 @@ class Menu extends Phaser.Scene {
     public create(data: any) {
         log("create", data)
 
-        const beamTest = this.add.image(0, -250, Assets.BeamTest).setInteractive()
-        const gameButton = this.add.image(0, 200, Assets.GameButton).setInteractive()
+        const gameButton = this.add.image(0, 0, Assets.GameButton).setInteractive()
 
-        this.add.container(this.centerX(), this.centerY(), [beamTest, gameButton])
-
-        beamTest.once("pointerup", () => {
-            this.scene.start(Scenes.BeamTest)
-        })
+        this.add.container(this.centerX(), this.centerY(), [gameButton])
 
         gameButton.once("pointerup", () => {
             this.scene.start(Scenes.Game, {
-                level: 400
+                level: 5
             } as IGameInitialization)
             this.scene.start(Scenes.GameUI)
         })
