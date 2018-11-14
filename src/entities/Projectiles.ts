@@ -5,6 +5,8 @@ import { Projectile } from "./Projectile"
 
 const log = debug("game:entities:Projectiles")
 
+export const PROJECTILE_STANDARD_VELOCITY = -1100
+
 export class Projectiles extends Phaser.GameObjects.Container {
     public elements: Phaser.Physics.Arcade.Group
     public scene: Phaser.Scene

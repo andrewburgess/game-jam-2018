@@ -5,8 +5,6 @@ import * as Phaser from "phaser"
 import { Assets } from "../assets"
 import { Piece } from "../entities/Piece"
 
-import { Player } from "./Player"
-
 const log = debug("game:entities:Beam")
 
 const BEAM_RESOURCES_TEXT = "Beam Resources: "
@@ -16,7 +14,6 @@ const BEAM_UPDATE_DELTA = 250.0
 
 export class Beam extends Phaser.GameObjects.Sprite {
     public scene: Phaser.Scene
-    private player: Player
     private resourceConsumeDelta: number
     private resourceGenDelta: number
     private resourceLimit: number
@@ -24,13 +21,11 @@ export class Beam extends Phaser.GameObjects.Sprite {
     private resourcesText: Phaser.GameObjects.Text
     private updateDelta: number
 
-    constructor(scene: Phaser.Scene, player: Player, startingResources: number) {
+    constructor(scene: Phaser.Scene, x: number, y: number, startingResources: number) {
         log("constructing")
 
-        super(scene, player.x, player.y, Assets.Beam)
+        super(scene, x, y, Assets.Beam)
         this.scene = scene
-
-        this.player = player
 
         this.resourceConsumeDelta = 0.0
         this.resourceGenDelta = 0.0
@@ -42,9 +37,6 @@ export class Beam extends Phaser.GameObjects.Sprite {
         )
         this.updateDelta = 0.0
 
-        this.setY(this.y - player.height - this.height)
-
-        this.scene.add.existing(this)
         this.setVisible(false)
 
         log("constructed")
@@ -59,8 +51,6 @@ export class Beam extends Phaser.GameObjects.Sprite {
             this.resources = Math.min(this.resources + 1, this.resourceLimit)
             this.resourceGenDelta = 0.0
         }
-
-        this.updateBeamPosition()
 
         if (!isUndefined(currentPiece)) {
             if (beamActive) {
@@ -108,13 +98,20 @@ export class Beam extends Phaser.GameObjects.Sprite {
             this.resourceConsumeDelta = 0.0
         }
 
-        const pieceWithinBeamBounds: boolean = piece.x <= this.x + this.width / 2 && piece.x >= this.x - this.width / 2
+        log(`tristan test: ${this.x}, ${this.width}, ${this.y}, ${this.height}, ${piece.x}, ${piece.y}`)
+
+        const pieceWithinBeamBounds: boolean =
+            piece.x >= this.parentContainer.x + this.leftEdgeXOffset() &&
+            piece.x <= this.parentContainer.x + this.rightEdgeXOffset()
+
         return pieceWithinBeamBounds
     }
 
-    private updateBeamPosition() {
-        const beamPosX: number = this.player.x
-        const beamPosY: number = this.player.y - this.height + 25
-        this.setPosition(beamPosX, beamPosY)
+    private leftEdgeXOffset() {
+        return -this.width / 2
+    }
+
+    private rightEdgeXOffset() {
+        return this.width / 2
     }
 }
