@@ -24,6 +24,13 @@ export interface IGameInitialization {
 export default class Game extends Phaser.Scene {
     public board: Board
 
+    /**
+     * The virtual controller that maps physical device actions into game actions.
+     *
+     * @private
+     * @type {Unified}
+     * @memberof Game
+     */
     private controller: UnifiedController
 
     /**
@@ -126,10 +133,6 @@ export default class Game extends Phaser.Scene {
         }
 
         this.player.update(time, delta, this.currentPiece!)
-
-        if (this.controller.space!.isDown() && !this.currentPiece.isRotating()) {
-            this.currentPiece.rotate(RotateDirection.CLOCKWISE)
-        }
     }
 
     public getLevel() {

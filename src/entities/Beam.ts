@@ -3,18 +3,22 @@ import { isUndefined } from "lodash"
 import * as Phaser from "phaser"
 
 import { Assets } from "../assets"
+import Game from "../scenes/Game"
 
 import { Piece } from "./Piece"
 
 const log = debug("game:entities:Beam")
 
 const BEAM_RESOURCES_TEXT = "Beam Resources: "
-const BEAM_RESOURCE_GEN_DELTA = 250.0
-const BEAM_RESOURCE_CONSUME_DELTA = 75.0
+// TODO(tristan): Resources should probably get more scarce as the level goes up.
+// Currently, as the level progresses such that tile movement is faster, you can easily never
+// run out of beam resources
+const BEAM_RESOURCE_GEN_DELTA = 200.0
+const BEAM_RESOURCE_CONSUME_DELTA = 20.0
 const BEAM_UPDATE_DELTA = 250.0
 
 export class Beam extends Phaser.GameObjects.Sprite {
-    public scene: Phaser.Scene
+    private game: Game
     private resourceConsumeDelta: number
     private resourceGenDelta: number
     private resourceLimit: number
@@ -22,17 +26,17 @@ export class Beam extends Phaser.GameObjects.Sprite {
     private resourcesText: Phaser.GameObjects.Text
     private updateDelta: number
 
-    constructor(scene: Phaser.Scene, x: number, y: number, startingResources: integer) {
+    constructor(game: Game, x: number, y: number, startingResources: integer) {
         log("constructing")
 
-        super(scene, x, y, Assets.Beam)
-        this.scene = scene
+        super(game, x, y, Assets.Beam)
+        this.game = game
 
         this.resourceConsumeDelta = 0.0
         this.resourceGenDelta = 0.0
         this.resources = this.resourceLimit = startingResources
-        this.resourcesText = this.scene.add.text(
-            this.scene.cameras.main.width - 200,
+        this.resourcesText = this.game.add.text(
+            this.game.cameras.main.width - 200,
             5,
             BEAM_RESOURCES_TEXT + this.resources
         )
@@ -99,12 +103,19 @@ export class Beam extends Phaser.GameObjects.Sprite {
             this.resourceConsumeDelta = 0.0
         }
 
-        const piecePLeft = piece.x - piece.width / 2
-        const piecePRight = piece.x + piece.width / 2
+        const pieceRelLeft = new Phaser.Math.Vector2(piece.x - piece.width / 2, piece.y - piece.height)
+        const pieceWorldLeft = this.game.board.canonicalizePosition(pieceRelLeft)
+
+        const pieceRelCenter = new Phaser.Math.Vector2(piece.x, piece.y - piece.height)
+        const pieceWorldCenter = this.game.board.canonicalizePosition(pieceRelCenter)
+
+        const pieceRelRight = new Phaser.Math.Vector2(piece.x + piece.width / 2, piece.y - piece.height)
+        const pieceWorldRight = this.game.board.canonicalizePosition(pieceRelRight)
+
         return (
-            this.parentContainer.body.hitTest(piecePLeft, this.parentContainer.y) ||
-            this.parentContainer.body.hitTest(piece.x, this.parentContainer.y) ||
-            this.parentContainer.body.hitTest(piecePRight, this.parentContainer.y)
+            this.parentContainer.body.hitTest(pieceWorldLeft.x, this.parentContainer.y) ||
+            this.parentContainer.body.hitTest(pieceWorldCenter.x, this.parentContainer.y) ||
+            this.parentContainer.body.hitTest(pieceWorldRight.x, this.parentContainer.y)
         )
     }
 }

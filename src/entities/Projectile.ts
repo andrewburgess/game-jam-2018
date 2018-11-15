@@ -2,23 +2,30 @@ import * as debug from "debug"
 import * as Phaser from "phaser"
 
 import { Assets } from "../assets"
+import Game from "../scenes/Game"
 
 import { Piece, RotateDirection } from "./Piece"
 
 const log = debug("game:entities:Projectile")
 
+const PROJECTILE_COLLISION_BOUND_SCALE_X = 0.5
+
 export class Projectile extends Phaser.Physics.Arcade.Sprite {
     private hasHit: boolean
+    private game: Game
 
-    constructor(scene: Phaser.Scene, x: number, y: number) {
+    constructor(game: Game, x: number, y: number) {
         log("constructing")
 
-        super(scene, x, y, Assets.Projectile)
+        super(game, x, y, Assets.Projectile)
+        this.game = game
 
         this.hasHit = false
 
         this.scene.physics.world.enable(this)
         this.scene.add.existing(this)
+
+        this.setSize(this.width * PROJECTILE_COLLISION_BOUND_SCALE_X, this.height)
 
         log("constructed")
     }
@@ -29,14 +36,21 @@ export class Projectile extends Phaser.Physics.Arcade.Sprite {
             return
         }
 
-        const piecePY = currentPiece.y - currentPiece.height
-        const piecePLeft = currentPiece.x - currentPiece.width / 2
-        const piecePRight = currentPiece.x + currentPiece.width / 2
+        const pieceRelLeft = new Phaser.Math.Vector2(
+            currentPiece.x - currentPiece.width / 2,
+            currentPiece.y - currentPiece.height
+        )
+        const pieceWorldLeft = this.game.board.canonicalizePosition(pieceRelLeft)
+        const pieceRelRight = new Phaser.Math.Vector2(
+            currentPiece.x + currentPiece.width / 2,
+            currentPiece.y - currentPiece.height
+        )
+        const pieceWorldRight = this.game.board.canonicalizePosition(pieceRelRight)
 
-        if (this.body.hitTest(piecePLeft, piecePY)) {
+        if (this.body.hitTest(pieceWorldLeft.x, pieceWorldLeft.y)) {
             currentPiece.rotate(RotateDirection.CLOCKWISE)
             this.hasHit = true
-        } else if (this.body.hitTest(piecePRight, piecePY)) {
+        } else if (this.body.hitTest(pieceWorldRight.x, pieceWorldRight.y)) {
             currentPiece.rotate(RotateDirection.COUNTER_CLOCKWISE)
             this.hasHit = true
         }

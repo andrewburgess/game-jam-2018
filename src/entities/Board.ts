@@ -21,6 +21,15 @@ export class Board extends Phaser.GameObjects.Container {
         this.setupPlatforms()
     }
 
+    public canonicalizePosition(boardRelativePos: Phaser.Math.Vector2): Phaser.Math.Vector2 {
+        const worldPos = new Phaser.Math.Vector2()
+
+        worldPos.x = this.x + boardRelativePos.x
+        worldPos.y = this.y + boardRelativePos.y
+
+        return worldPos
+    }
+
     public canPieceMoveTo(piece: Piece, x: number, y: number, angle?: number) {
         if (angle === undefined) {
             angle = piece.actualAngle

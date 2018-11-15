@@ -3,6 +3,7 @@ import * as Phaser from "phaser"
 
 import UnifiedController from "../GameInput"
 import { Assets } from "../assets"
+import Game from "../scenes/Game"
 
 import { Beam } from "./Beam"
 import { Piece } from "./Piece"
@@ -20,26 +21,29 @@ export class Player extends Phaser.GameObjects.Container {
     public beam: Beam
     public projectiles: Projectiles
     private controller: UnifiedController
+    private game: Game
 
-    constructor(scene: Phaser.Scene, x: number, y: number) {
+    constructor(game: Game, x: number, y: number) {
         log("constructing")
 
-        const playerSprite = new Phaser.Physics.Arcade.Sprite(scene, 0, 0, Assets.Player)
+        const playerSprite = new Phaser.Physics.Arcade.Sprite(game, 0, 0, Assets.Player)
         playerSprite.setScale(PLAYER_SCALE)
 
-        super(scene, x, y, [playerSprite])
+        super(game, x, y, [playerSprite])
+
+        this.game = game
 
         this.setSize(playerSprite.width * PLAYER_SCALE, playerSprite.height * PLAYER_SCALE)
 
-        this.scene.physics.world.enable(this)
-        this.scene.add.existing(this)
+        this.game.physics.world.enable(this)
+        this.game.add.existing(this)
 
         this.body.setMaxVelocity(PLAYER_MAX_VELOCITY)
         this.body.setCollideWorldBounds(true)
 
         // NOTE(tristan): I'm assuming that the follow directive is similar to adding the emmiters as
         // children of this container, but I don't know for sure
-        scene.add.particles(Assets.ParticleEngineThrust).createEmitter({
+        this.game.add.particles(Assets.ParticleEngineThrust).createEmitter({
             angle: 90,
             blendMode: Phaser.BlendModes.ADD,
             follow: this,
@@ -53,7 +57,7 @@ export class Player extends Phaser.GameObjects.Container {
             speed: 100
         })
 
-        scene.add.particles(Assets.ParticleEngineThrust).createEmitter({
+        this.game.add.particles(Assets.ParticleEngineThrust).createEmitter({
             angle: 90,
             blendMode: Phaser.BlendModes.ADD,
             follow: this,
@@ -72,10 +76,10 @@ export class Player extends Phaser.GameObjects.Container {
         // However, we don't want projectiles to always be offset relative to the player; we want
         // projectiles to always be fired starting at the position of the player and then let physics
         // take over from there.
-        this.beam = new Beam(scene, 0, this.topEdgeYOffset(), PLAYER_BEAM_STARTING_RESOURCES)
+        this.beam = new Beam(this.game, 0, this.topEdgeYOffset(), PLAYER_BEAM_STARTING_RESOURCES)
         this.add(this.beam)
-        this.controller = new UnifiedController(this.scene.input)
-        this.projectiles = new Projectiles(scene, 20, this.topEdgeYOffset(), PLAYER_PROJECTILES_STARTING_RESOURCES)
+        this.controller = new UnifiedController(this.game.input)
+        this.projectiles = new Projectiles(this.game, 20, this.topEdgeYOffset(), PLAYER_PROJECTILES_STARTING_RESOURCES)
 
         log("constructed")
     }
@@ -95,17 +99,19 @@ export class Player extends Phaser.GameObjects.Container {
         }
         this.beam.update(time, delta, beamActiveAttempt, currentPiece)
 
+        let projectileFireAttempt: boolean = false
         if (this.controller.actionRB!.isUniquelyDown()) {
-            this.projectiles.createProjectile(this.x, this.y, 0, PROJECTILE_STANDARD_VELOCITY)
+            projectileFireAttempt = true
         }
-        this.projectiles.update(time, delta, currentPiece)
+
+        this.projectiles.update(time, delta, projectileFireAttempt, this.x, this.y, currentPiece)
     }
 
     private topEdgeYOffset() {
-        return -this.height / 2
+        return -this.height / 2 - 15
     }
 
     private botEdgeYOffset() {
-        return this.height / 2
+        return this.height / 2 - 15
     }
 }
