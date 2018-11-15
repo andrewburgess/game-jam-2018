@@ -5,7 +5,7 @@ import { Assets } from "../assets"
 import { ILevel, IPlatform } from "../levels"
 import Game from "../scenes/Game"
 
-import { BLOCK_SIZE } from "./Block"
+import { BLOCK_SIZE, EmptyBlock } from "./Block"
 import { Piece } from "./Piece"
 
 export class Board extends Phaser.GameObjects.Container {
@@ -140,13 +140,32 @@ export class Board extends Phaser.GameObjects.Container {
     private setupPlatforms() {
         const platforms = this.level.platforms
 
-        each(platforms, (platform) =>
+        each(platforms, (platform) => {
+            // Draw platforms
+            const platformX = platform.x * BLOCK_SIZE - BLOCK_SIZE / 2
+            const platformY = platform.y * BLOCK_SIZE
+
             this.add(
                 this.scene.add
-                    .image(platform.x * BLOCK_SIZE - BLOCK_SIZE / 2, platform.y * BLOCK_SIZE, Assets.Platform)
+                    .image(platformX, platformY, Assets.Platform)
                     .setDisplaySize(platform.width * BLOCK_SIZE, 16)
                     .setOrigin(0, 1)
             )
+
+            // Parse cells
+            each(platform.cells, (cell, index) => {
+                if (cell === " ") {
+                    return
+                }
+
+                this.add(
+                    new EmptyBlock(
+                        this.scene,
+                        platformX + (index % platform.width) * BLOCK_SIZE,
+                        platformY - (Math.floor(index / platform.width) + 1) * BLOCK_SIZE
+                    )
         )
+            })
+        })
     }
 }
