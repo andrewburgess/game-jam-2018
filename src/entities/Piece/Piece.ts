@@ -1,5 +1,5 @@
 import * as debug from "debug"
-import { clamp, isUndefined } from "lodash"
+import { isUndefined } from "lodash"
 import * as Phaser from "phaser"
 
 import { ILevel } from "../../levels"

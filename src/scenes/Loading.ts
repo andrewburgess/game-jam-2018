@@ -67,6 +67,7 @@ class Loading extends Phaser.Scene {
         this.load.image(Assets.Beam, Files.BEAM)
         this.load.image(Assets.GameButton, Files.GAME_BUTTON)
         this.load.image(Assets.ParticleEngineThrust, Files.PARTICLE_ENGINE_THRUST)
+        this.load.image(Assets.Platform, Files.PLATFORM)
         this.load.spritesheet(Assets.Player, Files.PLAYER, {
             frameHeight: 32,
             frameWidth: 40

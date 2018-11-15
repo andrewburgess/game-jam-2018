@@ -1,7 +1,8 @@
 import { each, every, map, range, some } from "lodash"
 import * as Phaser from "phaser"
 
-import { ILevel } from "../levels"
+import { Assets } from "../assets"
+import { ILevel, IPlatform } from "../levels"
 import Game from "../scenes/Game"
 
 import { BLOCK_SIZE } from "./Block"
@@ -16,6 +17,8 @@ export class Board extends Phaser.GameObjects.Container {
 
         this.level = level
         this.cells = map(range(level.width), () => map(range(level.height), () => null))
+
+        this.setupPlatforms()
     }
 
     public canPieceMoveTo(piece: Piece, x: number, y: number, angle?: number) {
@@ -36,15 +39,24 @@ export class Board extends Phaser.GameObjects.Container {
             }
 
             const cell = this.cells[x + coordinates.x][y + coordinates.y]
-            if (cell === null) {
-                // Cell is empty, this block can move there
-                return true
-            }
-
             if (cell === piece) {
                 // Cell is occupied, but it's occupied by a block from the same
                 // piece, so it will move
                 return true
+            }
+
+            if (cell === null) {
+                // Cell is empty, check to see if a platform is in the way
+                return every(this.level.platforms, (platform: IPlatform) => {
+                    const xcoord = x + coordinates.x
+                    const ycoord = y + coordinates.y
+
+                    return (
+                        xcoord < platform.x || // To the left of the platform
+                        xcoord >= platform.x + platform.width || // To the right of the platform
+                        (xcoord >= platform.x && xcoord < platform.x + platform.width && ycoord !== platform.y) // Over the platform, but on a different row
+                    )
+                })
             }
 
             // Cell is occupied by a block, the move can not be completed
@@ -112,6 +124,19 @@ export class Board extends Phaser.GameObjects.Container {
                     0xff0000,
                     0.3
                 )
+            )
+        )
+    }
+
+    private setupPlatforms() {
+        const platforms = this.level.platforms
+
+        each(platforms, (platform) =>
+            this.add(
+                this.scene.add
+                    .image(platform.x * BLOCK_SIZE - BLOCK_SIZE / 2, platform.y * BLOCK_SIZE, Assets.Platform)
+                    .setDisplaySize(platform.width * BLOCK_SIZE, 16)
+                    .setOrigin(0, 1)
             )
         )
     }

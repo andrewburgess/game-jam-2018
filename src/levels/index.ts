@@ -8,6 +8,14 @@ export interface ILevel {
     readonly height: number
 
     /**
+     * Platforms in the level where building spots are located
+     *
+     * @type {IPlatform[]}
+     * @memberof ILevel
+     */
+    readonly platforms: IPlatform[]
+
+    /**
      * Duration between piece movements in milliseconds
      *
      * @type {number}
@@ -33,10 +41,30 @@ export interface ILevel {
     readonly zoom: number
 }
 
+export interface IPlatform {
+    width: number
+
+    x: number
+
+    y: number
+}
+
 export const Levels: { [key: string]: ILevel } = {
     [1]: {
         height: 12,
-        speed: 1000,
+        platforms: [
+            {
+                width: 4,
+                x: 3,
+                y: 4
+            },
+            {
+                width: 3,
+                x: 8,
+                y: 9
+            }
+        ],
+        speed: 100,
         width: 15,
         zoom: 1
     }

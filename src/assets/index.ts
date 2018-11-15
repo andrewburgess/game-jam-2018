@@ -5,6 +5,7 @@ import * as BACKGROUND from "./images/background.png"
 import * as BEAM from "./images/beam.png"
 import * as GAME_BUTTON from "./images/game-button.png"
 import * as PARTICLE_ENGINE_THRUST from "./images/particle-engine-thrust.png"
+import * as PLATFORM from "./images/platform.png"
 // NOTE(tristan): https://bit.ly/2SQMZtt
 import * as PROJECTILE from "./images/player-projectile.png"
 // NOTE(tristan): https://bit.ly/2qsAQh5
@@ -15,6 +16,7 @@ export const Files = {
     BEAM,
     GAME_BUTTON,
     PARTICLE_ENGINE_THRUST,
+    PLATFORM,
     PLAYER,
     PROJECTILE
 }
@@ -24,6 +26,7 @@ export enum Assets {
     Beam = "beam",
     GameButton = "game-button",
     ParticleEngineThrust = "particle-engine-thrust",
+    Platform = "platform",
     Player = "player",
     Projectile = "projectile"
 }
