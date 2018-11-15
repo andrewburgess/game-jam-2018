@@ -5,7 +5,7 @@ import * as Phaser from "phaser"
 import UnifiedController from "../GameInput"
 import { BLOCK_SIZE } from "../entities/Block"
 import { Board } from "../entities/Board"
-import { Piece, RotateDirection, Shape, createPiece } from "../entities/Piece/"
+import { Piece, Shape, createPiece } from "../entities/Piece/"
 import { Player } from "../entities/Player"
 
 import { Assets } from "../assets"
@@ -147,7 +147,12 @@ export default class Game extends Phaser.Scene {
     }
 
     public onPieceSettled() {
-        this.activateNextPiece()
+        if (!this.board.isComplete()) {
+            this.activateNextPiece()
+        } else {
+            log("you winner")
+            throw new Error("winner winner winner")
+        }
     }
 
     private activateNextPiece() {

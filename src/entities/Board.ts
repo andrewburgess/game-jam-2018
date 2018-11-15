@@ -10,6 +10,7 @@ import { Piece } from "./Piece"
 
 export class Board extends Phaser.GameObjects.Container {
     private cells: Array<Array<Piece | null>>
+    private toFill: Vector2Like[]
     private level: ILevel
 
     constructor(scene: Game, x: number, y: number, level: ILevel) {
@@ -17,6 +18,7 @@ export class Board extends Phaser.GameObjects.Container {
 
         this.level = level
         this.cells = map(range(level.width), () => map(range(level.height), () => null))
+        this.toFill = []
 
         this.setupPlatforms()
     }
@@ -71,6 +73,10 @@ export class Board extends Phaser.GameObjects.Container {
             // Cell is occupied by a block, the move can not be completed
             return false
         })
+    }
+
+    public isComplete() {
+        return every(this.toFill, (vec) => !!this.cells[vec.x][vec.y])
     }
 
     public touchingBottom(piece: Piece) {
