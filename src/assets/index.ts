@@ -12,12 +12,20 @@ import * as PROJECTILE from "./images/player-projectile.png"
 import * as PLAYER from "./images/player.png"
 // NOTE(tristan): opening the raw versions of sounds assets requires at least the demo version
 // of Propellerhead's Reason software: https://www.propellerheads.com/en/reason
+import * as FX_BEAM_ACTIVATED from "./sounds/fx-beam-activated.mp3"
+import * as FX_BEAM_BEAMING_PIECE from "./sounds/fx-beam-beaming-piece.mp3"
+import * as FX_PIECE_HIT from "./sounds/fx-piece-hit.mp3"
+import * as FX_PROJECTILE_FIRED from "./sounds/fx-projectile-fired.mp3"
 import * as MUSIC_01 from "./sounds/music01.mp3"
 import * as MUSIC_02 from "./sounds/music02.mp3"
 
 export const Files = {
     BACKGROUND,
     BEAM,
+    FX_BEAM_ACTIVATED,
+    FX_BEAM_BEAMING_PIECE,
+    FX_PIECE_HIT,
+    FX_PROJECTILE_FIRED,
     GAME_BUTTON,
     MUSIC_01,
     MUSIC_02,
@@ -31,6 +39,10 @@ export enum Assets {
     Background = "background",
     Beam = "beam",
     GameButton = "game-button",
+    FxBeamActivated = "fx-beam-activated",
+    FxBeamBeamingPiece = "fx-beam-beaming-piece",
+    FxPieceHit = "fx-piece-hit",
+    FxProjectileFired = "fx-projectile-fired",
     Music01 = "music-01",
     Music02 = "music-02",
     ParticleEngineThrust = "particle-engine-thrust",

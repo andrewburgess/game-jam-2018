@@ -102,6 +102,16 @@ export default class Game extends Phaser.Scene {
 
         this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, Assets.Background)
 
+        const music01 = this.sound.add(Assets.Music01)
+        const music02 = this.sound.add(Assets.Music02)
+        music01.on("ended", () => {
+            music02.play()
+        })
+        music02.on("ended", () => {
+            music01.play()
+        })
+        music01.play()
+
         this.board.add(
             new Phaser.GameObjects.Graphics(this)
                 .lineStyle(2, 0xff0000, 1)

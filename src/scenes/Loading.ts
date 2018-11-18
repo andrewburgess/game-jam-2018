@@ -63,6 +63,12 @@ class Loading extends Phaser.Scene {
     }
 
     private loadAssets() {
+        this.load.audio(Assets.FxBeamActivated, Files.FX_BEAM_ACTIVATED)
+        this.load.audio(Assets.FxBeamBeamingPiece, Files.FX_BEAM_BEAMING_PIECE)
+        this.load.audio(Assets.FxPieceHit, Files.FX_PIECE_HIT)
+        this.load.audio(Assets.FxProjectileFired, Files.FX_PROJECTILE_FIRED)
+        this.load.audio(Assets.Music01, Files.MUSIC_01)
+        this.load.audio(Assets.Music02, Files.MUSIC_02)
         this.load.image(Assets.Background, Files.BACKGROUND)
         this.load.image(Assets.Beam, Files.BEAM)
         this.load.image(Assets.GameButton, Files.GAME_BUTTON)

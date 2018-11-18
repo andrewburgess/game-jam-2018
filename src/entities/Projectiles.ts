@@ -54,7 +54,7 @@ export class Projectiles extends Phaser.GameObjects.Container {
                 }
             },
             undefined,
-            this.scene
+            this.game
         )
     }
 

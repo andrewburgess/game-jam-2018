@@ -64,8 +64,10 @@ export class Beam extends Phaser.GameObjects.Sprite {
                 }
 
                 if (this.canBeam(currentPiece)) {
+                    this.game.sound.play(Assets.FxBeamBeamingPiece, { volume: 0.75 })
                     this.beam(currentPiece)
                 } else {
+                    this.scene.sound.play(Assets.FxBeamActivated, { volume: 0.55 })
                     if (currentPiece.isBeingBeamed()) {
                         log("beam finished")
                         currentPiece.setBeingBeamed(false)
