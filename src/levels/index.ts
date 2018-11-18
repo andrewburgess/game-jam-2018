@@ -42,10 +42,41 @@ export interface ILevel {
 }
 
 export interface IPlatform {
+    /**
+     * Defines the shape of the structure to build.
+     *
+     * Starts from the lower left portion of the platform, going to the right
+     * and then up to the left for the next row
+     *
+     * Uses a `#` to mark a cell, and a ` ` to mark an empty space
+     *
+     * @type {string}
+     * @memberof IPlatform
+     */
+    cells: string
+
+    /**
+     * Number of blocks wide the platform is
+     *
+     * @type {number}
+     * @memberof IPlatform
+     */
     width: number
 
+    /**
+     * X coordinate for the platform
+     *
+     * @type {number}
+     * @memberof IPlatform
+     */
     x: number
 
+    /**
+     * Y coordinate for the platform
+     *
+     * @type {number}
+     * @memberof IPlatform
+     */
     y: number
 }
 
@@ -54,17 +85,13 @@ export const Levels: { [key: string]: ILevel } = {
         height: 12,
         platforms: [
             {
-                width: 4,
-                x: 3,
-                y: 4
-            },
-            {
+                cells: " ## ##  #",
                 width: 3,
                 x: 8,
                 y: 9
             }
         ],
-        speed: 100,
+        speed: 500,
         width: 15,
         zoom: 1
     }

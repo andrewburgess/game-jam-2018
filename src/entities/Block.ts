@@ -30,3 +30,19 @@ export class Block extends Phaser.GameObjects.Rectangle {
         log("constructed")
     }
 }
+
+export class EmptyBlock extends Phaser.GameObjects.Rectangle {
+    constructor(scene: Phaser.Scene, x: number, y: number) {
+        super(scene, x, y, BLOCK_SIZE, BLOCK_SIZE)
+
+        this.fillAlpha = 0.05
+        this.fillColor = 0xffffff
+        this.strokeAlpha = 0.7
+        this.strokeColor = 0xffffff
+        this.isStroked = true
+        this.isFilled = true
+        this.setOrigin(0, 0.5)
+
+        this.type = "EmptyBlock"
+    }
+}
