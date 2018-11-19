@@ -170,7 +170,12 @@ export class Board extends Phaser.GameObjects.Container {
                         platformX + (index % platform.width) * BLOCK_SIZE,
                         platformY - (Math.floor(index / platform.width) + 1) * BLOCK_SIZE
                     )
-        )
+                )
+
+                this.toFill.push({
+                    x: platform.x + (index % platform.width),
+                    y: platform.y - 1 - Math.floor(index / platform.width)
+                })
             })
         })
     }
