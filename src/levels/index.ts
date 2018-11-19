@@ -82,7 +82,7 @@ export interface IPlatform {
 
 export const Levels: { [key: string]: ILevel } = {
     [1]: {
-        height: 12,
+        height: 17,
         platforms: [
             {
                 cells: " ## ##  #",
@@ -92,7 +92,7 @@ export const Levels: { [key: string]: ILevel } = {
             }
         ],
         speed: 500,
-        width: 15,
+        width: 29,
         zoom: 1
     }
 }

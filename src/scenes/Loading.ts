@@ -70,10 +70,13 @@ class Loading extends Phaser.Scene {
         this.load.audio(Assets.Music01, Files.MUSIC_01)
         this.load.audio(Assets.Music02, Files.MUSIC_02)
         this.load.image(Assets.Background, Files.BACKGROUND)
-        this.load.image(Assets.Beam, Files.BEAM)
         this.load.image(Assets.GameButton, Files.GAME_BUTTON)
         this.load.image(Assets.ParticleEngineThrust, Files.PARTICLE_ENGINE_THRUST)
         this.load.image(Assets.Platform, Files.PLATFORM)
+        this.load.spritesheet(Assets.Beam, Files.BEAM, {
+            frameHeight: 640,
+            frameWidth: 126
+        })
         this.load.spritesheet(Assets.Player, Files.PLAYER, {
             frameHeight: 32,
             frameWidth: 40

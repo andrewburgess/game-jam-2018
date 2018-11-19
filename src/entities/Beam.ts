@@ -16,6 +16,8 @@ const BEAM_RESOURCES_TEXT = "Beam Resources: "
 const BEAM_RESOURCE_GEN_DELTA = 200.0
 const BEAM_RESOURCE_CONSUME_DELTA = 20.0
 const BEAM_UPDATE_DELTA = 250.0
+const BEAM_START = "beam-start"
+const BEAM_FIRE = "beam-fire"
 
 export class Beam extends Phaser.GameObjects.Sprite {
     private game: Game
@@ -31,6 +33,8 @@ export class Beam extends Phaser.GameObjects.Sprite {
 
         super(game, x, y, Assets.Beam)
         this.game = game
+        this.setPosition(x, (y - this.height) / 2)
+        this.setDisplaySize(this.width / 2, this.height)
 
         this.resourceConsumeDelta = 0.0
         this.resourceGenDelta = 0.0
@@ -43,6 +47,28 @@ export class Beam extends Phaser.GameObjects.Sprite {
         this.updateDelta = 0.0
 
         this.setVisible(false)
+        this.setAlpha(0.75)
+
+        this.scene.anims.create({
+            frameRate: 24,
+            frames: this.scene.anims.generateFrameNumbers(Assets.Beam, {
+                end: 5,
+                start: 0
+            }),
+            key: BEAM_START
+        })
+
+        this.scene.anims.create({
+            frameRate: 24,
+            frames: this.scene.anims.generateFrameNumbers(Assets.Beam, {
+                end: 9,
+                start: 6
+            }),
+            key: BEAM_FIRE,
+            repeat: -1
+        })
+
+        this.on("animationcomplete", this.onAnimationComplete.bind(this))
 
         log("constructed")
     }
@@ -61,6 +87,7 @@ export class Beam extends Phaser.GameObjects.Sprite {
             if (beamActive) {
                 if (!this.visible) {
                     this.setVisible(true)
+                    this.anims.play(BEAM_START, true)
                 }
 
                 if (this.canBeam(currentPiece)) {
@@ -82,6 +109,9 @@ export class Beam extends Phaser.GameObjects.Sprite {
         }
 
         this.resourcesText.text = BEAM_RESOURCES_TEXT + this.resources
+
+        super.update(time, delta)
+        this.anims.update(time, delta)
     }
 
     private beam(piece: Piece) {
@@ -119,5 +149,11 @@ export class Beam extends Phaser.GameObjects.Sprite {
             this.parentContainer.body.hitTest(pieceWorldCenter.x, this.parentContainer.y) ||
             this.parentContainer.body.hitTest(pieceWorldRight.x, this.parentContainer.y)
         )
+    }
+
+    private onAnimationComplete(currentAnimation: Phaser.Animations.Animation) {
+        if (currentAnimation.key === BEAM_START && this.visible) {
+            this.anims.play(BEAM_FIRE)
+        }
     }
 }
