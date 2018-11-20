@@ -21,6 +21,7 @@ export class Board extends Phaser.GameObjects.Container {
         this.toFill = []
 
         this.setupPlatforms()
+        this.drawBorders()
     }
 
     public canonicalizePosition(boardRelativePos: Phaser.Math.Vector2): Phaser.Math.Vector2 {
@@ -141,6 +142,38 @@ export class Board extends Phaser.GameObjects.Container {
                 )
             )
         )
+    }
+
+    private drawBorders() {
+        const leftSide = new Phaser.GameObjects.Line(
+            this.scene,
+            -4,
+            (this.level.height * BLOCK_SIZE) / 2 - BLOCK_SIZE / 2,
+            (-1 * BLOCK_SIZE) / 2,
+            0,
+            (-1 * BLOCK_SIZE) / 2,
+            this.level.height * BLOCK_SIZE,
+            0x666666,
+            1
+        )
+
+        const rightSide = new Phaser.GameObjects.Line(
+            this.scene,
+            (this.level.width - 1) * BLOCK_SIZE + 4,
+            (this.level.height * BLOCK_SIZE) / 2 - BLOCK_SIZE / 2,
+            BLOCK_SIZE / 2,
+            0,
+            BLOCK_SIZE / 2,
+            this.level.height * BLOCK_SIZE,
+            0x666666,
+            1
+        )
+
+        leftSide.setLineWidth(4, 4)
+        rightSide.setLineWidth(4, 4)
+
+        this.add(leftSide)
+        this.add(rightSide)
     }
 
     private setupPlatforms() {
