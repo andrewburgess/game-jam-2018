@@ -18,6 +18,7 @@ const BEAM_RESOURCE_CONSUME_DELTA = 20.0
 const BEAM_UPDATE_DELTA = 250.0
 const BEAM_START = "beam-start"
 const BEAM_FIRE = "beam-fire"
+const BEAM_END = "beam-end"
 
 export class Beam extends Phaser.GameObjects.Sprite {
     private game: Game
@@ -34,7 +35,6 @@ export class Beam extends Phaser.GameObjects.Sprite {
         super(game, x, y, Assets.Beam)
         this.game = game
         this.setPosition(x, (y - this.height) / 2)
-        // this.setDisplaySize(this.width / 2, this.height)
 
         this.resourceConsumeDelta = 0.0
         this.resourceGenDelta = 0.0
@@ -66,6 +66,15 @@ export class Beam extends Phaser.GameObjects.Sprite {
             }),
             key: BEAM_FIRE,
             repeat: -1
+        })
+
+        this.scene.anims.create({
+            frameRate: 24,
+            frames: this.scene.anims.generateFrameNumbers(Assets.Beam, {
+                end: 5,
+                start: 0
+            }),
+            key: BEAM_END
         })
 
         this.on("animationcomplete", this.onAnimationComplete.bind(this))
@@ -104,7 +113,11 @@ export class Beam extends Phaser.GameObjects.Sprite {
                 if (currentPiece.isBeingBeamed()) {
                     currentPiece.setBeingBeamed(false)
                 }
-                this.setVisible(false)
+
+                if (this.visible && this.anims.currentAnim && this.anims.currentAnim.key === BEAM_FIRE) {
+                    this.anims.stop()
+                    this.anims.playReverse(BEAM_END, true)
+                }
             }
         }
 
@@ -154,6 +167,8 @@ export class Beam extends Phaser.GameObjects.Sprite {
     private onAnimationComplete(currentAnimation: Phaser.Animations.Animation) {
         if (currentAnimation.key === BEAM_START && this.visible) {
             this.anims.play(BEAM_FIRE)
+        } else if (currentAnimation.key === BEAM_END && this.visible) {
+            this.setVisible(false)
         }
     }
 }
