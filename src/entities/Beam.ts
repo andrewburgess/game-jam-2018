@@ -34,7 +34,7 @@ export class Beam extends Phaser.GameObjects.Sprite {
         super(game, x, y, Assets.Beam)
         this.game = game
         this.setPosition(x, (y - this.height) / 2)
-        this.setDisplaySize(this.width / 2, this.height)
+        // this.setDisplaySize(this.width / 2, this.height)
 
         this.resourceConsumeDelta = 0.0
         this.resourceGenDelta = 0.0
