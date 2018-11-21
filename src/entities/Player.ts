@@ -18,6 +18,7 @@ const PLAYER_PROJECTILES_STARTING_RESOURCES = 20
 
 export class Player extends Phaser.GameObjects.Container {
     public beam: Beam
+    public body: Phaser.Physics.Arcade.Body
     public projectiles: Projectiles
     private controller: UnifiedController
     private game: Game
@@ -33,9 +34,12 @@ export class Player extends Phaser.GameObjects.Container {
 
         this.setSize(100, 110)
         playerSprite.setDisplaySize(100, 110)
-
+    
         this.game.physics.world.enable(this)
         this.game.add.existing(this)
+        this.body.setAllowGravity(false)
+        this.body.setAllowDrag(true)
+        this.body.setDrag(500, 0)
 
         this.body.setMaxVelocity(PLAYER_MAX_VELOCITY)
         this.body.setCollideWorldBounds(true)
