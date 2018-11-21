@@ -1,10 +1,10 @@
 import * as Phaser from "phaser"
 
 import Game from "./scenes/Game"
+import GameSettings from "./scenes/GameSettings"
 import GameUI from "./scenes/GameUI"
 import Loading from "./scenes/Loading"
 import Menu from "./scenes/Menu"
-import Pause from "./scenes/Pause"
 
 const GameConfiguration: GameConfig = {
     backgroundColor: "#6495ED",
@@ -12,7 +12,7 @@ const GameConfiguration: GameConfig = {
     input: {
         gamepad: true
     },
-    scene: [Loading, Menu, Game, GameUI, Pause],
+    scene: [Loading, Menu, Game, GameSettings, GameUI],
     width: 1000
 }
 
