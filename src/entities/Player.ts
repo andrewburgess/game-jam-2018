@@ -34,7 +34,7 @@ export class Player extends Phaser.GameObjects.Container {
 
         this.setSize(100, 110)
         playerSprite.setDisplaySize(100, 110)
-    
+
         this.game.physics.world.enable(this)
         this.game.add.existing(this)
         this.body.setAllowGravity(false)
@@ -79,7 +79,7 @@ export class Player extends Phaser.GameObjects.Container {
         // However, we don't want projectiles to always be offset relative to the player; we want
         // projectiles to always be fired starting at the position of the player and then let physics
         // take over from there.
-        this.beam = new Beam(this.game, 0, this.topEdgeYOffset(), PLAYER_BEAM_STARTING_RESOURCES)
+        this.beam = new Beam(this.game, 0, this.topEdgeYOffset())
         this.add(this.beam)
         this.controller = new UnifiedController(this.game.input)
         this.projectiles = new Projectiles(this.game, 20, this.topEdgeYOffset(), PLAYER_PROJECTILES_STARTING_RESOURCES)
@@ -96,11 +96,12 @@ export class Player extends Phaser.GameObjects.Container {
             this.body.setAccelerationX(0)
         }
 
-        let beamActiveAttempt: boolean = false
-        if (this.controller.actionLB!.isDown()) {
-            beamActiveAttempt = true
+        if (!this.beam.isFiring() && this.controller.actionLB!.isUniquelyDown()) {
+            this.beam.fire()
+        } else if (this.beam.isFiring() && !this.controller.actionLB!.isDown()) {
+            this.beam.stopFiring()
         }
-        this.beam.update(time, delta, beamActiveAttempt, currentPiece)
+        this.beam.update(time, delta)
 
         let projectileFireAttempt: boolean = false
         if (this.controller.actionRB!.isUniquelyDown()) {

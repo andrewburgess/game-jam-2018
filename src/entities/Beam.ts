@@ -3,49 +3,29 @@ import { isUndefined } from "lodash"
 import * as Phaser from "phaser"
 
 import { Assets } from "../assets"
+import { ILevel } from "../levels"
 import Game from "../scenes/Game"
 
+import { Data } from "./Data"
 import { Piece } from "./Piece"
 
 const log = debug("game:entities:Beam")
 
-const BEAM_RESOURCES_TEXT = "Beam Resources: "
-// TODO(tristan): Resources should probably get more scarce as the level goes up.
-// Currently, as the level progresses such that tile movement is faster, you can easily never
-// run out of beam resources
-const BEAM_RESOURCE_GEN_DELTA = 200.0
-const BEAM_RESOURCE_CONSUME_DELTA = 20.0
-const BEAM_UPDATE_DELTA = 250.0
-const BEAM_START = "beam-start"
-const BEAM_FIRE = "beam-fire"
-const BEAM_END = "beam-end"
+const BEAM_END_ANIMATION = "beam-end"
+const BEAM_FIRE_ANIMATION = "beam-fire"
+const BEAM_START_ANIMATION = "beam-start"
 
 export class Beam extends Phaser.GameObjects.Sprite {
+    private firing: boolean
     private game: Game
-    private resourceConsumeDelta: number
-    private resourceGenDelta: number
-    private resourceLimit: number
-    private resources: number
-    private resourcesText: Phaser.GameObjects.Text
-    private updateDelta: number
+    private level: ILevel
 
-    constructor(game: Game, x: number, y: number, startingResources: integer) {
-        log("constructing")
-
+    constructor(game: Game, x: number, y: number) {
         super(game, x, y, Assets.Beam)
-        this.game = game
-        this.setPosition(x, y - (this.scene.cameras.main.height / 2))
-        this.setDisplaySize(this.width, this.scene.cameras.main.height)
 
-        this.resourceConsumeDelta = 0.0
-        this.resourceGenDelta = 0.0
-        this.resources = this.resourceLimit = startingResources
-        this.resourcesText = this.game.add.text(
-            this.game.cameras.main.width - 200,
-            5,
-            BEAM_RESOURCES_TEXT + this.resources
-        )
-        this.updateDelta = 0.0
+        this.game = game
+        this.setPosition(x, y - this.scene.cameras.main.height / 2)
+        this.setDisplaySize(this.width, this.scene.cameras.main.height)
 
         this.setVisible(false)
         this.setAlpha(0.75)
@@ -56,7 +36,7 @@ export class Beam extends Phaser.GameObjects.Sprite {
                 end: 5,
                 start: 0
             }),
-            key: BEAM_START
+            key: BEAM_START_ANIMATION
         })
 
         this.scene.anims.create({
@@ -65,7 +45,7 @@ export class Beam extends Phaser.GameObjects.Sprite {
                 end: 9,
                 start: 6
             }),
-            key: BEAM_FIRE,
+            key: BEAM_FIRE_ANIMATION,
             repeat: -1
         })
 
@@ -75,29 +55,67 @@ export class Beam extends Phaser.GameObjects.Sprite {
                 end: 5,
                 start: 0
             }),
-            key: BEAM_END
+            key: BEAM_END_ANIMATION
         })
 
         this.on("animationcomplete", this.onAnimationComplete.bind(this))
 
+        // Initialize game data
+        this.level = this.game.getLevel()
+        this.scene.registry.set(Data.BEAM_CURRENT, this.level.beam.maximum)
+        this.scene.registry.set(Data.BEAM_MAX, this.level.beam.maximum)
+
+        this.firing = false
+
         log("constructed")
     }
 
-    public update(time: number, delta: number, beamActive: boolean, currentPiece?: Piece) {
-        this.resourceGenDelta += delta
-        this.resourceConsumeDelta += delta
-        this.updateDelta += delta
+    public fire() {
+        log("firing")
+        this.setVisible(false)
+        this.firing = false
+        this.anims.stop()
 
-        if (this.resourceGenDelta > BEAM_RESOURCE_GEN_DELTA) {
-            this.resources = Math.min(this.resources + 1, this.resourceLimit)
-            this.resourceGenDelta = 0.0
+        this.firing = true
+        this.setVisible(true)
+        this.anims.play(BEAM_START_ANIMATION)
+    }
+
+    public isFiring() {
+        return this.firing
+    }
+
+    public stopFiring() {
+        log("stop firing")
+
+        this.firing = false
+        this.anims.playReverse(BEAM_END_ANIMATION)
+    }
+
+    public update(time: number, delta: number) {
+        super.update(time, delta)
+        this.anims.update(time, delta)
+
+        const beamResource = this.game.registry.get(Data.BEAM_CURRENT)
+
+        if (this.firing) {
+            if (beamResource > 0) {
+                this.consumeBeam(delta)
+                this.game.sound.play(Assets.FxBeamActivated, { volume: 0.55 })
+            } else {
+                this.stopFiring()
+            }
+        } else {
+            this.regenerateBeam(delta)
         }
+    }
 
+    /*public update(time: number, delta: number, beamActive: boolean, currentPiece?: Piece) {
         if (!isUndefined(currentPiece)) {
             if (beamActive) {
                 if (!this.visible) {
                     this.setVisible(true)
-                    this.anims.play(BEAM_START, true)
+                    this.anims.play(BEAM_START_ANIMATION, true)
                 }
 
                 if (this.canBeam(currentPiece)) {
@@ -115,40 +133,25 @@ export class Beam extends Phaser.GameObjects.Sprite {
                     currentPiece.setBeingBeamed(false)
                 }
 
-                if (this.visible && this.anims.currentAnim && this.anims.currentAnim.key === BEAM_FIRE) {
+                if (this.visible && this.anims.currentAnim && this.anims.currentAnim.key === BEAM_FIRE_ANIMATION) {
                     this.anims.stop()
-                    this.anims.playReverse(BEAM_END, true)
+                    this.anims.playReverse(BEAM_END_ANIMATION, true)
                 }
             }
         }
 
-        this.resourcesText.text = BEAM_RESOURCES_TEXT + this.resources
-
         super.update(time, delta)
         this.anims.update(time, delta)
-    }
+    }*/
 
     private beam(piece: Piece) {
         if (!piece.isBeingBeamed()) {
             log("beam started")
             piece.setBeingBeamed(true)
         }
-
-        if (this.updateDelta > BEAM_UPDATE_DELTA) {
-            this.updateDelta = 0.0
-        }
     }
 
     private canBeam(piece: Piece): boolean {
-        if (this.resources <= 0) {
-            return false
-        }
-
-        if (this.resourceConsumeDelta > BEAM_RESOURCE_CONSUME_DELTA) {
-            this.resources--
-            this.resourceConsumeDelta = 0.0
-        }
-
         const pieceRelLeft = new Phaser.Math.Vector2(piece.x - piece.width / 2, piece.y - piece.height)
         const pieceWorldLeft = this.game.board.canonicalizePosition(pieceRelLeft)
 
@@ -165,11 +168,36 @@ export class Beam extends Phaser.GameObjects.Sprite {
         )
     }
 
-    private onAnimationComplete(currentAnimation: Phaser.Animations.Animation) {
-        if (currentAnimation.key === BEAM_START && this.visible) {
-            this.anims.play(BEAM_FIRE)
-        } else if (currentAnimation.key === BEAM_END && this.visible) {
+    private consumeBeam(delta: number) {
+        let current: number = this.game.registry.get(Data.BEAM_CURRENT)
+        current = Math.max(current - (this.level.beam.consumptionRate / 1000) * delta, 0)
+
+        this.game.registry.set(Data.BEAM_CURRENT, current)
+    }
+
+    private onAnimationComplete(currentAnimation?: Phaser.Animations.Animation) {
+        if (!currentAnimation) {
+            return
+        }
+
+        const resource: number = this.game.registry.get(Data.BEAM_CURRENT)
+
+        if (currentAnimation.key === BEAM_START_ANIMATION && this.isFiring()) {
+            log("play fire animation")
+            this.anims.play(BEAM_FIRE_ANIMATION)
+        } else if (currentAnimation.key === BEAM_END_ANIMATION && this.visible) {
+            log("set invisible")
             this.setVisible(false)
         }
+    }
+
+    private regenerateBeam(delta: number) {
+        if (this.isFiring()) {
+            return
+        }
+
+        let current: number = this.game.registry.get(Data.BEAM_CURRENT)
+        current = Math.min(current + (this.level.beam.regenerationRate / 1000) * delta, this.level.beam.maximum)
+        this.game.registry.set(Data.BEAM_CURRENT, current)
     }
 }
