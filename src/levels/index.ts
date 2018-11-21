@@ -1,4 +1,34 @@
+import { merge } from "lodash"
+
+export interface IBeamConfiguration {
+    /**
+     * Rate at which Beam resource is consumed (units per second)
+     *
+     * @type {number}
+     * @memberof IBeamConfiguration
+     */
+    consumptionRate: number
+
+    /**
+     * Maximum amount of Beam resource the player can have
+     *
+     * @type {number}
+     * @memberof IBeamConfiguration
+     */
+    maximum: number
+
+    /**
+     * Rate at which Beam resource is regenerated (units per second)
+     *
+     * @type {number}
+     * @memberof IBeamConfiguration
+     */
+    regenerationRate: number
+}
+
 export interface ILevel {
+    readonly beam: IBeamConfiguration
+
     /**
      * Total number of rows in the game board
      *
@@ -80,8 +110,18 @@ export interface IPlatform {
     y: number
 }
 
+const LevelDefaults = {
+    beam: {
+        consumptionRate: 30,
+        maximum: 100,
+        regenerationRate: 10
+    },
+    speed: 500,
+    zoom: 1
+}
+
 export const Levels: { [key: string]: ILevel } = {
-    [1]: {
+    [1]: merge({}, LevelDefaults, {
         height: 17,
         platforms: [
             {
@@ -91,8 +131,6 @@ export const Levels: { [key: string]: ILevel } = {
                 y: 9
             }
         ],
-        speed: 500,
-        width: 29,
-        zoom: 1
-    }
+        width: 29
+    })
 }
