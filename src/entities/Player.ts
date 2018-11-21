@@ -15,7 +15,6 @@ const PLAYER_BEAM_STARTING_RESOURCES = 100
 const PLAYER_MAX_VELOCITY = 550
 const PLAYER_MOVEMENT_ACCELERATION_SCALE = 1500
 const PLAYER_PROJECTILES_STARTING_RESOURCES = 20
-const PLAYER_SCALE = 3
 
 export class Player extends Phaser.GameObjects.Container {
     public beam: Beam
@@ -26,14 +25,14 @@ export class Player extends Phaser.GameObjects.Container {
     constructor(game: Game, x: number, y: number) {
         log("constructing")
 
-        const playerSprite = new Phaser.Physics.Arcade.Sprite(game, 0, 0, Assets.Player)
-        playerSprite.setScale(PLAYER_SCALE)
+        const playerSprite = new Phaser.Physics.Arcade.Image(game, 0, 0, Assets.Player)
 
         super(game, x, y, [playerSprite])
 
         this.game = game
 
-        this.setSize(playerSprite.width * PLAYER_SCALE, playerSprite.height * PLAYER_SCALE)
+        this.setSize(100, 110)
+        playerSprite.setDisplaySize(100, 110)
 
         this.game.physics.world.enable(this)
         this.game.add.existing(this)
@@ -47,7 +46,7 @@ export class Player extends Phaser.GameObjects.Container {
             angle: 90,
             blendMode: Phaser.BlendModes.ADD,
             follow: this,
-            followOffset: { x: -15, y: this.botEdgeYOffset() },
+            followOffset: { x: -30, y: this.botEdgeYOffset() },
             lifespan: {
                 onEmit: () => {
                     return Math.max(250, Phaser.Math.Percent(this.body.velocity.length(), 0, 300) * 1000)
@@ -61,7 +60,7 @@ export class Player extends Phaser.GameObjects.Container {
             angle: 90,
             blendMode: Phaser.BlendModes.ADD,
             follow: this,
-            followOffset: { x: 15, y: this.botEdgeYOffset() },
+            followOffset: { x: 30, y: this.botEdgeYOffset() },
             lifespan: {
                 onEmit: () => {
                     return Math.max(250, Phaser.Math.Percent(this.body.velocity.length(), 0, 300) * 1000)
@@ -108,10 +107,10 @@ export class Player extends Phaser.GameObjects.Container {
     }
 
     private topEdgeYOffset() {
-        return -this.height / 2 - 15
+        return -this.height / 2
     }
 
     private botEdgeYOffset() {
-        return this.height / 2 - 15
+        return this.height / 2 - 2
     }
 }

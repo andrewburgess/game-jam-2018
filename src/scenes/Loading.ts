@@ -77,10 +77,7 @@ class Loading extends Phaser.Scene {
             frameHeight: 682,
             frameWidth: 64
         })
-        this.load.spritesheet(Assets.Player, Files.PLAYER, {
-            frameHeight: 32,
-            frameWidth: 40
-        })
+        this.load.image(Assets.Player, Files.PLAYER)
         this.load.image(Assets.Projectile, Files.PROJECTILE)
     }
 }
