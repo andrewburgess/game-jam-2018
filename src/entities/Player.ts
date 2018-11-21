@@ -7,7 +7,7 @@ import Game from "../scenes/Game"
 
 import { Beam } from "./Beam"
 import { Piece } from "./Piece"
-import { PROJECTILE_STANDARD_VELOCITY, Projectiles } from "./Projectiles"
+import { Projectiles } from "./Projectiles"
 
 const log = debug("game:entities:Player")
 
@@ -34,7 +34,7 @@ export class Player extends Phaser.GameObjects.Container {
 
         this.setSize(100, 110)
         playerSprite.setDisplaySize(100, 110)
-    
+
         this.game.physics.world.enable(this)
         this.game.add.existing(this)
         this.body.setAllowGravity(false)

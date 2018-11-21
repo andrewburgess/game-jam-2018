@@ -4,6 +4,7 @@ import Game from "./scenes/Game"
 import GameUI from "./scenes/GameUI"
 import Loading from "./scenes/Loading"
 import Menu from "./scenes/Menu"
+import Pause from "./scenes/Pause"
 
 const GameConfiguration: GameConfig = {
     backgroundColor: "#6495ED",
@@ -11,7 +12,7 @@ const GameConfiguration: GameConfig = {
     input: {
         gamepad: true
     },
-    scene: [Loading, Menu, Game, GameUI],
+    scene: [Loading, Menu, Game, GameUI, Pause],
     width: 1000
 }
 

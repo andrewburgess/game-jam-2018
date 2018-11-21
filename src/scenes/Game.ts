@@ -102,6 +102,16 @@ export default class Game extends Phaser.Scene {
 
         this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, Assets.Background)
 
+        const settingsButton = this.add.image(this.cameras.main.width, 0, Assets.GameSettingsButton).setInteractive()
+        settingsButton.setScale(0.17)
+        settingsButton.setX(settingsButton.x - (settingsButton.width * 0.17) / 2 + 10)
+        settingsButton.setY(settingsButton.y + (settingsButton.height * 0.17) / 2 - 10)
+        settingsButton.once("pointerup", () => {
+            log("launching pause screen")
+            this.scene.launch(Scenes.Pause)
+            this.scene.pause()
+        })
+
         const music01 = this.sound.add(Assets.Music01, { volume: 0.25 })
         const music02 = this.sound.add(Assets.Music02, { volume: 0.25 })
         music01.on("ended", () => {
@@ -129,6 +139,12 @@ export default class Game extends Phaser.Scene {
 
     public update(time: number, delta: number) {
         super.update(time, delta)
+
+        if (this.controller.settings!.isUniquelyDown()) {
+            log("launching pause screen")
+            this.scene.launch(Scenes.Pause)
+            this.scene.pause()
+        }
 
         if (!this.currentPiece) {
             return

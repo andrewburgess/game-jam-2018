@@ -34,7 +34,7 @@ export class Projectiles extends Phaser.GameObjects.Container {
         this.resourceGenDelta = 0.0
         this.resources = this.resourceLimit = startingResources
         this.resourcesText = this.game.add.text(
-            this.game.cameras.main.width - 258,
+            this.game.cameras.main.width - 308,
             25,
             PROJECTILE_RESOURCES_TEXT + this.resources
         )
