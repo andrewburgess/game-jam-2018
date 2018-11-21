@@ -112,11 +112,6 @@ export default class Game extends Phaser.Scene {
         })
         music01.play()
 
-        this.board.add(
-            new Phaser.GameObjects.Graphics(this)
-                .lineStyle(2, 0xff0000, 1)
-                .strokeRect((-1 * BLOCK_SIZE) / 2, -1 * BLOCK_SIZE, BLOCK_SIZE * 4, 2)
-        )
         this.add.existing(this.board)
 
         this.player = new Player(this, this.cameras.main.centerX, this.cameras.main.height - 80)
@@ -124,10 +119,6 @@ export default class Game extends Phaser.Scene {
         const worldTop: Phaser.Physics.Arcade.Sprite = this.physics.add.staticSprite(16, -16, "world_top")
         worldTop.setSize(this.physics.world.bounds.width, worldTop.height)
         this.player.projectiles.destroyOnCollisionWith(worldTop)
-
-        if (window.localStorage && window.localStorage.getItem("debug")) {
-            this.board.drawBoard()
-        }
 
         this.spawnNextPiece()
 

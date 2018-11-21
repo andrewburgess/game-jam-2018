@@ -22,6 +22,7 @@ export class Board extends Phaser.GameObjects.Container {
 
         this.setupPlatforms()
         this.drawBorders()
+        this.drawSpawnLocation()
     }
 
     public canonicalizePosition(boardRelativePos: Phaser.Math.Vector2): Phaser.Math.Vector2 {
@@ -111,39 +112,6 @@ export class Board extends Phaser.GameObjects.Container {
         })
     }
 
-    public drawBoard() {
-        each(range(this.level.width + 1), (x) =>
-            this.add(
-                new Phaser.GameObjects.Line(
-                    this.scene,
-                    BLOCK_SIZE / 2,
-                    ((this.level.height + 2) * BLOCK_SIZE) / 2,
-                    (x - 1) * BLOCK_SIZE,
-                    -BLOCK_SIZE,
-                    (x - 1) * BLOCK_SIZE,
-                    (this.level.height + 2) * BLOCK_SIZE,
-                    0x0000ff,
-                    0.3
-                )
-            )
-        )
-        each(range(this.level.height + 1), (y) =>
-            this.add(
-                new Phaser.GameObjects.Line(
-                    this.scene,
-                    ((this.level.width + 2) * BLOCK_SIZE) / 2,
-                    BLOCK_SIZE / 2,
-                    -BLOCK_SIZE,
-                    (y - 1) * BLOCK_SIZE,
-                    (this.level.width + 2) * BLOCK_SIZE,
-                    (y - 1) * BLOCK_SIZE,
-                    0xff0000,
-                    0.3
-                )
-            )
-        )
-    }
-
     private drawBorders() {
         const leftSide = new Phaser.GameObjects.Line(
             this.scene,
@@ -174,6 +142,14 @@ export class Board extends Phaser.GameObjects.Container {
 
         this.add(leftSide)
         this.add(rightSide)
+    }
+
+    private drawSpawnLocation() {
+        this.add(
+            new Phaser.GameObjects.Graphics(this.scene)
+                .lineStyle(2, 0xff0000, 1)
+                .strokeRect((-1 * BLOCK_SIZE) / 2, -1 * BLOCK_SIZE, BLOCK_SIZE * 4, 2)
+        )
     }
 
     private setupPlatforms() {

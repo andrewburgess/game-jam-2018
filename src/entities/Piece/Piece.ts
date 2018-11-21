@@ -171,8 +171,6 @@ export abstract class Piece extends Phaser.GameObjects.Container {
             return this.move(Direction.DOWN)
         }
 
-        log(`move piece ${this.shape} ${newLocation.x},${newLocation.y}`)
-
         this.location = newLocation
         this.scene.board.updateLocation(this, oldLocation, newLocation, this.actualAngle, this.actualAngle)
 
@@ -195,8 +193,6 @@ export abstract class Piece extends Phaser.GameObjects.Container {
     }
 
     private onMoveComplete() {
-        log("on move complete")
-
         if (this.direction === Direction.LEFT && this.scene.board.touchingLeft(this)) {
             this.direction = Direction.RIGHT
             this.move(Direction.DOWN)
