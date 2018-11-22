@@ -1,5 +1,5 @@
 import * as debug from "debug"
-import { isUndefined } from "lodash"
+import { each, isUndefined } from "lodash"
 import * as Phaser from "phaser"
 
 import { ILevel } from "../../levels"
@@ -49,7 +49,7 @@ export abstract class Piece extends Phaser.GameObjects.Container {
     public abstract getBlockLocations(angle?: number): Phaser.Math.Vector2[]
 
     public getBlocks(): Block[] {
-        return this.getAll() as Block[]
+        return this.getAll("type", "Block") as Block[]
     }
 
     public isBeingBeamed() {
@@ -121,8 +121,19 @@ export abstract class Piece extends Phaser.GameObjects.Container {
         })
     }
 
-    public setBeingBeamed(isBeingBeamed: boolean) {
+    public setBeingBeamed(isBeingBeamed: boolean, beamLeft: number = 0, beamRight: number = 0) {
         this.beingBeamed = isBeingBeamed
+        const blocks = this.getBlocks()
+
+        if (isBeingBeamed) {
+            each(blocks, (block) => {
+                const left = this.x + block.x
+                const right = this.x + block.x + block.width
+                block.setBeingBeamed(beamRight >= left && beamLeft <= right)
+            })
+        } else {
+            each(blocks, (block) => block.setBeingBeamed(false))
+        }
     }
 
     protected abstract build(): void

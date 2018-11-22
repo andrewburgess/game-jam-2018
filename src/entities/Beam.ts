@@ -1,5 +1,5 @@
 import * as debug from "debug"
-import { some } from "lodash"
+import { map, max, min } from "lodash"
 import * as Phaser from "phaser"
 
 import { Assets } from "../assets"
@@ -25,7 +25,7 @@ export class Beam extends Phaser.GameObjects.Sprite {
         super(game, x, y, Assets.Beam)
 
         this.game = game
-        this.setPosition(x, y - this.scene.cameras.main.height / 2)
+        this.setPosition(x + 2, y - this.scene.cameras.main.height / 2)
         this.setDisplaySize(this.width, this.scene.cameras.main.height)
 
         this.setVisible(false)
@@ -89,6 +89,11 @@ export class Beam extends Phaser.GameObjects.Sprite {
     public stopFiring() {
         log("stop firing")
 
+        const currentPiece = this.game.getCurrentPiece()
+        if (currentPiece && currentPiece.isBeingBeamed()) {
+            currentPiece.setBeingBeamed(false)
+        }
+
         this.firing = false
         this.anims.playReverse(BEAM_END_ANIMATION)
     }
@@ -104,64 +109,6 @@ export class Beam extends Phaser.GameObjects.Sprite {
         }
     }
 
-    /*public update(time: number, delta: number, beamActive: boolean, currentPiece?: Piece) {
-        if (!isUndefined(currentPiece)) {
-            if (beamActive) {
-                if (!this.visible) {
-                    this.setVisible(true)
-                    this.anims.play(BEAM_START_ANIMATION, true)
-                }
-
-                if (this.canBeam(currentPiece)) {
-                    this.game.sound.play(Assets.FxBeamBeamingPiece, { volume: 0.75 })
-                    this.beam(currentPiece)
-                } else {
-                    this.scene.sound.play(Assets.FxBeamActivated, { volume: 0.55 })
-                    if (currentPiece.isBeingBeamed()) {
-                        log("beam finished")
-                        currentPiece.setBeingBeamed(false)
-                    }
-                }
-            } else {
-                if (currentPiece.isBeingBeamed()) {
-                    currentPiece.setBeingBeamed(false)
-                }
-
-                if (this.visible && this.anims.currentAnim && this.anims.currentAnim.key === BEAM_FIRE_ANIMATION) {
-                    this.anims.stop()
-                    this.anims.playReverse(BEAM_END_ANIMATION, true)
-                }
-            }
-        }
-
-        super.update(time, delta)
-        this.anims.update(time, delta)
-    }*/
-
-    private beam(piece: Piece) {
-        if (!piece.isBeingBeamed()) {
-            log("beam started")
-            piece.setBeingBeamed(true)
-        }
-    }
-
-    /*private canBeam(piece: Piece): boolean {
-        const pieceRelLeft = new Phaser.Math.Vector2(piece.x - piece.width / 2, piece.y - piece.height)
-        const pieceWorldLeft = this.game.board.canonicalizePosition(pieceRelLeft)
-
-        const pieceRelCenter = new Phaser.Math.Vector2(piece.x, piece.y - piece.height)
-        const pieceWorldCenter = this.game.board.canonicalizePosition(pieceRelCenter)
-
-        const pieceRelRight = new Phaser.Math.Vector2(piece.x + piece.width / 2, piece.y - piece.height)
-        const pieceWorldRight = this.game.board.canonicalizePosition(pieceRelRight)
-
-        return (
-            this.parentContainer.body.hitTest(pieceWorldLeft.x, this.parentContainer.y) ||
-            this.parentContainer.body.hitTest(pieceWorldCenter.x, this.parentContainer.y) ||
-            this.parentContainer.body.hitTest(pieceWorldRight.x, this.parentContainer.y)
-        )
-    }*/
-
     private consumeBeam(delta: number) {
         let current: number = this.game.registry.get(Data.BEAM_CURRENT)
         current = Math.max(current - (this.level.beam.consumptionRate / 1000) * delta, 0)
@@ -171,32 +118,40 @@ export class Beam extends Phaser.GameObjects.Sprite {
 
     private fireBeam(delta: number) {
         const beamResource = this.game.registry.get(Data.BEAM_CURRENT)
-        if (beamResource > 0) {
+
+        const currentPiece = this.game.getCurrentPiece()
+
+        if (beamResource > 0 && currentPiece) {
             this.consumeBeam(delta)
 
-            const pieceHit = this.isBeamHittingPiece()
-            log(`piece hit ${pieceHit}`)
-            this.game.sound.play(Assets.FxBeamActivated, { volume: 0.55 })
+            if (this.isBeamHittingPiece(currentPiece)) {
+                this.game.sound.play(Assets.FxBeamBeamingPiece, { volume: 0.75 })
+                currentPiece.setBeingBeamed(
+                    true,
+                    this.getBeamCenter() - this.width / 4,
+                    this.getBeamCenter() + this.width / 4
+                )
+            } else {
+                this.game.sound.play(Assets.FxBeamActivated, { volume: 0.45 })
+                currentPiece.setBeingBeamed(false)
+            }
         } else {
             this.stopFiring()
         }
     }
 
-    private isBeamHittingPiece() {
-        const piece = this.game.getCurrentPiece()
-        if (!piece) {
-            return false
-        }
+    private getBeamCenter() {
+        const container = this.parentContainer
+        return container.x + this.x
+    }
 
-        const blockLocations = piece.getBlockLocations()
-        const beamLeft = this.x - this.width / 2
-        const beamRight = this.x + this.width / 2
-        return some(blockLocations, (vec: Vector2Like) => {
-            const vecLeft = vec.x * BLOCK_SIZE
-            const vecRight = vec.x * BLOCK_SIZE + BLOCK_SIZE
+    private isBeamHittingPiece(piece: Piece) {
+        const beamCenter = this.getBeamCenter()
+        const blocks = piece.getBlockLocations()
+        const lefts = map(blocks, (block) => piece.x + block.x * BLOCK_SIZE)
+        const rights = map(blocks, (block) => piece.x + block.x * BLOCK_SIZE + BLOCK_SIZE)
 
-            return vecLeft >= beamLeft && vecRight <= beamRight
-        })
+        return beamCenter + this.width / 4 >= min(lefts)! && beamCenter - this.width / 4 <= max(rights)!
     }
 
     private onAnimationComplete(currentAnimation?: Phaser.Animations.Animation) {

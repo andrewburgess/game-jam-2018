@@ -120,8 +120,8 @@ export default class Game extends Phaser.Scene {
             })
         })
 
-        const music01 = this.sound.add(Assets.Music01, { volume: 0.25 })
-        const music02 = this.sound.add(Assets.Music02, { volume: 0.25 })
+        const music01 = this.sound.add(Assets.Music01, { volume: 0.05 })
+        const music02 = this.sound.add(Assets.Music02, { volume: 0.05 })
         music01.on("ended", () => {
             music02.play()
         })
