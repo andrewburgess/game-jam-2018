@@ -194,6 +194,10 @@ export default class Game extends Phaser.Scene {
         }
 
         this.currentPiece = this.nextPiece
+
+        // Make sure the player is on top of all of the blocks so the beam
+        // overlaps them
+        this.board.moveTo(this.player, this.board.getIndex(this.currentPiece))
         this.nextPiece = undefined
         if (!this.board.canPieceMoveTo(this.currentPiece, this.currentPiece.location.x, this.currentPiece.location.y)) {
             // The player loses!
