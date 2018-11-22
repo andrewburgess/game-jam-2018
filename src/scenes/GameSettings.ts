@@ -19,6 +19,8 @@ export default class GameSettings extends Phaser.Scene {
      */
     private controller: UnifiedController
 
+    private firstUpdate: boolean
+
     /**
      * The parent settings menu
      *
@@ -39,36 +41,32 @@ export default class GameSettings extends Phaser.Scene {
 
     constructor(inKey: string = Scenes.GameSettings) {
         super({
-            key: inKey,
-            physics: {
-                arcade: {
-                    debug: !!window.localStorage.debug,
-                    gravity: { y: 300 }
-                }
-            }
+            key: inKey
         })
+
+        this.firstUpdate = true
 
         log("constructed")
     }
 
-    // TODO(tristan): current settings screen jankiness issues enumerated
-    // If I toggle the settings scene with the keyboard, then launch the settings scene with the mouse, I get a number of settings GUIs showing equal to the number of toggles triggered by the keyboard.
-    // If I create a new field for this.sound.detune and update that based on player input, it seems to work well. If I do the same for volume and mute, it doesn't work at all on Firefox, but sort of works on Edge???
-    // The first time toggling the settings screen with the game pad, it immediately closes. Thereafter, it will open as expected.
-    // If I click on the settings button with the mouse with the intention to close the open settings screen, it will close and then immediately reopen (because of how I'm currently doing pointerup/down detection)
-
     public create() {
-        this.controller = new UnifiedController(this.input)
         this.mainGUI = new dat.GUI()
-
         this.setupSettingsMenus()
 
-        this.input.once("pointerdown", () => {
-            this.teardownSettingsMenus()
-        })
+        this.controller = new UnifiedController(this.input)
     }
 
     public update() {
+        // NOTE(tristan): user will be pressing the settings key when we enter this new scene.
+        // So we need to not register that and immediately close the settings menu.
+        // This takes advantage of the fact that scene constructors are called pretty much only once ever.
+        if (this.firstUpdate && !this.controller.settings!.isDown()) {
+            return
+        } else if (this.firstUpdate && this.controller.settings!.isDown()) {
+            this.firstUpdate = false
+            return
+        }
+
         if (this.controller.settings!.isUniquelyDown()) {
             this.teardownSettingsMenus()
         }
@@ -94,7 +92,6 @@ export default class GameSettings extends Phaser.Scene {
 
     private setupSettingsMenus() {
         log("showing settings menus")
-
         this.soundSettings = this.mainGUI!.addFolder("Sound Settings")
         this.soundSettings!.add(this.sound, "mute").listen()
         this.soundSettings!.add(this.sound, "volume", 0, 1).listen()
@@ -103,7 +100,9 @@ export default class GameSettings extends Phaser.Scene {
 
     private teardownSettingsMenus() {
         log("hiding settings menu")
+        this.mainGUI!.removeFolder(this.soundSettings!)
         this.mainGUI!.destroy()
+        this.mainGUI!.updateDisplay()
         this.scene.stop(Scenes.GameSettings)
         this.scene.resume(Scenes.Game)
     }

@@ -4,7 +4,6 @@
 import * as BACKGROUND from "./images/background.png"
 import * as BEAM from "./images/beam.png"
 import * as GAME_BUTTON from "./images/game-button.png"
-import * as GAME_SETTINGS_BUTTON from "./images/game-settings-button.png"
 import * as PARTICLE_ENGINE_THRUST from "./images/particle-engine-thrust.png"
 import * as PLATFORM from "./images/platform.png"
 // NOTE(tristan): https://bit.ly/2SQMZtt
@@ -28,7 +27,6 @@ export const Files = {
     FX_PIECE_HIT,
     FX_PROJECTILE_FIRED,
     GAME_BUTTON,
-    GAME_SETTINGS_BUTTON,
     MUSIC_01,
     MUSIC_02,
     PARTICLE_ENGINE_THRUST,
@@ -41,7 +39,6 @@ export enum Assets {
     Background = "background",
     Beam = "beam",
     GameButton = "game-button",
-    GameSettingsButton = "game-settings-button",
     FxBeamActivated = "fx-beam-activated",
     FxBeamBeamingPiece = "fx-beam-beaming-piece",
     FxPieceHit = "fx-piece-hit",
