@@ -94,7 +94,7 @@ export default class Game extends Phaser.Scene {
         const boardWidth = this.level.width * BLOCK_SIZE
         this.board = new Board(
             this,
-            this.cameras.main.centerX - boardWidth / 2,
+            this.cameras.main.centerX - (boardWidth - BLOCK_SIZE) / 2,
             this.cameras.main.centerY - boardHeight / 2,
             this.level
         )
