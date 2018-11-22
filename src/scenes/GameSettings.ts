@@ -14,11 +14,18 @@ export default class GameSettings extends Phaser.Scene {
      * The virtual controller that maps physical device actions into game actions.
      *
      * @private
-     * @type {Unified}
-     * @memberof Game
+     * @type {UnifiedController}
+     * @memberof GameSettings
      */
     private controller: UnifiedController
 
+    /**
+     * Flag for special processing on the first update call of this scene.
+     *
+     * @private
+     * @type {boolean}
+     * @memberof GameSettings
+     */
     private firstUpdate: boolean
 
     /**
@@ -26,7 +33,7 @@ export default class GameSettings extends Phaser.Scene {
      *
      * @private
      * @type {dat.GUI}
-     * @memberof Game
+     * @memberof GameSettings
      */
     private mainGUI?: dat.GUI
 
@@ -35,7 +42,7 @@ export default class GameSettings extends Phaser.Scene {
      *
      * @private
      * @type {dat.GUI}
-     * @memberof Game
+     * @memberof GameSettings
      */
     private soundSettings?: dat.GUI
 
@@ -44,25 +51,24 @@ export default class GameSettings extends Phaser.Scene {
             key: inKey
         })
 
-        this.firstUpdate = true
-
         log("constructed")
     }
 
     public create() {
+        // TODO(tristan): replace this with our own sliders and other gui entities!
+        // Will need sliders for music and fx volumes, global mute
         this.mainGUI = new dat.GUI()
         this.setupSettingsMenus()
 
         this.controller = new UnifiedController(this.input)
+        this.firstUpdate = true
     }
 
     public update() {
-        // NOTE(tristan): user will be pressing the settings key when we enter this new scene.
-        // So we need to not register that and immediately close the settings menu.
-        // This takes advantage of the fact that scene constructors are called pretty much only once ever.
-        if (this.firstUpdate && !this.controller.settings!.isDown()) {
-            return
-        } else if (this.firstUpdate && this.controller.settings!.isDown()) {
+        // NOTE(tristan): user will be pressing the settings key when we switch to this scene.
+        // So we need to not register that and thus immediately close the settings menu.
+        if (this.firstUpdate) {
+            this.controller.settings!.setCurrentlyDown(true)
             this.firstUpdate = false
             return
         }
@@ -91,7 +97,7 @@ export default class GameSettings extends Phaser.Scene {
     }
 
     private setupSettingsMenus() {
-        log("showing settings menus")
+        log("setting up settings menus")
         this.soundSettings = this.mainGUI!.addFolder("Sound Settings")
         this.soundSettings!.add(this.sound, "mute").listen()
         this.soundSettings!.add(this.sound, "volume", 0, 1).listen()
@@ -99,10 +105,9 @@ export default class GameSettings extends Phaser.Scene {
     }
 
     private teardownSettingsMenus() {
-        log("hiding settings menu")
-        this.mainGUI!.removeFolder(this.soundSettings!)
+        log("tearing down settings menus")
         this.mainGUI!.destroy()
-        this.mainGUI!.updateDisplay()
+        log("resuming game scene")
         this.scene.stop(Scenes.GameSettings)
         this.scene.resume(Scenes.Game)
     }

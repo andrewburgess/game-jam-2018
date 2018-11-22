@@ -28,7 +28,7 @@ export default class Game extends Phaser.Scene {
      * The virtual controller that maps physical device actions into game actions.
      *
      * @private
-     * @type {Unified}
+     * @type {UnifiedController}
      * @memberof Game
      */
     private controller: UnifiedController
@@ -132,7 +132,7 @@ export default class Game extends Phaser.Scene {
         super.update(time, delta)
 
         if (this.controller.settings!.isUniquelyDown()) {
-            log("launching game settings screen")
+            log("launching game settings scene")
             this.scene.launch(Scenes.GameSettings)
             this.scene.pause()
         }

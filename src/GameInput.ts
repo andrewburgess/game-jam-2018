@@ -100,6 +100,12 @@ class VirtualKey {
         return this.curDownState && !this.prevDownState
     }
 
+    // NOTE(tristan): this can be used to propagate button states and isUniquelyDown state
+    // between instances of UnifiedController.
+    public setCurrentlyDown(state: boolean) {
+        this.curDownState = state
+    }
+
     public setGamepadButton(button: Phaser.Input.Gamepad.Button) {
         this.gamepadButton = button
     }
