@@ -114,7 +114,8 @@ export default class Game extends Phaser.Scene {
 
         this.add.existing(this.board)
 
-        this.player = new Player(this, this.cameras.main.centerX, this.cameras.main.height - 80)
+        this.player = new Player(this, boardWidth / 2, boardHeight + 40)
+        this.board.add(this.player)
 
         const worldTop: Phaser.Physics.Arcade.Sprite = this.physics.add.staticSprite(16, -16, "world_top")
         worldTop.setSize(this.physics.world.bounds.width, worldTop.height)
@@ -135,6 +136,10 @@ export default class Game extends Phaser.Scene {
         }
 
         this.player.update(time, delta, this.currentPiece!)
+    }
+
+    public getCurrentPiece() {
+        return this.currentPiece
     }
 
     public getLevel() {

@@ -42,12 +42,12 @@ export class Projectile extends Phaser.Physics.Arcade.Sprite {
             currentPiece.x - currentPiece.width / 2,
             currentPiece.y - currentPiece.height
         )
-        const pieceWorldLeft = this.game.board.canonicalizePosition(pieceRelLeft)
+        const pieceWorldLeft = { x: 0, y: 0 } //this.game.board.canonicalizePosition(pieceRelLeft)
         const pieceRelRight = new Phaser.Math.Vector2(
             currentPiece.x + currentPiece.width / 2,
             currentPiece.y - currentPiece.height
         )
-        const pieceWorldRight = this.game.board.canonicalizePosition(pieceRelRight)
+        const pieceWorldRight = { x: 0, y: 0 } // this.game.board.canonicalizePosition(pieceRelRight)
 
         if (this.body.hitTest(pieceWorldLeft.x, pieceWorldLeft.y)) {
             currentPiece.rotate(RotateDirection.CLOCKWISE)
