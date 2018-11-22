@@ -7,11 +7,9 @@ import Game from "../scenes/Game"
 
 import { Beam } from "./Beam"
 import { Piece } from "./Piece"
-import { PROJECTILE_STANDARD_VELOCITY, Projectiles } from "./Projectiles"
+import { Projectiles } from "./Projectiles"
 
 const log = debug("game:entities:Player")
-
-const PLAYER_BEAM_STARTING_RESOURCES = 100
 const PLAYER_MAX_VELOCITY = 550
 const PLAYER_MOVEMENT_ACCELERATION_SCALE = 1500
 const PLAYER_PROJECTILES_STARTING_RESOURCES = 20
@@ -27,8 +25,7 @@ export class Player extends Phaser.GameObjects.Container {
         log("constructing")
 
         const playerSprite = new Phaser.Physics.Arcade.Image(game, 0, 0, Assets.Player)
-
-        super(game, x, y, [playerSprite])
+        super(game, x, y)
 
         this.game = game
 
@@ -44,35 +41,69 @@ export class Player extends Phaser.GameObjects.Container {
         this.body.setMaxVelocity(PLAYER_MAX_VELOCITY)
         this.body.setCollideWorldBounds(true)
 
-        // NOTE(tristan): I'm assuming that the follow directive is similar to adding the emmiters as
-        // children of this container, but I don't know for sure
-        this.game.add.particles(Assets.ParticleEngineThrust).createEmitter({
-            angle: 90,
-            blendMode: Phaser.BlendModes.ADD,
-            follow: this,
-            followOffset: { x: -30, y: this.botEdgeYOffset() },
-            lifespan: {
+        const leftEngine = this.scene.add.particles(Assets.ParticleEngineThrust)
+        leftEngine.createEmitter({
+            angle: {
                 onEmit: () => {
-                    return Math.max(250, Phaser.Math.Percent(this.body.velocity.length(), 0, 300) * 1000)
-                }
-            },
-            scale: { start: 0.25, end: 0.0 },
-            speed: 100
-        })
+                    if (Math.abs(this.body.acceleration.x) > 0) {
+                        return this.body.acceleration.x < 0 ? 0 : 180
+                    }
 
-        this.game.add.particles(Assets.ParticleEngineThrust).createEmitter({
-            angle: 90,
+                    return 90 - 90 * (this.body.velocity.x / PLAYER_MAX_VELOCITY)
+                }
+            },
             blendMode: Phaser.BlendModes.ADD,
-            follow: this,
-            followOffset: { x: 30, y: this.botEdgeYOffset() },
             lifespan: {
                 onEmit: () => {
                     return Math.max(250, Phaser.Math.Percent(this.body.velocity.length(), 0, 300) * 1000)
                 }
             },
-            scale: { start: 0.25, end: 0.0 },
-            speed: 100
+            scale: { start: 0.2, end: 0.0 },
+            speed: {
+                onEmit: () => {
+                    if (Math.abs(this.body.acceleration.x) > 0) {
+                        return 100
+                    }
+
+                    return Math.max(25, Math.abs(100 * (this.body.velocity.x / PLAYER_MAX_VELOCITY)))
+                }
+            },
+            x: -30,
+            y: 55
         })
+        this.add(leftEngine)
+
+        const rightEngine = this.scene.add.particles(Assets.ParticleEngineThrust)
+        rightEngine.createEmitter({
+            angle: {
+                onEmit: () => {
+                    if (Math.abs(this.body.acceleration.x) > 0) {
+                        return this.body.acceleration.x < 0 ? 0 : 180
+                    }
+
+                    return 90 - 90 * (this.body.velocity.x / PLAYER_MAX_VELOCITY)
+                }
+            },
+            blendMode: Phaser.BlendModes.ADD,
+            lifespan: {
+                onEmit: () => {
+                    return Math.max(250, Phaser.Math.Percent(this.body.velocity.length(), 0, 300) * 1000)
+                }
+            },
+            scale: { start: 0.2, end: 0.0 },
+            speed: {
+                onEmit: () => {
+                    if (Math.abs(this.body.acceleration.x) > 0) {
+                        return 100
+                    }
+
+                    return Math.max(25, Math.abs(100 * (this.body.velocity.x / PLAYER_MAX_VELOCITY)))
+                }
+            },
+            x: 30,
+            y: 55
+        })
+        this.add(rightEngine)
 
         // NOTE(tristan): We want the beam to always be offset relative to the player, so it's added as a child
         // to the player continer.
@@ -83,6 +114,7 @@ export class Player extends Phaser.GameObjects.Container {
         this.add(this.beam)
         this.controller = new UnifiedController(this.game.input)
         this.projectiles = new Projectiles(this.game, 20, this.topEdgeYOffset(), PLAYER_PROJECTILES_STARTING_RESOURCES)
+        this.add(playerSprite)
 
         log("constructed")
     }
@@ -107,7 +139,6 @@ export class Player extends Phaser.GameObjects.Container {
         if (this.controller.actionRB!.isUniquelyDown()) {
             projectileFireAttempt = true
         }
-
         this.projectiles.update(time, delta, projectileFireAttempt, this.x, this.y, currentPiece)
     }
 
