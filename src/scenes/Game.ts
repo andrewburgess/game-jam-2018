@@ -69,6 +69,8 @@ export default class Game extends Phaser.Scene {
      */
     private player: Player
 
+    private sounds: Phaser.Sound.HTML5AudioSound[]
+
     constructor(inKey: string = Scenes.Game) {
         super({
             key: inKey,
@@ -89,6 +91,9 @@ export default class Game extends Phaser.Scene {
         this.level = Levels[config.level]
 
         this.cameras.main.setZoom(this.level.zoom)
+        this.events.on("resume", () => {
+            this.cameras.main.fadeIn(500, 0, 0, 0)
+        })
 
         const boardHeight = this.level.height * BLOCK_SIZE
         const boardWidth = this.level.width * BLOCK_SIZE
@@ -102,8 +107,35 @@ export default class Game extends Phaser.Scene {
 
         this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, Assets.Background)
 
-        const music01 = this.sound.add(Assets.Music01, { volume: 0.05 })
-        const music02 = this.sound.add(Assets.Music02, { volume: 0.05 })
+        const music01 = this.sound.add(Assets.Music01) as Phaser.Sound.HTML5AudioSound
+        const music02 = this.sound.add(Assets.Music02) as Phaser.Sound.HTML5AudioSound
+        const fxBeamActivated = this.sound.add(Assets.FxBeamActivated) as Phaser.Sound.HTML5AudioSound
+        const fxBeamBeamingPiece = this.sound.add(Assets.FxBeamBeamingPiece) as Phaser.Sound.HTML5AudioSound
+        const fxProjectileFired = this.sound.add(Assets.FxProjectileFired) as Phaser.Sound.HTML5AudioSound
+        const fxPieceHit = this.sound.add(Assets.FxPieceHit) as Phaser.Sound.HTML5AudioSound
+
+        this.sounds = new Array<Phaser.Sound.HTML5AudioSound>()
+        this.sounds[Assets.Music01] = music01
+        this.sounds[Assets.Music02] = music02
+        this.sounds[Assets.FxBeamActivated] = fxBeamActivated
+        this.sounds[Assets.FxBeamBeamingPiece] = fxBeamBeamingPiece
+        this.sounds[Assets.FxProjectileFired] = fxProjectileFired
+        this.sounds[Assets.FxPieceHit] = fxPieceHit
+
+        this.scene.get(Scenes.GameSettings).events.on("musicVolumeChanged", (amount: number) => {
+            music01.setVolume(Phaser.Math.Clamp(music01.volume + amount, 0.0, 1.0))
+            music02.setVolume(Phaser.Math.Clamp(music02.volume + amount, 0.0, 1.0))
+        })
+        this.scene.get(Scenes.GameSettings).events.on("fxVolumeChanged", (amount: number) => {
+            fxBeamActivated.setVolume(Phaser.Math.Clamp(fxBeamActivated.volume + amount, 0.0, 1.0))
+            fxBeamBeamingPiece.setVolume(Phaser.Math.Clamp(fxBeamBeamingPiece.volume + amount, 0.0, 1.0))
+            fxPieceHit.setVolume(Phaser.Math.Clamp(fxPieceHit.volume + amount, 0.0, 1.0))
+            fxProjectileFired.setVolume(Phaser.Math.Clamp(fxProjectileFired.volume + amount, 0.0, 1.0))
+        })
+        this.scene.get(Scenes.GameSettings).events.on("globalMuteToggled", () => {
+            this.sound.mute = !this.sound.mute
+        })
+
         music01.on("ended", () => {
             music02.play()
         })
@@ -133,8 +165,11 @@ export default class Game extends Phaser.Scene {
 
         if (this.controller.settings!.isUniquelyDown()) {
             log("launching game settings scene")
-            this.scene.launch(Scenes.GameSettings)
-            this.scene.pause()
+            this.cameras.main.fade(500, 0, 0, 0)
+            this.cameras.main.once("camerafadeoutcomplete", () => {
+                this.scene.launch(Scenes.GameSettings)
+                this.scene.pause()
+            })
         }
 
         if (!this.currentPiece) {
@@ -150,6 +185,10 @@ export default class Game extends Phaser.Scene {
 
     public getLevel() {
         return this.level
+    }
+
+    public getSound(key: Assets) {
+        return this.sounds[key]
     }
 
     public onPieceActivated() {
