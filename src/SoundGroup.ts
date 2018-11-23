@@ -28,7 +28,7 @@ export class SoundGroup {
         this.sounds.push(sound)
     }
 
-    public get(key: Assets) {
+    public get(key: Assets): Phaser.Sound.HTML5AudioSound {
         return this.soundMap[key]
     }
 
