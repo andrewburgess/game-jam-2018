@@ -125,14 +125,14 @@ export class Beam extends Phaser.GameObjects.Sprite {
             this.consumeBeam(delta)
 
             if (this.isBeamHittingPiece(currentPiece)) {
-                this.game.sound.play(Assets.FxBeamBeamingPiece, { volume: 0.75 })
+                this.game.getSound(Assets.FxBeamBeamingPiece).play()
                 currentPiece.setBeingBeamed(
                     true,
                     this.getBeamCenter() - this.width / 4,
                     this.getBeamCenter() + this.width / 4
                 )
             } else {
-                this.game.sound.play(Assets.FxBeamActivated, { volume: 0.45 })
+                this.game.getSound(Assets.FxBeamActivated).play()
                 currentPiece.setBeingBeamed(false)
             }
         } else {

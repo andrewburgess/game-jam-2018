@@ -1,6 +1,4 @@
-import * as dat from "dat.gui"
 import * as debug from "debug"
-import { isUndefined } from "lodash"
 import * as Phaser from "phaser"
 
 import UnifiedController from "../GameInput"
@@ -28,24 +26,6 @@ export default class GameSettings extends Phaser.Scene {
      */
     private firstUpdate: boolean
 
-    /**
-     * The parent settings menu
-     *
-     * @private
-     * @type {dat.GUI}
-     * @memberof GameSettings
-     */
-    private mainGUI?: dat.GUI
-
-    /**
-     * The sound settings menu
-     *
-     * @private
-     * @type {dat.GUI}
-     * @memberof GameSettings
-     */
-    private soundSettings?: dat.GUI
-
     constructor(inKey: string = Scenes.GameSettings) {
         super({
             key: inKey
@@ -55,13 +35,12 @@ export default class GameSettings extends Phaser.Scene {
     }
 
     public create() {
-        // TODO(tristan): replace this with our own sliders and other gui entities!
-        // Will need sliders for music and fx volumes, global mute
-        this.mainGUI = new dat.GUI()
         this.setupSettingsMenus()
 
         this.controller = new UnifiedController(this.input)
         this.firstUpdate = true
+
+        this.cameras.main.fadeIn(500, 0, 0, 0)
     }
 
     public update() {
@@ -74,41 +53,57 @@ export default class GameSettings extends Phaser.Scene {
         }
 
         if (this.controller.settings!.isUniquelyDown()) {
-            this.teardownSettingsMenus()
+            log("resuming game scene")
+            this.cameras.main.fade(500, 0, 0, 0)
+            this.cameras.main.once("camerafadeoutcomplete", () => {
+                this.scene.stop(Scenes.GameSettings)
+                this.scene.resume(Scenes.Game)
+            })
         }
 
         if (this.controller.up!.isDown()) {
-            if (!isUndefined(this.soundSettings)) {
-                this.sound.volume = Phaser.Math.Clamp(this.sound.volume + 0.01, 0.0, 1.0)
-            }
         }
 
         if (this.controller.down!.isDown()) {
-            if (!isUndefined(this.soundSettings)) {
-                this.sound.volume = Phaser.Math.Clamp(this.sound.volume - 0.01, 0.0, 1.0)
-            }
         }
 
-        if (this.controller.actionRB!.isUniquelyDown()) {
-            if (!isUndefined(this.soundSettings)) {
-                this.sound.mute = !this.sound.mute
-            }
+        if (this.controller.left!.isDown()) {
+        }
+
+        if (this.controller.right!.isDown()) {
+        }
+
+        if (this.controller.actionA!.isUniquelyDown()) {
         }
     }
 
     private setupSettingsMenus() {
         log("setting up settings menus")
-        this.soundSettings = this.mainGUI!.addFolder("Sound Settings")
-        this.soundSettings!.add(this.sound, "mute").listen()
-        this.soundSettings!.add(this.sound, "volume", 0, 1).listen()
-        this.soundSettings!.open()
-    }
+        const cenX = this.cameras.main.centerX
+        const cenY = this.cameras.main.centerY
 
-    private teardownSettingsMenus() {
-        log("tearing down settings menus")
-        this.mainGUI!.destroy()
-        log("resuming game scene")
-        this.scene.stop(Scenes.GameSettings)
-        this.scene.resume(Scenes.Game)
+        const musicVolume = this.add.graphics()
+        musicVolume.fillStyle(0x222222, 0.8)
+        musicVolume.fillRect(cenX, cenY - 270 / 2, 320, 50)
+        this.add.text(cenX - 300, cenY - 270 / 2, "MUSIC VOLUME:", {
+            fill: "#ffffff",
+            font: "22px Righteous"
+        })
+
+        const fxVolume = this.add.graphics()
+        fxVolume.fillStyle(0x222222, 0.8)
+        fxVolume.fillRect(cenX, cenY - 160 / 2, 320, 50)
+        this.add.text(cenX - 278, cenY - 160 / 2, "FX VOLUME:", {
+            fill: "#ffffff",
+            font: "22px Righteous"
+        })
+
+        const globalMute = this.add.graphics()
+        globalMute.fillStyle(0x222222, 0.8)
+        globalMute.fillRect(cenX + 270 / 2, cenY - 50 / 2, 50, 50)
+        this.add.text(cenX - 250, cenY - 50 / 2, "MUTE:", {
+            fill: "#ffffff",
+            font: "22px Righteous"
+        })
     }
 }
