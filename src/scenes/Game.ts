@@ -93,6 +93,9 @@ export default class Game extends Phaser.Scene {
 
         this.cameras.main.setZoom(this.level.zoom)
         this.events.on("resume", () => {
+            log(`fx volume on resume: ${this.fxSounds.getVolume()}`)
+            log(`music volume on resume: ${this.musicSounds.getVolume()}`)
+            log(`global mute on resume: ${this.fxSounds.isMuted()}`)
             this.cameras.main.fadeIn(500, 0, 0, 0)
         })
 
@@ -116,16 +119,6 @@ export default class Game extends Phaser.Scene {
         this.fxSounds.add(Assets.FxProjectileFired)
         this.musicSounds.add(Assets.Music01)
         this.musicSounds.add(Assets.Music02)
-
-        this.scene.get(Scenes.GameSettings).events.on("fxVolumeChanged", (amount: number) => {
-            this.fxSounds.setVolume(Phaser.Math.Clamp(this.fxSounds.getVolume() + amount, 0.0, 1.0))
-        })
-        this.scene.get(Scenes.GameSettings).events.on("musicVolumeChanged", (amount: number) => {
-            this.musicSounds.setVolume(Phaser.Math.Clamp(this.musicSounds.getVolume() + amount, 0.0, 1.0))
-        })
-        this.scene.get(Scenes.GameSettings).events.on("globalMuteToggled", () => {
-            this.fxSounds.toggleMuted()
-        })
 
         this.musicSounds.loopAllSounds()
 
@@ -152,7 +145,7 @@ export default class Game extends Phaser.Scene {
             log("launching game settings scene")
             this.cameras.main.fade(500, 0, 0, 0)
             this.cameras.main.once("camerafadeoutcomplete", () => {
-                this.scene.launch(Scenes.GameSettings)
+                this.scene.launch(Scenes.GameSettings, { fxSounds: this.fxSounds, musicSounds: this.musicSounds })
                 this.scene.pause()
             })
         }

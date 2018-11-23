@@ -2,12 +2,16 @@ import * as debug from "debug"
 import * as Phaser from "phaser"
 
 import UnifiedController from "../GameInput"
+import { SoundGroup } from "../SoundGroup"
 
 import { Scenes } from "./"
 
 const log = debug(`game:scenes:${Scenes.GameSettings}`)
 
 export default class GameSettings extends Phaser.Scene {
+    public fxSounds: SoundGroup
+    public musicSounds: SoundGroup
+
     /**
      * The virtual controller that maps physical device actions into game actions.
      *
@@ -34,6 +38,11 @@ export default class GameSettings extends Phaser.Scene {
         log("constructed")
     }
 
+    public init(data: object) {
+        this.fxSounds = data.fxSounds
+        this.musicSounds = data.musicSounds
+    }
+
     public create() {
         this.setupSettingsMenus()
 
@@ -41,6 +50,20 @@ export default class GameSettings extends Phaser.Scene {
         this.firstUpdate = true
 
         this.cameras.main.fadeIn(500, 0, 0, 0)
+
+        this.events.on("fxVolumeChanged", (amount: number) => {
+            this.fxSounds.setVolume(Phaser.Math.Clamp(this.fxSounds.getVolume() + amount, 0.0, 1.0))
+            log(`fx volume changed to: ${this.fxSounds.getVolume()}`)
+        })
+        this.events.on("musicVolumeChanged", (amount: number) => {
+            this.musicSounds.setVolume(Phaser.Math.Clamp(this.musicSounds.getVolume() + amount, 0.0, 1.0))
+            log(`music volume changed to: ${this.musicSounds.getVolume()}`)
+        })
+        this.events.on("globalMuteToggled", () => {
+            this.fxSounds.toggleMuted()
+            this.musicSounds.toggleMuted()
+            log(`global mute changed to: ${this.musicSounds.isMuted()}`)
+        })
     }
 
     public update() {
@@ -61,6 +84,7 @@ export default class GameSettings extends Phaser.Scene {
             })
         }
 
+        // TODO(tristan): use these to select the UI element to change
         if (this.controller.up!.isDown()) {
         }
 
@@ -68,12 +92,17 @@ export default class GameSettings extends Phaser.Scene {
         }
 
         if (this.controller.left!.isDown()) {
+            this.events.emit("musicVolumeChanged", -0.01)
+            this.events.emit("fxVolumeChanged", -0.02)
         }
 
         if (this.controller.right!.isDown()) {
+            this.events.emit("musicVolumeChanged", 0.01)
+            this.events.emit("fxVolumeChanged", 0.02)
         }
 
         if (this.controller.actionA!.isUniquelyDown()) {
+            this.events.emit("globalMuteToggled")
         }
     }
 
