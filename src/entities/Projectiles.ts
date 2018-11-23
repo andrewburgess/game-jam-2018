@@ -11,7 +11,6 @@ const log = debug("game:entities:Projectiles")
 
 export const PROJECTILE_STANDARD_VELOCITY = -1200
 
-const PROJECTILE_RESOURCES_TEXT = "Projectile Resources: "
 const PROJECTILE_RESOURCE_GEN_DELTA = 750.0
 
 export class Projectiles extends Phaser.GameObjects.Container {
@@ -21,7 +20,6 @@ export class Projectiles extends Phaser.GameObjects.Container {
     private resourceGenDelta: number
     private resourceLimit: number
     private resources: number
-    private resourcesText: Phaser.GameObjects.Text
 
     constructor(game: Game, x: number, y: number, startingResources: integer) {
         log("constructing")
@@ -33,11 +31,6 @@ export class Projectiles extends Phaser.GameObjects.Container {
 
         this.resourceGenDelta = 0.0
         this.resources = this.resourceLimit = startingResources
-        this.resourcesText = this.game.add.text(
-            this.game.cameras.main.width - 308,
-            25,
-            PROJECTILE_RESOURCES_TEXT + this.resources
-        )
 
         this.game.add.existing(this)
 
@@ -88,8 +81,6 @@ export class Projectiles extends Phaser.GameObjects.Container {
                 projectile.update(time, delta, currentPiece)
             }
         })
-
-        this.resourcesText.text = PROJECTILE_RESOURCES_TEXT + this.resources
     }
 
     private createProjectile(gunPosX: number, gunPosY: number, velocityX: number, velocityY: number) {
