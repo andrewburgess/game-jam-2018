@@ -12,7 +12,7 @@ const GameConfiguration: GameConfig = {
     audio: {
         disableWebAudio: true
     },
-    backgroundColor: "#6495ED",
+    backgroundColor: "#000000",
     height: 800,
     input: {
         gamepad: true
@@ -22,4 +22,12 @@ const GameConfiguration: GameConfig = {
 }
 
 const start = () => new Phaser.Game(GameConfiguration)
-start()
+
+window.WebFont.load({
+    active: () => start(),
+    google: {
+        families: ["Righteous"]
+    },
+    inactive: () => start(),
+    timeout: 2000
+})
