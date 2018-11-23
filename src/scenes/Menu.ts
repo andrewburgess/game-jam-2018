@@ -24,9 +24,10 @@ class Menu extends Phaser.Scene {
     public create(data: any) {
         log("create", data)
 
+        this.add.image(this.centerX(), this.centerY(), Assets.Title)
         const gameButton = this.add.image(0, 0, Assets.GameButton).setInteractive()
 
-        this.add.container(this.centerX(), this.centerY(), [gameButton])
+        this.add.container(this.centerX(), this.centerY() * 1.4, [gameButton])
 
         gameButton.once("pointerup", () => {
             this.scene.start(Scenes.Game, {

@@ -10,6 +10,7 @@ import * as PLATFORM from "./images/platform.png"
 import * as PROJECTILE from "./images/player-projectile.png"
 // NOTE(tristan): https://bit.ly/2qsAQh5
 import * as PLAYER from "./images/player.png"
+import * as TITLE from "./images/title.png"
 // NOTE(tristan): opening the raw versions of sounds assets requires at least the demo version
 // of Propellerhead's Reason software: https://www.propellerheads.com/en/reason
 import * as FX_BEAM_ACTIVATED from "./sounds/fx-beam-activated.mp3"
@@ -32,7 +33,8 @@ export const Files = {
     PARTICLE_ENGINE_THRUST,
     PLATFORM,
     PLAYER,
-    PROJECTILE
+    PROJECTILE,
+    TITLE
 }
 
 export enum Assets {
@@ -48,5 +50,6 @@ export enum Assets {
     ParticleEngineThrust = "particle-engine-thrust",
     Platform = "platform",
     Player = "player",
-    Projectile = "projectile"
+    Projectile = "projectile",
+    Title = "title"
 }

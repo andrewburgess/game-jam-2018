@@ -41,9 +41,9 @@ class Loading extends Phaser.Scene {
         const loadingText = this.make.text({
             style: {
                 fill: "#ffffff",
-                font: "20px monospace"
+                font: "28px Righteous"
             },
-            text: "Loading...",
+            text: "LOADING",
             x: width / 2,
             y: height / 2 - 50
         })
@@ -73,6 +73,7 @@ class Loading extends Phaser.Scene {
         this.load.image(Assets.GameButton, Files.GAME_BUTTON)
         this.load.image(Assets.ParticleEngineThrust, Files.PARTICLE_ENGINE_THRUST)
         this.load.image(Assets.Platform, Files.PLATFORM)
+        this.load.image(Assets.Title, Files.TITLE)
         this.load.spritesheet(Assets.Beam, Files.BEAM, {
             frameHeight: 682,
             frameWidth: 64
