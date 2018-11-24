@@ -56,7 +56,7 @@ export default class UnifiedController implements IUnifiedController {
     }
 
     private initGamepadButtons(pad: Phaser.Input.Gamepad.Gamepad) {
-        this.actionA!.setGamepadButton(pad.buttons[1])
+        this.actionA!.setGamepadButton(pad.buttons[0])
         this.actionLB!.setGamepadButton(pad.buttons[4])
         this.actionRB!.setGamepadButton(pad.buttons[5])
         this.down!.setGamepadButton(pad.buttons[13])

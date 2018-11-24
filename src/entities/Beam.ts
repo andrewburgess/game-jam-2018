@@ -94,6 +94,9 @@ export class Beam extends Phaser.GameObjects.Sprite {
             currentPiece.setBeingBeamed(false)
         }
 
+        this.game.fxSounds.get(Assets.FxBeamBeamingPiece).stop()
+        this.game.fxSounds.get(Assets.FxBeamActivated).stop()
+
         this.firing = false
         this.anims.playReverse(BEAM_END_ANIMATION)
     }
@@ -125,14 +128,18 @@ export class Beam extends Phaser.GameObjects.Sprite {
             this.consumeBeam(delta)
 
             if (this.isBeamHittingPiece(currentPiece)) {
-                this.game.getSound(Assets.FxBeamBeamingPiece).play()
+                if (!this.game.fxSounds.get(Assets.FxBeamBeamingPiece).isPlaying) {
+                    this.game.fxSounds.get(Assets.FxBeamBeamingPiece).play(undefined, { loop: true })
+                }
                 currentPiece.setBeingBeamed(
                     true,
                     this.getBeamCenter() - this.width / 4,
                     this.getBeamCenter() + this.width / 4
                 )
             } else {
-                this.game.getSound(Assets.FxBeamActivated).play()
+                if (!this.game.fxSounds.get(Assets.FxBeamActivated).isPlaying) {
+                    this.game.fxSounds.get(Assets.FxBeamActivated).play(undefined, { loop: true })
+                }
                 currentPiece.setBeingBeamed(false)
             }
         } else {

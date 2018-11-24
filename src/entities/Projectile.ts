@@ -25,7 +25,7 @@ export class Projectile extends Phaser.Physics.Arcade.Sprite {
         this.game.physics.world.enable(this)
         this.game.add.existing(this)
 
-        this.game.getSound(Assets.FxProjectileFired).play()
+        this.game.fxSounds.get(Assets.FxProjectileFired).play()
 
         this.setSize(this.width * PROJECTILE_COLLISION_BOUND_SCALE_X, this.height)
 
@@ -58,7 +58,7 @@ export class Projectile extends Phaser.Physics.Arcade.Sprite {
         }
 
         if (this.hasHit) {
-            this.game.sound.play(Assets.FxPieceHit, { volume: 2.77, rate: 1.77 })
+            this.game.fxSounds.get(Assets.FxPieceHit).play()
         }
     }
 }
