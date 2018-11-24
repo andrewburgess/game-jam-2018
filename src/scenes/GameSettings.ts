@@ -30,6 +30,10 @@ export default class GameSettings extends Phaser.Scene {
      */
     private firstUpdate: boolean
 
+    private selectedElementIdx: integer
+
+    private uiElements: Phaser.GameObjects.Graphics[]
+
     constructor(inKey: string = Scenes.GameSettings) {
         super({
             key: inKey
@@ -44,26 +48,14 @@ export default class GameSettings extends Phaser.Scene {
     }
 
     public create() {
-        this.setupSettingsMenus()
-
         this.controller = new UnifiedController(this.input)
         this.firstUpdate = true
 
         this.cameras.main.fadeIn(500, 0, 0, 0)
 
-        this.events.on("fxVolumeChanged", (amount: number) => {
-            this.fxSounds.setVolume(Phaser.Math.Clamp(this.fxSounds.getVolume() + amount, 0.0, 1.0))
-            log(`fx volume changed to: ${this.fxSounds.getVolume()}`)
-        })
-        this.events.on("musicVolumeChanged", (amount: number) => {
-            this.musicSounds.setVolume(Phaser.Math.Clamp(this.musicSounds.getVolume() + amount, 0.0, 1.0))
-            log(`music volume changed to: ${this.musicSounds.getVolume()}`)
-        })
-        this.events.on("globalMuteToggled", () => {
-            this.fxSounds.toggleMuted()
-            this.musicSounds.toggleMuted()
-            log(`global mute changed to: ${this.musicSounds.isMuted()}`)
-        })
+        this.uiElements = new Array<Phaser.GameObjects.Graphics>()
+        this.setupSettingsMenus()
+        this.selectedElementIdx = 0
     }
 
     public update() {
@@ -84,25 +76,43 @@ export default class GameSettings extends Phaser.Scene {
             })
         }
 
-        // TODO(tristan): use these to select the UI element to change
-        if (this.controller.up!.isDown()) {
+        for (const uiElement of this.uiElements) {
+            uiElement.setAlpha(0.1)
         }
 
-        if (this.controller.down!.isDown()) {
+        // TODO(tristan): use these to select the UI element to change
+        if (this.controller.up!.isUniquelyDown()) {
+            this.selectedElementIdx = (this.selectedElementIdx - 1 + this.uiElements.length) % this.uiElements.length
+            log(`now selected UI element: ${this.selectedElementIdx}`)
         }
+
+        if (this.controller.down!.isUniquelyDown()) {
+            this.selectedElementIdx = (this.selectedElementIdx + 1) % this.uiElements.length
+            log(`now selected UI element: ${this.selectedElementIdx}`)
+        }
+
+        this.uiElements[this.selectedElementIdx].alpha = 1.0
 
         if (this.controller.left!.isDown()) {
-            this.events.emit("musicVolumeChanged", -0.01)
-            this.events.emit("fxVolumeChanged", -0.02)
+            if (this.selectedElementIdx === 0) {
+                this.events.emit("musicVolumeChanged", -0.005)
+            } else if (this.selectedElementIdx === 1) {
+                this.events.emit("fxVolumeChanged", -0.005)
+            }
         }
 
         if (this.controller.right!.isDown()) {
-            this.events.emit("musicVolumeChanged", 0.01)
-            this.events.emit("fxVolumeChanged", 0.02)
+            if (this.selectedElementIdx === 0) {
+                this.events.emit("musicVolumeChanged", 0.005)
+            } else if (this.selectedElementIdx === 1) {
+                this.events.emit("fxVolumeChanged", 0.005)
+            }
         }
 
         if (this.controller.actionA!.isUniquelyDown()) {
-            this.events.emit("globalMuteToggled")
+            if (this.selectedElementIdx === 2) {
+                this.events.emit("globalMuteToggled")
+            }
         }
     }
 
@@ -111,28 +121,97 @@ export default class GameSettings extends Phaser.Scene {
         const cenX = this.cameras.main.centerX
         const cenY = this.cameras.main.centerY
 
-        const musicVolume = this.add.graphics()
-        musicVolume.fillStyle(0x222222, 0.8)
-        musicVolume.fillRect(cenX, cenY - 270 / 2, 320, 50)
-        this.add.text(cenX - 300, cenY - 270 / 2, "MUSIC VOLUME:", {
+        const musicVolumeSlider = this.add.graphics()
+        musicVolumeSlider.fillStyle(0x222222, 0.8)
+        musicVolumeSlider.fillRect(cenX, cenY - 270 / 2, 320, 50)
+        musicVolumeSlider.fillStyle(0x00ff11, 0.8)
+        musicVolumeSlider.fillRect(cenX, cenY - 270 / 2, 320 * this.musicSounds.getVolume(), 50)
+        this.add.text(cenX - 300, cenY - 250 / 2, "MUSIC VOLUME:", {
             fill: "#ffffff",
             font: "22px Righteous"
         })
+        const musicVolumeText = this.add.text(
+            cenX + 380 / 2,
+            cenY - 250 / 2,
+            parseFloat(this.musicSounds.getVolume().toString()).toFixed(3),
+            {
+                fill: "#ffffff",
+                font: "22px Righteous"
+            }
+        )
+        this.uiElements.push(musicVolumeSlider)
+        this.events.on("musicVolumeChanged", (amount: number) => {
+            this.musicSounds.setVolume(Phaser.Math.Clamp(this.musicSounds.getVolume() + amount, 0.0, 1.0))
+            log(`music volume changed to: ${this.musicSounds.getVolume()}`)
+            musicVolumeSlider.clear()
+            musicVolumeSlider.fillStyle(0x222222, 0.8)
+            musicVolumeSlider.fillRect(cenX, cenY - 270 / 2, 320, 50)
+            musicVolumeSlider.fillStyle(0x00ff11, 0.8)
+            musicVolumeSlider.fillRect(cenX, cenY - 270 / 2, 320 * this.musicSounds.getVolume(), 50)
+            musicVolumeText.text = parseFloat(this.musicSounds.getVolume().toString()).toFixed(3)
+        })
 
-        const fxVolume = this.add.graphics()
-        fxVolume.fillStyle(0x222222, 0.8)
-        fxVolume.fillRect(cenX, cenY - 160 / 2, 320, 50)
-        this.add.text(cenX - 278, cenY - 160 / 2, "FX VOLUME:", {
+        const fxVolumeSlider = this.add.graphics()
+        fxVolumeSlider.fillStyle(0x222222, 0.8)
+        fxVolumeSlider.fillRect(cenX, cenY - 160 / 2, 320, 50)
+        fxVolumeSlider.fillStyle(0x00ff11, 0.8)
+        fxVolumeSlider.fillRect(cenX, cenY - 160 / 2, 320 * this.fxSounds.getVolume(), 50)
+        this.add.text(cenX - 278, cenY - 140 / 2, "FX VOLUME:", {
             fill: "#ffffff",
             font: "22px Righteous"
         })
+        const fxVolumeText = this.add.text(
+            cenX + 380 / 2,
+            cenY - 140 / 2,
+            parseFloat(this.fxSounds.getVolume().toString()).toFixed(3),
+            {
+                fill: "#ffffff",
+                font: "22px Righteous"
+            }
+        )
+        this.uiElements.push(fxVolumeSlider)
+        this.events.on("fxVolumeChanged", (amount: number) => {
+            this.fxSounds.setVolume(Phaser.Math.Clamp(this.fxSounds.getVolume() + amount, 0.0, 1.0))
+            log(`fx volume changed to: ${this.fxSounds.getVolume()}`)
+            fxVolumeSlider.clear()
+            fxVolumeSlider.fillStyle(0x222222, 0.8)
+            fxVolumeSlider.fillRect(cenX, cenY - 160 / 2, 320, 50)
+            fxVolumeSlider.fillStyle(0x00ff11, 0.8)
+            fxVolumeSlider.fillRect(cenX, cenY - 160 / 2, 320 * this.fxSounds.getVolume(), 50)
+            fxVolumeText.text = parseFloat(this.fxSounds.getVolume().toString()).toFixed(3)
+        })
 
-        const globalMute = this.add.graphics()
-        globalMute.fillStyle(0x222222, 0.8)
-        globalMute.fillRect(cenX + 270 / 2, cenY - 50 / 2, 50, 50)
-        this.add.text(cenX - 250, cenY - 50 / 2, "MUTE:", {
+        const globalMuteCheckbox = this.add.graphics()
+        globalMuteCheckbox.fillStyle(0x222222, 0.8)
+        globalMuteCheckbox.fillRect(cenX + 270 / 2, cenY - 50 / 2, 50, 50)
+        globalMuteCheckbox.fillStyle(0x00ff11, 0.8)
+        const globalMuteInitial = this.fxSounds.isMuted() && this.musicSounds.isMuted()
+        globalMuteCheckbox.fillRect(cenX + 270 / 2, cenY - 50 / 2, 50 * (globalMuteInitial ? 1 : 0), 50)
+        this.add.text(cenX - 250, cenY - 25 / 2, "MUTE:", {
             fill: "#ffffff",
             font: "22px Righteous"
+        })
+        const globalMuteText = this.add.text(cenX + 380 / 2, cenY - 25 / 2, globalMuteInitial ? "true" : "false", {
+            fill: "#ffffff",
+            font: "22px Righteous"
+        })
+        this.uiElements.push(globalMuteCheckbox)
+        this.events.on("globalMuteToggled", () => {
+            this.fxSounds.toggleMuted()
+            this.musicSounds.toggleMuted()
+            const globalMuteUpdated = this.fxSounds.isMuted() && this.musicSounds.isMuted()
+            log(`global mute changed to: ${globalMuteUpdated}`)
+            globalMuteCheckbox.clear()
+            globalMuteCheckbox.fillStyle(0x222222, 0.8)
+            globalMuteCheckbox.fillRect(cenX + 270 / 2, cenY - 50 / 2, 50, 50)
+            if (globalMuteUpdated) {
+                globalMuteCheckbox.fillStyle(0x00ff11, 0.8)
+                globalMuteCheckbox.fillRect(cenX + 270 / 2, cenY - 50 / 2, 50, 50)
+            } else {
+                globalMuteCheckbox.fillStyle(0x222222, 0.8)
+                globalMuteCheckbox.fillRect(cenX + 270 / 2, cenY - 50 / 2, 50, 50)
+            }
+            globalMuteText.text = globalMuteUpdated ? "true" : "false"
         })
     }
 }
