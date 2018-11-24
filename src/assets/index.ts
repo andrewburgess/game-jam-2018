@@ -3,6 +3,7 @@
 // NOTE(tristan): https://bit.ly/2pGYaak
 import * as BACKGROUND from "./images/background.png"
 import * as BEAM from "./images/beam.png"
+import * as BLOCKS from "./images/blocks.png"
 import * as GAME_BUTTON from "./images/game-button.png"
 import * as PARTICLE_ENGINE_THRUST from "./images/particle-engine-thrust.png"
 import * as PLATFORM from "./images/platform.png"
@@ -23,6 +24,7 @@ import * as MUSIC_02 from "./sounds/music02.mp3"
 export const Files = {
     BACKGROUND,
     BEAM,
+    BLOCKS,
     FX_BEAM_ACTIVATED,
     FX_BEAM_BEAMING_PIECE,
     FX_PIECE_HIT,
@@ -40,6 +42,7 @@ export const Files = {
 export enum Assets {
     Background = "background",
     Beam = "beam",
+    Blocks = "blocks",
     GameButton = "game-button",
     FxBeamActivated = "fx-beam-activated",
     FxBeamBeamingPiece = "fx-beam-beaming-piece",
