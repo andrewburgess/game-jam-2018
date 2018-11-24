@@ -17,8 +17,9 @@ import * as FX_BEAM_ACTIVATED from "./sounds/fx-beam-activated.mp3"
 import * as FX_BEAM_BEAMING_PIECE from "./sounds/fx-beam-beaming-piece.mp3"
 import * as FX_PIECE_HIT from "./sounds/fx-piece-hit.mp3"
 import * as FX_PROJECTILE_FIRED from "./sounds/fx-projectile-fired.mp3"
-import * as MUSIC_01 from "./sounds/music01.mp3"
-import * as MUSIC_02 from "./sounds/music02.mp3"
+import * as MUSIC_01 from "./sounds/music-01.mp3"
+import * as MUSIC_02 from "./sounds/music-02.mp3"
+import * as MUSIC_TITLE from "./sounds/music-title.mp3"
 
 export const Files = {
     BACKGROUND,
@@ -30,6 +31,7 @@ export const Files = {
     GAME_BUTTON,
     MUSIC_01,
     MUSIC_02,
+    MUSIC_TITLE,
     PARTICLE_ENGINE_THRUST,
     PLATFORM,
     PLAYER,
@@ -47,6 +49,7 @@ export enum Assets {
     FxProjectileFired = "fx-projectile-fired",
     Music01 = "music-01",
     Music02 = "music-02",
+    MusicTitle = "music-title",
     ParticleEngineThrust = "particle-engine-thrust",
     Platform = "platform",
     Player = "player",
