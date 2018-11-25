@@ -111,10 +111,11 @@ export class Player extends Phaser.GameObjects.Container {
         // projectiles to always be fired starting at the position of the player and then let physics
         // take over from there.
         this.beam = new Beam(this.game, 0, this.topEdgeYOffset())
-        this.add(this.beam)
         this.controller = new UnifiedController(this.game.input)
-        this.projectiles = new Projectiles(this.game, 20, this.topEdgeYOffset(), PLAYER_PROJECTILES_STARTING_RESOURCES)
+        this.projectiles = new Projectiles(this.game, 0, this.topEdgeYOffset())
+        this.add(this.beam)
         this.add(playerSprite)
+        this.add(this.projectiles)
 
         log("constructed")
     }
@@ -135,18 +136,13 @@ export class Player extends Phaser.GameObjects.Container {
         }
         this.beam.update(time, delta)
 
-        let projectileFireAttempt: boolean = false
-        if (this.controller.actionRB!.isUniquelyDown()) {
-            projectileFireAttempt = true
+        if (this.controller.actionRB!.isDown()) {
+            this.projectiles.fire()
         }
-        this.projectiles.update(time, delta, projectileFireAttempt, this.x, this.y, currentPiece)
+        this.projectiles.update(time, delta)
     }
 
     private topEdgeYOffset() {
         return -this.height / 2
-    }
-
-    private botEdgeYOffset() {
-        return this.height / 2 - 2
     }
 }

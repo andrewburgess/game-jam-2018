@@ -11,6 +11,7 @@ const log = debug("game:entities:Projectile")
 const PROJECTILE_COLLISION_BOUND_SCALE_X = 0.5
 
 export class Projectile extends Phaser.Physics.Arcade.Sprite {
+    public body: Phaser.Physics.Arcade.Body
     private hasHit: boolean
     private game: Game
 
@@ -23,6 +24,7 @@ export class Projectile extends Phaser.Physics.Arcade.Sprite {
         this.hasHit = false
 
         this.game.physics.world.enable(this)
+        this.body.setAllowGravity(false)
         this.game.add.existing(this)
 
         this.game.fxSounds.get(Assets.FxProjectileFired).play()

@@ -9,14 +9,15 @@ import { IGameInitialization } from "./Game"
 
 const log = debug(`game:scenes:${Scenes.GameUI}`)
 
+const AMMO_TOP = 70
 const BorderColor = Phaser.Display.Color.HexStringToColor("#302828")
 const BeamResourceColor = Phaser.Display.Color.HexStringToColor("#741a7a")
 const BEAM_TOP = 20
-const BEAM_LEFT_OFFSET = -250
+const UI_X_OFFSET = -250
 
 export default class GameUI extends Phaser.Scene {
+    private ammoText: Phaser.GameObjects.Text
     private beamResources: Phaser.GameObjects.Graphics
-    private beamText: Phaser.GameObjects.Text
     private level: ILevel
 
     constructor() {
@@ -32,10 +33,19 @@ export default class GameUI extends Phaser.Scene {
 
         this.level = Levels[config.level]
         this.beamResources = this.add.graphics()
-        this.beamText = this.add.text(this.cameras.main.width + BEAM_LEFT_OFFSET - 80, BEAM_TOP, "BEAM:", {
+        this.add.text(this.cameras.main.width + UI_X_OFFSET - 80, BEAM_TOP, "BEAM:", {
             fill: "#ffffff",
             font: "22px Righteous"
         })
+        this.ammoText = this.add.text(
+            this.cameras.main.width + UI_X_OFFSET - 80,
+            AMMO_TOP,
+            `AMMO: ${this.level.ammo.maximum} / ${this.level.ammo.maximum}`,
+            {
+                fill: "#ffffff",
+                font: "22px Righteous"
+            }
+        )
 
         this.registry.events.on("changedata", this.onDataUpdated.bind(this))
 
@@ -43,7 +53,7 @@ export default class GameUI extends Phaser.Scene {
     }
 
     private drawBeamResources(amount: number = 1) {
-        const left = this.cameras.main.width + BEAM_LEFT_OFFSET
+        const left = this.cameras.main.width + UI_X_OFFSET
         const top = BEAM_TOP
         const height = 24
         const width = 150
@@ -62,7 +72,9 @@ export default class GameUI extends Phaser.Scene {
     }
 
     private onDataUpdated(parent: any, key: string, data: any) {
-        if (key === Data.BEAM_CURRENT) {
+        if (key === Data.AMMO_CURRENT) {
+            this.ammoText.setText(`AMMO: ${data} / ${this.level.ammo.maximum}`)
+        } else if (key === Data.BEAM_CURRENT) {
             const max: number = this.registry.get(Data.BEAM_MAX)
             this.drawBeamResources(data / max)
         }

@@ -127,10 +127,6 @@ export default class Game extends Phaser.Scene {
         this.player = new Player(this, boardWidth / 2, boardHeight + 40)
         this.board.add(this.player)
 
-        const worldTop: Phaser.Physics.Arcade.Sprite = this.physics.add.staticSprite(16, -16, "world_top")
-        worldTop.setSize(this.physics.world.bounds.width, worldTop.height)
-        this.player.projectiles.destroyOnCollisionWith(worldTop)
-
         this.spawnNextPiece()
 
         setTimeout(() => {

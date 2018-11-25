@@ -1,5 +1,20 @@
 import { merge } from "lodash"
 
+export interface IAmmoConfiguration {
+    /**
+     * Maximum amount of ammunition the player can have (also what they start the level with)
+     *
+     * @type {number}
+     * @memberof IAmmoConfiguration
+     */
+    maximum: number
+
+    /**
+     * How often a new unit of ammo spawns (in milliseconds)
+     */
+    regenerationInterval: number
+}
+
 export interface IBeamConfiguration {
     /**
      * Rate at which Beam resource is consumed (units per second)
@@ -27,6 +42,7 @@ export interface IBeamConfiguration {
 }
 
 export interface ILevel {
+    readonly ammo: IAmmoConfiguration
     readonly beam: IBeamConfiguration
 
     /**
@@ -111,12 +127,18 @@ export interface IPlatform {
 }
 
 const LevelDefaults = {
+    ammo: {
+        maximum: 5,
+        regenerationInterval: 3000
+    },
     beam: {
         consumptionRate: 30,
         maximum: 100,
         regenerationRate: 10
     },
+    height: 17,
     speed: 500,
+    width: 29,
     zoom: 1
 }
 
