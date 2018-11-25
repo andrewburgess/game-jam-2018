@@ -6,7 +6,6 @@ import { ILevel } from "../levels"
 import Game from "../scenes/Game"
 
 import { Data } from "./Data"
-import { Piece } from "./Piece"
 import { Projectile } from "./Projectile"
 
 const log = debug("game:entities:Projectiles")
@@ -51,7 +50,7 @@ export class Projectiles extends Phaser.GameObjects.Container {
         this.game.physics.add.overlap(
             this.elements,
             worldTop,
-            (collidedBoundary: Phaser.Physics.Arcade.Sprite, playerProjectile: Phaser.Physics.Arcade.Sprite) => {
+            (collidedBoundary: Phaser.Physics.Arcade.Sprite, playerProjectile: Projectile) => {
                 if (collidedBoundary.body.bottom >= playerProjectile.body.bottom) {
                     playerProjectile.destroy()
                 }
@@ -71,7 +70,6 @@ export class Projectiles extends Phaser.GameObjects.Container {
         const current = this.game.registry.get(Data.AMMO_CURRENT)
 
         if (current === 0) {
-            log("no ammo left")
             return
         }
 
@@ -82,22 +80,24 @@ export class Projectiles extends Phaser.GameObjects.Container {
         return this.getAll() as Projectile[]
     }
 
-    private createProjectile(gunPosX: number, gunPosY: number, velocityY: number) {
-        const pProj: Projectile = new Projectile(this.game, gunPosX, gunPosY)
+    public update(time: number, delta: number) {
+        this.elements
+            .getChildren()
+            .forEach((projectile: Phaser.GameObjects.GameObject) => projectile.update(time, delta))
+    }
 
-        this.elements.add(pProj)
-        pProj.setVelocityY(velocityY)
+    private createProjectile(gunPosX: number, gunPosY: number, velocityY: number) {
+        const projectile: Projectile = new Projectile(this.game, gunPosX, gunPosY)
+
+        this.elements.add(projectile)
+        projectile.setVelocityY(velocityY)
     }
 
     private fireProjectile() {
         const current = this.game.registry.get(Data.AMMO_CURRENT)
         this.game.registry.set(Data.AMMO_CURRENT, Math.max(0, current - 1))
 
-        this.createProjectile(
-            this.parentContainer.x + this.parentContainer.width / 2,
-            this.parentContainer.y + this.y,
-            PROJECTILE_STANDARD_VELOCITY
-        )
+        this.createProjectile(this.parentContainer.x, this.parentContainer.y + this.y, PROJECTILE_STANDARD_VELOCITY)
 
         this.regenerateAmmo()
     }

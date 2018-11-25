@@ -4,15 +4,10 @@ import * as Phaser from "phaser"
 import { Assets } from "../assets"
 import Game from "../scenes/Game"
 
-import { Piece, RotateDirection } from "./Piece"
-
 const log = debug("game:entities:Projectile")
-
-const PROJECTILE_COLLISION_BOUND_SCALE_X = 0.5
 
 export class Projectile extends Phaser.Physics.Arcade.Sprite {
     public body: Phaser.Physics.Arcade.Body
-    private hasHit: boolean
     private game: Game
 
     constructor(game: Game, x: number, y: number) {
@@ -21,26 +16,35 @@ export class Projectile extends Phaser.Physics.Arcade.Sprite {
         super(game, x, y, Assets.Projectile)
         this.game = game
 
-        this.hasHit = false
-
         this.game.physics.world.enable(this)
         this.body.setAllowGravity(false)
-        this.game.add.existing(this)
+        this.game.board.add(this)
 
         this.game.fxSounds.get(Assets.FxProjectileFired).play()
-
-        this.setSize(this.width * PROJECTILE_COLLISION_BOUND_SCALE_X, this.height)
 
         log("constructed")
     }
 
-    public update(time: number, delta: number, currentPiece: Piece) {
-        // NOTE(tristan): may need to rework this if we ever want more than one piece on the board
-        if (this.hasHit) {
+    public update(time: number, delta: number) {
+        const piece = this.game.getCurrentPiece()
+
+        if (!piece) {
             return
         }
 
-        const pieceRelLeft = new Phaser.Math.Vector2(
+        if (
+            this.game.board.hitToRotate(
+                piece,
+                this.x - this.width * this.originX,
+                this.y - this.height * this.originY,
+                this.width,
+                this.height
+            )
+        ) {
+            log("hit")
+        }
+
+        /*const pieceRelLeft = new Phaser.Math.Vector2(
             currentPiece.x - currentPiece.width / 2,
             currentPiece.y - currentPiece.height
         )
@@ -61,6 +65,6 @@ export class Projectile extends Phaser.Physics.Arcade.Sprite {
 
         if (this.hasHit) {
             this.game.fxSounds.get(Assets.FxPieceHit).play()
-        }
+        }*/
     }
 }

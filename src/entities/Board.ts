@@ -1,4 +1,5 @@
-import { each, every, map, range, some } from "lodash"
+import * as debug from "debug"
+import { each, every, filter, map, range, reduce, some } from "lodash"
 import * as Phaser from "phaser"
 
 import { Assets } from "../assets"
@@ -6,7 +7,9 @@ import { ILevel, IPlatform } from "../levels"
 import Game from "../scenes/Game"
 
 import { BLOCK_SIZE, EmptyBlock } from "./Block"
-import { Piece } from "./Piece"
+import { Piece, RotateDirection } from "./Piece"
+
+const log = debug("game:entities:Board")
 
 export class Board extends Phaser.GameObjects.Container {
     private cells: Array<Array<Piece | null>>
@@ -66,6 +69,41 @@ export class Board extends Phaser.GameObjects.Container {
             // Cell is occupied by a block, the move can not be completed
             return false
         })
+    }
+
+    public hitToRotate(piece: Piece, x: number, y: number, width: number, height: number) {
+        /**
+         * if (RectA.X1 < RectB.X2 && RectA.X2 > RectB.X1 &&
+    RectA.Y1 > RectB.Y2 && RectA.Y2 < RectB.Y1) 
+         */
+        const hit = filter(piece.getBlockLocations(), (coordinate) => {
+            const blockX = piece.x + coordinate.x * BLOCK_SIZE
+            const blockY = piece.y + coordinate.y * BLOCK_SIZE
+
+            return blockX < x + width && blockX + BLOCK_SIZE > x && blockY < y + height && blockY + BLOCK_SIZE > y
+        })
+
+        if (hit.length > 0) {
+            const centerX = x
+            const direction = reduce(
+                hit,
+                (value, vector) => {
+                    const vectorX = piece.x + vector.x * BLOCK_SIZE + BLOCK_SIZE / 2
+                    if (centerX === vectorX) {
+                        return value
+                    }
+
+                    return value + (centerX > vectorX ? 1 : -1)
+                },
+                0
+            )
+
+            if (direction !== 0) {
+                piece.rotate(direction > 0 ? RotateDirection.COUNTER_CLOCKWISE : RotateDirection.CLOCKWISE)
+            }
+        }
+
+        return hit.length > 0
     }
 
     public isComplete() {

@@ -77,8 +77,7 @@ export default class Game extends Phaser.Scene {
             key: inKey,
             physics: {
                 arcade: {
-                    debug: !!window.localStorage.debug,
-                    gravity: { y: 300 }
+                    debug: !!window.localStorage.debug
                 }
             }
         })
