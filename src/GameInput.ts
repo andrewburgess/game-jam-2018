@@ -31,8 +31,6 @@ export default class UnifiedController implements IUnifiedController {
 
         this.plugin = plugin
 
-        // TODO(tristan): worth keeping init out of constructor?
-        // TODO(tristan): something fancy with action <--> key map configs?
         this.up = new VirtualKey(plugin.keyboard.addKey("W"))
         this.down = new VirtualKey(plugin.keyboard.addKey("S"))
         this.left = new VirtualKey(plugin.keyboard.addKey("A"))
