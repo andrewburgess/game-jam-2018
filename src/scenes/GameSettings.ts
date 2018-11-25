@@ -80,7 +80,6 @@ export default class GameSettings extends Phaser.Scene {
             uiElement.setAlpha(0.1)
         }
 
-        // TODO(tristan): use these to select the UI element to change
         if (this.controller.up!.isUniquelyDown()) {
             this.selectedElementIdx = (this.selectedElementIdx - 1 + this.uiElements.length) % this.uiElements.length
             log(`now selected UI element: ${this.selectedElementIdx}`)
