@@ -228,5 +228,6 @@ export default class Game extends Phaser.Scene {
             this.nextPiece.location.y * BLOCK_SIZE + -3 * BLOCK_SIZE
         )
         this.board.add(this.nextPiece)
+        this.board.moveTo(this.nextPiece, 0)
     }
 }
