@@ -45,7 +45,7 @@ export default class GameSettings extends Phaser.Scene {
         log("constructed")
     }
 
-    public init(data: object) {
+    public init(data: any) {
         this.fxSounds = data.fxSounds
         this.musicSounds = data.musicSounds
     }
