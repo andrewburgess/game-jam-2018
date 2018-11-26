@@ -17,6 +17,7 @@ import { Scenes } from "./"
 const log = debug(`game:scenes:${Scenes.Game}`)
 
 const list: Shape[] = []
+const PIECE_PRICE = 500
 
 export interface IGameInitialization {
     level: number
@@ -89,6 +90,8 @@ export default class Game extends Phaser.Scene {
         log(`create level ${config.level}`)
 
         this.level = Levels[config.level]
+
+        this.registry.set(Data.BUDGET, this.level.budget)
 
         this.cameras.main.setZoom(this.level.zoom)
         this.events.on("resume", () => {
@@ -202,17 +205,19 @@ export default class Game extends Phaser.Scene {
         }
 
         this.currentPiece = this.nextPiece
+        const newBudget = (this.registry.get(Data.BUDGET) as number) - PIECE_PRICE
 
-        // Make sure the player is on top of all of the blocks so the beam
-        // overlaps them
-        this.board.moveTo(this.player, this.board.getIndex(this.currentPiece))
         this.nextPiece = undefined
-        if (!this.board.canPieceMoveTo(this.currentPiece, this.currentPiece.location.x, this.currentPiece.location.y)) {
+        if (
+            newBudget < 0 ||
+            !this.board.canPieceMoveTo(this.currentPiece, this.currentPiece.location.x, this.currentPiece.location.y)
+        ) {
             // The player loses!
             log("you loser")
             throw new Error("loser loser loser")
         }
 
+        this.registry.set(Data.BUDGET, newBudget)
         this.currentPiece.onActivate()
     }
 
@@ -228,6 +233,6 @@ export default class Game extends Phaser.Scene {
             this.nextPiece.location.y * BLOCK_SIZE + -3 * BLOCK_SIZE
         )
         this.board.add(this.nextPiece)
-        this.board.moveTo(this.nextPiece, 0)
+        this.board.moveTo(this.nextPiece, 0) // Ensure next piece is at the bottom of the draw stack
     }
 }

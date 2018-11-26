@@ -9,15 +9,17 @@ import { IGameInitialization } from "./Game"
 
 const log = debug(`game:scenes:${Scenes.GameUI}`)
 
-const AMMO_TOP = 70
+const AMMO_TOP = 48
 const BorderColor = Phaser.Display.Color.HexStringToColor("#302828")
 const BeamResourceColor = Phaser.Display.Color.HexStringToColor("#741a7a")
-const BEAM_TOP = 20
-const UI_X_OFFSET = -250
+const BEAM_TOP = 16
+const UI_X_OFFSET = -180
 
 export default class GameUI extends Phaser.Scene {
     private ammoText: Phaser.GameObjects.Text
     private beamResources: Phaser.GameObjects.Graphics
+    private budgetLabelText: Phaser.GameObjects.Text
+    private budgetText: Phaser.GameObjects.Text
     private level: ILevel
 
     constructor() {
@@ -46,6 +48,26 @@ export default class GameUI extends Phaser.Scene {
                 font: "22px Righteous"
             }
         )
+        this.budgetLabelText = this.add
+            .text(0, BEAM_TOP, "BUDGET", {
+                fill: "#ffffff",
+                font: "24px Righteous"
+            })
+            .setAlign("center")
+
+        this.budgetLabelText.setPosition(
+            this.cameras.main.centerX - this.budgetLabelText.width / 2,
+            this.budgetLabelText.y
+        )
+
+        this.budgetText = this.add
+            .text(this.cameras.main.centerX, BEAM_TOP + 24, `$${this.level.budget}`, {
+                fill: "#ffffff",
+                font: "48px Righteous"
+            })
+            .setAlign("center")
+
+        this.budgetText.setPosition(this.cameras.main.centerX - this.budgetText.width / 2, this.budgetText.y)
 
         this.registry.events.on("changedata", this.onDataUpdated.bind(this))
 
@@ -77,6 +99,13 @@ export default class GameUI extends Phaser.Scene {
         } else if (key === Data.BEAM_CURRENT) {
             const max: number = this.registry.get(Data.BEAM_MAX)
             this.drawBeamResources(data / max)
+        } else if (key === Data.BUDGET) {
+            this.budgetText.setText(`${data < 0 ? "-" : ""}$${data}`)
+            this.budgetText.setPosition(this.cameras.main.centerX - this.budgetText.width / 2, this.budgetText.y)
+
+            if (data < 0) {
+                this.budgetText.setFill("#ff0000")
+            }
         }
     }
 }

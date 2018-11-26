@@ -3,5 +3,6 @@ export enum Data {
     AMMO_CURRENT = "ammo-current",
     BEAM_CURRENT = "beam-current",
     BEAM_MAX = "beam-maximum",
+    BUDGET = "budget",
     VOLUME = "volume"
 }

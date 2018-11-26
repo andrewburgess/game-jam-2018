@@ -46,6 +46,14 @@ export interface ILevel {
     readonly beam: IBeamConfiguration
 
     /**
+     * Amount of money the player starts with
+     *
+     * @type {number}
+     * @memberof ILevel
+     */
+    readonly budget: number
+
+    /**
      * Total number of rows in the game board
      *
      * @type {number}
@@ -144,6 +152,7 @@ const LevelDefaults = {
 
 export const Levels: { [key: string]: ILevel } = {
     [1]: merge({}, LevelDefaults, {
+        budget: 4000,
         height: 17,
         platforms: [
             {
