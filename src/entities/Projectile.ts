@@ -18,6 +18,7 @@ export class Projectile extends Phaser.Physics.Arcade.Sprite {
 
         this.game.physics.world.enable(this)
         this.body.setAllowGravity(false)
+        this.setSize(this.width * 0.6, this.height * 0.8)
         this.game.board.add(this)
 
         this.game.fxSounds.get(Assets.FxProjectileFired).play()
@@ -35,36 +36,15 @@ export class Projectile extends Phaser.Physics.Arcade.Sprite {
         if (
             this.game.board.hitToRotate(
                 piece,
-                this.x - this.width * this.originX,
-                this.y - this.height * this.originY,
-                this.width,
-                this.height
+                this.x - this.body.width * this.originX,
+                this.y - this.body.height * this.originY,
+                this.body.width,
+                this.body.height
             )
         ) {
+            this.game.fxSounds.get(Assets.FxPieceHit).play()
+            this.destroy()
             log("hit")
         }
-
-        /*const pieceRelLeft = new Phaser.Math.Vector2(
-            currentPiece.x - currentPiece.width / 2,
-            currentPiece.y - currentPiece.height
-        )
-        const pieceWorldLeft = { x: 0, y: 0 } //this.game.board.canonicalizePosition(pieceRelLeft)
-        const pieceRelRight = new Phaser.Math.Vector2(
-            currentPiece.x + currentPiece.width / 2,
-            currentPiece.y - currentPiece.height
-        )
-        const pieceWorldRight = { x: 0, y: 0 } // this.game.board.canonicalizePosition(pieceRelRight)
-
-        if (this.body.hitTest(pieceWorldLeft.x, pieceWorldLeft.y)) {
-            currentPiece.rotate(RotateDirection.CLOCKWISE)
-            this.hasHit = true
-        } else if (this.body.hitTest(pieceWorldRight.x, pieceWorldRight.y)) {
-            currentPiece.rotate(RotateDirection.COUNTER_CLOCKWISE)
-            this.hasHit = true
-        }
-
-        if (this.hasHit) {
-            this.game.fxSounds.get(Assets.FxPieceHit).play()
-        }*/
     }
 }

@@ -72,38 +72,26 @@ export class Board extends Phaser.GameObjects.Container {
     }
 
     public hitToRotate(piece: Piece, x: number, y: number, width: number, height: number) {
-        /**
-         * if (RectA.X1 < RectB.X2 && RectA.X2 > RectB.X1 &&
-    RectA.Y1 > RectB.Y2 && RectA.Y2 < RectB.Y1) 
-         */
-        const hit = filter(piece.getBlockLocations(), (coordinate) => {
-            const blockX = piece.x + coordinate.x * BLOCK_SIZE
-            const blockY = piece.y + coordinate.y * BLOCK_SIZE
+        const projectile = new Phaser.Geom.Rectangle(x, y, width, height)
 
-            return blockX < x + width && blockX + BLOCK_SIZE > x && blockY < y + height && blockY + BLOCK_SIZE > y
-        })
-
-        if (hit.length > 0) {
-            const centerX = x
-            const direction = reduce(
-                hit,
-                (value, vector) => {
-                    const vectorX = piece.x + vector.x * BLOCK_SIZE + BLOCK_SIZE / 2
-                    if (centerX === vectorX) {
-                        return value
-                    }
-
-                    return value + (centerX > vectorX ? 1 : -1)
-                },
-                0
+        const hit = some(piece.getBlockLocations(), (coordinate) => {
+            const block = new Phaser.Geom.Rectangle(
+                piece.x + coordinate.x * BLOCK_SIZE,
+                piece.y + coordinate.y * BLOCK_SIZE,
+                BLOCK_SIZE,
+                BLOCK_SIZE
             )
 
-            if (direction !== 0) {
-                piece.rotate(direction > 0 ? RotateDirection.COUNTER_CLOCKWISE : RotateDirection.CLOCKWISE)
-            }
+            return Phaser.Geom.Rectangle.Overlaps(projectile, block)
+        })
+
+        if (hit) {
+            const centerX = x
+
+            piece.rotate(piece.x < centerX ? RotateDirection.COUNTER_CLOCKWISE : RotateDirection.CLOCKWISE)
         }
 
-        return hit.length > 0
+        return hit
     }
 
     public isComplete() {
