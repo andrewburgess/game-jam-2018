@@ -13,7 +13,7 @@ export class TPiece extends Piece {
                 return [new Vector2(0, 0), new Vector2(1, 0), new Vector2(-1, 0), new Vector2(0, -1)]
             case -180:
             case 180:
-                return [new Vector2(0, 0), new Vector2(0, -1), new Vector2(0, 1), new Vector2(1, 0)]
+                return [new Vector2(0, 0), new Vector2(-1, 0), new Vector2(0, 1), new Vector2(1, 0)]
             case 90:
                 return [new Vector2(0, 0), new Vector2(0, -1), new Vector2(0, 1), new Vector2(1, 0)]
             case -90:
