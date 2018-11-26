@@ -98,6 +98,30 @@ export abstract class Piece extends Phaser.GameObjects.Container {
 
         if (!this.scene.board.canPieceMoveTo(this, this.location.x, this.location.y, newAngle)) {
             log("can't rotate")
+            const angle = this.angle
+            this.scene.tweens.timeline({
+                tweens: [
+                    {
+                        angle: Phaser.Math.Angle.WrapDegrees(
+                            angle + (direction === RotateDirection.CLOCKWISE ? 10 : -10)
+                        ),
+                        duration: 50,
+                        targets: this
+                    },
+                    {
+                        angle: Phaser.Math.Angle.WrapDegrees(
+                            angle + (direction === RotateDirection.CLOCKWISE ? -20 : 20)
+                        ),
+                        duration: 100,
+                        targets: this
+                    },
+                    {
+                        angle: this.actualAngle,
+                        duration: 50,
+                        targets: this
+                    }
+                ]
+            })
             return
         }
 
