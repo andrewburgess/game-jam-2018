@@ -7,9 +7,6 @@ import Loading from "./scenes/Loading"
 import Menu from "./scenes/Menu"
 
 const GameConfiguration: GameConfig = {
-    audio: {
-        disableWebAudio: true
-    },
     backgroundColor: "#000000",
     height: 800,
     input: {

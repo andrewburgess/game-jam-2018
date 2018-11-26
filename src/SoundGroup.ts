@@ -9,26 +9,30 @@ const log = debug(`game:SoundGroup`)
 export class SoundGroup {
     private game: Game
     private muted: boolean
-    private soundMap: Map<Assets, Phaser.Sound.HTML5AudioSound>
-    private sounds: Phaser.Sound.HTML5AudioSound[]
+    private soundMap: Map<Assets, Phaser.Sound.WebAudioSound>
+    private sounds: Phaser.Sound.WebAudioSound[]
     private volume: number
 
     constructor(game: Game) {
         this.game = game
-        this.soundMap = new Map<Assets, Phaser.Sound.HTML5AudioSound>()
-        this.sounds = new Array<Phaser.Sound.HTML5AudioSound>()
+        this.soundMap = new Map<Assets, Phaser.Sound.WebAudioSound>()
+        this.sounds = new Array<Phaser.Sound.WebAudioSound>()
 
         this.setMuted(false)
         this.setVolume(1.0)
     }
 
     public add(key: Assets) {
-        const sound = this.game.sound.add(key) as Phaser.Sound.HTML5AudioSound
+        const sound = this.game.sound.add(key) as Phaser.Sound.WebAudioSound
+
+        sound.setMute(this.muted)
+        sound.setVolume(this.volume)
+
         this.soundMap[key] = sound
         this.sounds.push(sound)
     }
 
-    public get(key: Assets): Phaser.Sound.HTML5AudioSound {
+    public get(key: Assets): Phaser.Sound.WebAudioSound {
         return this.soundMap[key]
     }
 

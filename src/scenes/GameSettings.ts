@@ -3,6 +3,7 @@ import * as Phaser from "phaser"
 
 import UnifiedController from "../GameInput"
 import { SoundGroup } from "../SoundGroup"
+import { Data } from "../entities/Data"
 
 import { Scenes } from "./"
 
@@ -155,6 +156,8 @@ export default class GameSettings extends Phaser.Scene {
         fxVolumeSlider.fillRect(cenX, cenY - 160 / 2, 320 * this.fxSounds.getVolume(), 50)
 
         fxVolumeText.text = parseFloat(this.fxSounds.getVolume().toString()).toFixed(3)
+
+        this.storeVolume()
     }
 
     private onGlobalMuteToggled() {
@@ -181,6 +184,8 @@ export default class GameSettings extends Phaser.Scene {
         }
 
         globalMuteText.text = globalMuteUpdated ? "true" : "false"
+
+        this.storeVolume()
     }
 
     private onMusicVolumeChanged(amount: number) {
@@ -200,6 +205,8 @@ export default class GameSettings extends Phaser.Scene {
         musicVolumeSlider.fillRect(cenX, cenY - 270 / 2, 320 * this.musicSounds.getVolume(), 50)
 
         musicVolumeText.text = parseFloat(this.musicSounds.getVolume().toString()).toFixed(3)
+
+        this.storeVolume()
     }
 
     private setupSettingsMenus() {
@@ -265,5 +272,15 @@ export default class GameSettings extends Phaser.Scene {
         })
         this.uiElements.push([globalMuteCheckbox, globalMuteText])
         this.events.on("globalMuteToggled", this.onGlobalMuteToggled, this)
+    }
+
+    private storeVolume() {
+        const volume: VolumeSettings = {
+            fxSounds: Phaser.Math.RoundTo(this.fxSounds.getVolume(), -3),
+            musicSounds: Phaser.Math.RoundTo(this.musicSounds.getVolume(), -3),
+            muted: this.fxSounds.isMuted() && this.musicSounds.isMuted()
+        }
+
+        window.localStorage.setItem(Data.VOLUME, JSON.stringify(volume))
     }
 }

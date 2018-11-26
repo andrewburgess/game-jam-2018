@@ -3,6 +3,7 @@ import * as Phaser from "phaser"
 
 import UnifiedController from "../GameInput"
 import { Assets } from "../assets"
+import { Data } from "../entities/Data"
 
 import { Scenes } from "./"
 import { IGameInitialization } from "./Game"
@@ -41,7 +42,29 @@ class Menu extends Phaser.Scene {
 
         this.controller = new UnifiedController(this.input)
 
-        this.sound.play(Assets.MusicTitle, { loop: true })
+        const volumeSettingsRaw = window.localStorage.getItem(Data.VOLUME)
+        const volumeSettings: VolumeSettings = {
+            fxSounds: 1,
+            musicSounds: 0.8,
+            muted: false
+        }
+        if (volumeSettingsRaw) {
+            const parsed = JSON.parse(volumeSettingsRaw) as VolumeSettings
+            volumeSettings.fxSounds = parsed.fxSounds
+            volumeSettings.musicSounds = parsed.musicSounds
+            volumeSettings.muted = parsed.muted
+        }
+
+        const titleMusic = this.sound.add(Assets.MusicTitle, {
+            loop: true,
+            mute: volumeSettings.muted,
+            volume: volumeSettings.musicSounds
+        })
+
+        titleMusic.play()
+
+        this.events.once("destroy", () => titleMusic.stop())
+        this.events.once("shutdown", () => titleMusic.stop())
 
         gameButton.once("pointerup", () => {
             this.startGame()

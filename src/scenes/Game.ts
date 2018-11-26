@@ -4,12 +4,12 @@ import * as Phaser from "phaser"
 
 import UnifiedController from "../GameInput"
 import { SoundGroup } from "../SoundGroup"
+import { Assets } from "../assets"
 import { BLOCK_SIZE } from "../entities/Block"
 import { Board } from "../entities/Board"
+import { Data } from "../entities/Data"
 import { Piece, Shape, createPiece } from "../entities/Piece/"
 import { Player } from "../entities/Player"
-
-import { Assets } from "../assets"
 import { ILevel, Levels } from "../levels"
 
 import { Scenes } from "./"
@@ -110,6 +110,7 @@ export default class Game extends Phaser.Scene {
 
         this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, Assets.Background)
 
+        this.sound.volume = 1
         this.fxSounds = new SoundGroup(this)
         this.musicSounds = new SoundGroup(this)
         this.fxSounds.add(Assets.FxBeamActivated)
@@ -119,6 +120,23 @@ export default class Game extends Phaser.Scene {
         this.musicSounds.add(Assets.Music01)
         this.musicSounds.add(Assets.Music02)
 
+        const volumeSettingsRaw = window.localStorage.getItem(Data.VOLUME)
+        const volumeSettings: VolumeSettings = {
+            fxSounds: 1,
+            musicSounds: 0.8,
+            muted: false
+        }
+        if (volumeSettingsRaw) {
+            const parsed = JSON.parse(volumeSettingsRaw) as VolumeSettings
+            volumeSettings.fxSounds = parsed.fxSounds
+            volumeSettings.musicSounds = parsed.musicSounds
+            volumeSettings.muted = parsed.muted
+        }
+
+        this.fxSounds.setVolume(volumeSettings.fxSounds)
+        this.musicSounds.setVolume(volumeSettings.musicSounds)
+        this.fxSounds.setMuted(volumeSettings.muted)
+        this.musicSounds.setMuted(volumeSettings.muted)
         this.musicSounds.loopAllSounds()
 
         this.add.existing(this.board)
