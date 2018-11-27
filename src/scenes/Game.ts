@@ -155,7 +155,7 @@ export default class Game extends Phaser.Scene {
     public update(time: number, delta: number) {
         super.update(time, delta)
 
-        if (this.controller.settings!.isUniquelyDown()) {
+        if ((this.nextPiece || this.currentPiece) && this.controller.settings!.isUniquelyDown()) {
             log("launching game settings scene")
             this.cameras.main.fade(200, 0, 0, 0)
             this.cameras.main.once("camerafadeoutcomplete", () => {
