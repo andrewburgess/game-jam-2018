@@ -43,7 +43,15 @@ class Menu extends Phaser.Scene {
 
         this.controller = new UnifiedController(this.input)
 
-        const volumeSettingsRaw = window.localStorage.getItem(Data.VOLUME)
+        let volumeSettingsRaw: any = null
+
+        try {
+            volumeSettingsRaw = window.localStorage.getItem(Data.VOLUME)
+        } catch (e) {
+            console.warn(
+                "You seem to have third party cookies and site data blocked. Can't save anything unfortunately"
+            )
+        }
         const volumeSettings: VolumeSettings = {
             fxSounds: 1,
             musicSounds: 0.8,

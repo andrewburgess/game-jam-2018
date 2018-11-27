@@ -281,6 +281,12 @@ export default class GameSettings extends Phaser.Scene {
             muted: this.fxSounds.isMuted() && this.musicSounds.isMuted()
         }
 
-        window.localStorage.setItem(Data.VOLUME, JSON.stringify(volume))
+        try {
+            window.localStorage.setItem(Data.VOLUME, JSON.stringify(volume))
+        } catch (e) {
+            console.warn(
+                "You seem to have third party cookies and site data blocked. Can't save anything unfortunately"
+            )
+        }
     }
 }

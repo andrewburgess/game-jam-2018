@@ -80,7 +80,7 @@ export default class Game extends Phaser.Scene {
             key: inKey,
             physics: {
                 arcade: {
-                    debug: !!window.localStorage.debug
+                    debug: false
                 }
             }
         })
@@ -126,7 +126,14 @@ export default class Game extends Phaser.Scene {
         this.musicSounds.add(Assets.Music01)
         this.musicSounds.add(Assets.Music02)
 
-        const volumeSettingsRaw = window.localStorage.getItem(Data.VOLUME)
+        let volumeSettingsRaw: any = null
+        try {
+            volumeSettingsRaw = window.localStorage.getItem(Data.VOLUME)
+        } catch (e) {
+            console.warn(
+                "You seem to have third party cookies and site data blocked. Can't save anything unfortunately"
+            )
+        }
         const volumeSettings: VolumeSettings = {
             fxSounds: 1,
             musicSounds: 0.8,
