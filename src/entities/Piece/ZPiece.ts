@@ -7,12 +7,14 @@ import { Piece } from "./Piece"
 const Vector2 = Phaser.Math.Vector2
 export class ZPiece extends Piece {
     public getBlockLocations(angle: number = this.actualAngle): Phaser.Math.Vector2[] {
+        angle = Phaser.Math.Angle.WrapDegrees(angle)
+
         switch (angle) {
             case 0:
                 return [new Vector2(0, 0), new Vector2(-1, 0), new Vector2(0, 1), new Vector2(1, 1)]
             case -180:
             case 180:
-                return [new Vector2(0, 0), new Vector2(-1, -1), new Vector2(0, -1), new Vector2(1, 0)]
+                return [new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, -1), new Vector2(-1, -1)]
             case 90:
                 return [new Vector2(0, 0), new Vector2(0, -1), new Vector2(-1, 0), new Vector2(-1, 1)]
             case -90:
@@ -24,8 +26,8 @@ export class ZPiece extends Piece {
 
     public build() {
         this.color = Phaser.Display.Color.HexStringToColor("#FF0000")
-        this.add(new Block(this, BLOCK_SIZE * -1, 0, this.color))
         this.add(new Block(this, 0, 0, this.color))
+        this.add(new Block(this, BLOCK_SIZE * -1, 0, this.color))
         this.add(new Block(this, 0, BLOCK_SIZE, this.color))
         this.add(new Block(this, BLOCK_SIZE, BLOCK_SIZE, this.color))
 

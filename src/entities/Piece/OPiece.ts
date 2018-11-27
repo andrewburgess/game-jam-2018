@@ -8,16 +8,18 @@ const Vector2 = Phaser.Math.Vector2
 
 export class OPiece extends Piece {
     public getBlockLocations(angle: number = this.actualAngle): Phaser.Math.Vector2[] {
+        angle = Phaser.Math.Angle.WrapDegrees(angle)
+
         switch (angle) {
             case 0:
-                return [new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1)]
+                return [new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 0), new Vector2(1, 1)]
             case -180:
             case 180:
-                return [new Vector2(0, 0), new Vector2(-1, 0), new Vector2(0, -1), new Vector2(-1, -1)]
+                return [new Vector2(0, 0), new Vector2(0, -1), new Vector2(-1, 0), new Vector2(-1, -1)]
             case 90:
-                return [new Vector2(0, 0), new Vector2(0, 1), new Vector2(-1, 1), new Vector2(-1, 0)]
+                return [new Vector2(0, 1), new Vector2(0, 0), new Vector2(-1, 1), new Vector2(-1, 0)]
             case -90:
-                return [new Vector2(0, 0), new Vector2(0, -1), new Vector2(1, -1), new Vector2(1, 0)]
+                return [new Vector2(0, -1), new Vector2(1, -1), new Vector2(0, 0), new Vector2(1, 0)]
             default:
                 throw new Error(`invalid angle ${angle}`)
         }
