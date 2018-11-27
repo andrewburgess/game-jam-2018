@@ -69,7 +69,8 @@ export default class GameUI extends Phaser.Scene {
 
         this.budgetText.setPosition(this.cameras.main.centerX - this.budgetText.width / 2, this.budgetText.y)
 
-        this.registry.events.on("changedata", this.onDataUpdated.bind(this))
+        this.registry.events.on("changedata", this.onDataUpdated, this)
+        this.events.once("shutdown", () => this.registry.events.off("changedata", this.onDataUpdated, this, false))
 
         this.drawBeamResources()
     }
@@ -94,6 +95,10 @@ export default class GameUI extends Phaser.Scene {
     }
 
     private onDataUpdated(parent: any, key: string, data: any) {
+        if (!this.scene.isActive(Scenes.GameUI)) {
+            return
+        }
+
         if (key === Data.AMMO_CURRENT) {
             this.ammoText.setText(`AMMO: ${data} / ${this.level.ammo.maximum}`)
         } else if (key === Data.BEAM_CURRENT) {
