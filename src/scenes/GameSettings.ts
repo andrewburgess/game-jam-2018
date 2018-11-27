@@ -54,7 +54,7 @@ export default class GameSettings extends Phaser.Scene {
         this.controller = new UnifiedController(this.input)
         this.firstUpdate = true
 
-        this.cameras.main.fadeIn(500, 0, 0, 0)
+        this.cameras.main.fadeIn(150, 0, 0, 0)
 
         this.uiElements = new Array<[Phaser.GameObjects.Graphics, Phaser.GameObjects.Text]>()
         this.setupSettingsMenus()
@@ -84,7 +84,7 @@ export default class GameSettings extends Phaser.Scene {
 
         if (this.controller.settings!.isUniquelyDown()) {
             log("resuming game scene")
-            this.cameras.main.fade(500, 0, 0, 0)
+            this.cameras.main.fade(150, 0, 0, 0)
             this.cameras.main.once("camerafadeoutcomplete", () => {
                 this.scene.stop(Scenes.GameSettings)
                 this.scene.resume(Scenes.Game)

@@ -28,6 +28,8 @@ export default class Game extends Phaser.Scene {
     public fxSounds: SoundGroup
     public musicSounds: SoundGroup
 
+    private config: IGameInitialization
+
     /**
      * The virtual controller that maps physical device actions into game actions.
      *
@@ -89,6 +91,7 @@ export default class Game extends Phaser.Scene {
     public create(config: IGameInitialization) {
         log(`create level ${config.level}`)
 
+        this.config = config
         this.level = Levels[config.level]
 
         this.registry.set(Data.BUDGET, this.level.budget)
@@ -144,14 +147,9 @@ export default class Game extends Phaser.Scene {
 
         this.add.existing(this.board)
 
-        this.player = new Player(this, boardWidth / 2, boardHeight + 40)
-        this.board.add(this.player)
-
-        this.spawnNextPiece()
-
-        setTimeout(() => {
-            this.activateNextPiece()
-        }, 1500)
+        this.scene.launch(Scenes.LevelStart, {
+            level: config.level
+        })
     }
 
     public update(time: number, delta: number) {
@@ -159,7 +157,7 @@ export default class Game extends Phaser.Scene {
 
         if (this.controller.settings!.isUniquelyDown()) {
             log("launching game settings scene")
-            this.cameras.main.fade(500, 0, 0, 0)
+            this.cameras.main.fade(200, 0, 0, 0)
             this.cameras.main.once("camerafadeoutcomplete", () => {
                 this.scene.launch(Scenes.GameSettings, { fxSounds: this.fxSounds, musicSounds: this.musicSounds })
                 this.scene.pause()
@@ -171,6 +169,23 @@ export default class Game extends Phaser.Scene {
         }
 
         this.player.update(time, delta, this.currentPiece!)
+    }
+
+    public begin() {
+        this.scene.launch(Scenes.GameUI, {
+            level: this.config.level
+        } as IGameInitialization)
+
+        const boardHeight = this.level.height * BLOCK_SIZE
+        const boardWidth = this.level.width * BLOCK_SIZE
+        this.player = new Player(this, boardWidth / 2, boardHeight + 40)
+        this.board.add(this.player)
+
+        this.spawnNextPiece()
+
+        setTimeout(() => {
+            this.activateNextPiece()
+        }, 1500)
     }
 
     public getCurrentPiece() {

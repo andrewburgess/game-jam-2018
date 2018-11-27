@@ -54,6 +54,14 @@ export interface ILevel {
     readonly budget: number
 
     /**
+     * Description of the Level
+     *
+     * @type {string}
+     * @memberof ILevel
+     */
+    readonly description: string
+
+    /**
      * Total number of rows in the game board
      *
      * @type {number}
@@ -153,6 +161,10 @@ const LevelDefaults = {
 export const Levels: { [key: string]: ILevel } = {
     [1]: merge({}, LevelDefaults, {
         budget: 4000,
+        description: `Outpost X417 needs basic life support
+systems installed.
+
+Get building`,
         height: 17,
         platforms: [
             {

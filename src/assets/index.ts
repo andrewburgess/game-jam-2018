@@ -3,8 +3,10 @@
 // NOTE(tristan): https://bit.ly/2pGYaak
 import * as BACKGROUND from "./images/background.png"
 import * as BEAM from "./images/beam.png"
+import * as BEGIN_BUTTON from "./images/begin-button.png"
 import * as BLOCKS from "./images/blocks.png"
 import * as GAME_BUTTON from "./images/game-button.png"
+import * as LEVEL_START_BACKGROUND from "./images/level-start-background.png"
 import * as PARTICLE_ENGINE_THRUST from "./images/particle-engine-thrust.png"
 import * as PLATFORM from "./images/platform.png"
 // NOTE(tristan): https://bit.ly/2SQMZtt
@@ -25,12 +27,14 @@ import * as MUSIC_TITLE from "./sounds/music-title.mp3"
 export const Files = {
     BACKGROUND,
     BEAM,
+    BEGIN_BUTTON,
     BLOCKS,
     FX_BEAM_ACTIVATED,
     FX_BEAM_BEAMING_PIECE,
     FX_PIECE_HIT,
     FX_PROJECTILE_FIRED,
     GAME_BUTTON,
+    LEVEL_START_BACKGROUND,
     MUSIC_01,
     MUSIC_02,
     MUSIC_TITLE,
@@ -44,12 +48,14 @@ export const Files = {
 export enum Assets {
     Background = "background",
     Beam = "beam",
+    BeginButton = "begin-button",
     Blocks = "blocks",
-    GameButton = "game-button",
     FxBeamActivated = "fx-beam-activated",
     FxBeamBeamingPiece = "fx-beam-beaming-piece",
     FxPieceHit = "fx-piece-hit",
     FxProjectileFired = "fx-projectile-fired",
+    GameButton = "game-button",
+    LevelStartBackground = "level-start-background",
     Music01 = "music-01",
     Music02 = "music-02",
     MusicTitle = "music-title",
