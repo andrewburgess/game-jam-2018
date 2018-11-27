@@ -37,9 +37,9 @@ export class Projectile extends Phaser.Physics.Arcade.Sprite {
             this.game.board.hitToRotate(
                 piece,
                 this.x - this.body.width * this.originX,
-                this.y - this.body.height * this.originY,
+                this.y - this.body.height * this.originY - 16,
                 this.body.width,
-                this.body.height
+                this.body.height - 16
             )
         ) {
             this.game.fxSounds.get(Assets.FxPieceHit).play()
