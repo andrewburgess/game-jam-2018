@@ -27,6 +27,10 @@ export class Projectile extends Phaser.Physics.Arcade.Sprite {
     }
 
     public update(time: number, delta: number) {
+        if (!this.active) {
+            return
+        }
+
         const piece = this.game.getCurrentPiece()
 
         if (!piece) {

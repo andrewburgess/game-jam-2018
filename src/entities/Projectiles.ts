@@ -81,6 +81,10 @@ export class Projectiles extends Phaser.GameObjects.Container {
     }
 
     public update(time: number, delta: number) {
+        if (!this.active) {
+            return
+        }
+
         this.elements
             .getChildren()
             .forEach((projectile: Phaser.GameObjects.GameObject) => projectile.update(time, delta))
