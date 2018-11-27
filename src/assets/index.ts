@@ -16,28 +16,42 @@ import * as PLAYER from "./images/player.png"
 import * as TITLE from "./images/title.png"
 // NOTE(tristan): opening the raw versions of sounds assets requires at least the demo version
 // of Propellerhead's Reason software: https://www.propellerheads.com/en/reason
-import * as FX_BEAM_ACTIVATED from "./sounds/fx-beam-activated.mp3"
-import * as FX_BEAM_BEAMING_PIECE from "./sounds/fx-beam-beaming-piece.mp3"
-import * as FX_PIECE_HIT from "./sounds/fx-piece-hit.mp3"
-import * as FX_PROJECTILE_FIRED from "./sounds/fx-projectile-fired.mp3"
-import * as MUSIC_01 from "./sounds/music-01.mp3"
-import * as MUSIC_02 from "./sounds/music-02.mp3"
-import * as MUSIC_TITLE from "./sounds/music-title.mp3"
+import * as FX_BEAM_ACTIVATED_OGG from "./sounds/fx-beam-activated.ogg"
+import * as FX_BEAM_ACTIVATED_WAV from "./sounds/fx-beam-activated.wav"
+import * as FX_BEAM_BEAMING_PIECE_OGG from "./sounds/fx-beam-beaming-piece.ogg"
+import * as FX_BEAM_BEAMING_PIECE_WAV from "./sounds/fx-beam-beaming-piece.wav"
+import * as FX_PIECE_HIT_MP3 from "./sounds/fx-piece-hit.mp3"
+import * as FX_PIECE_HIT_OGG from "./sounds/fx-piece-hit.ogg"
+import * as FX_PROJECTILE_FIRED_MP3 from "./sounds/fx-projectile-fired.mp3"
+import * as FX_PROJECTILE_FIRED_OGG from "./sounds/fx-projectile-fired.ogg"
+import * as MUSIC_01_MP3 from "./sounds/music-01.mp3"
+import * as MUSIC_01_OGG from "./sounds/music-01.ogg"
+import * as MUSIC_02_MP3 from "./sounds/music-02.mp3"
+import * as MUSIC_02_OGG from "./sounds/music-02.ogg"
+import * as MUSIC_TITLE_MP3 from "./sounds/music-title.mp3"
+import * as MUSIC_TITLE_OGG from "./sounds/music-title.ogg"
 
 export const Files = {
     BACKGROUND,
     BEAM,
     BEGIN_BUTTON,
     BLOCKS,
-    FX_BEAM_ACTIVATED,
-    FX_BEAM_BEAMING_PIECE,
-    FX_PIECE_HIT,
-    FX_PROJECTILE_FIRED,
+    FX_BEAM_ACTIVATED_OGG,
+    FX_BEAM_ACTIVATED_WAV,
+    FX_BEAM_BEAMING_PIECE_OGG,
+    FX_BEAM_BEAMING_PIECE_WAV,
+    FX_PIECE_HIT_MP3,
+    FX_PIECE_HIT_OGG,
+    FX_PROJECTILE_FIRED_MP3,
+    FX_PROJECTILE_FIRED_OGG,
     GAME_BUTTON,
     LEVEL_START_BACKGROUND,
-    MUSIC_01,
-    MUSIC_02,
-    MUSIC_TITLE,
+    MUSIC_01_MP3,
+    MUSIC_01_OGG,
+    MUSIC_02_MP3,
+    MUSIC_02_OGG,
+    MUSIC_TITLE_MP3,
+    MUSIC_TITLE_OGG,
     PARTICLE_ENGINE_THRUST,
     PLATFORM,
     PLAYER,

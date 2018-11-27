@@ -14,7 +14,7 @@ const common = {
                 use: [{ loader: "ts-loader", options: { transpileOnly: true } }]
             },
             {
-                test: /\.(png|jpg|jpeg|gif|mp3)$/,
+                test: /\.(png|jpg|jpeg|gif|mp3|ogg|wav)$/,
                 exclude: /node_modules/,
                 use: [{ loader: "file-loader" }]
             }

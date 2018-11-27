@@ -22,3 +22,13 @@ declare module "*.mp3" {
     const content: string
     export = content
 }
+
+declare module "*.ogg" {
+    const content: string
+    export = content
+}
+
+declare module "*.wav" {
+    const content: string
+    export = content
+}
