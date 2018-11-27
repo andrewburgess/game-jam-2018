@@ -146,17 +146,23 @@ export abstract class Piece extends Phaser.GameObjects.Container {
     }
 
     public setBeingBeamed(isBeingBeamed: boolean, beamLeft: number = 0, beamRight: number = 0) {
+        const wasBeingBeamed = this.beingBeamed
         this.beingBeamed = isBeingBeamed
         const blocks = this.getBlocks()
+        const locations = this.getBlockLocations()
 
         if (isBeingBeamed) {
-            each(blocks, (block) => {
-                const left = this.x + block.x
-                const right = this.x + block.x + block.width
-                block.setBeingBeamed(beamRight >= left && beamLeft <= right)
+            each(locations, (location, index) => {
+                const left = this.x + location.x * BLOCK_SIZE
+                const right = this.x + location.x * BLOCK_SIZE + BLOCK_SIZE
+                blocks[index].setBeingBeamed(beamRight >= left && beamLeft <= right)
             })
         } else {
             each(blocks, (block) => block.setBeingBeamed(false))
+        }
+
+        if (!wasBeingBeamed && isBeingBeamed && this.tween && this.tween.isPlaying()) {
+            this.move(Direction.DOWN, true)
         }
     }
 
@@ -166,7 +172,7 @@ export abstract class Piece extends Phaser.GameObjects.Container {
         return this.level.speed / (this.isBeingBeamed() ? 4 : 1)
     }
 
-    private move(direction?: Direction): void {
+    private move(direction?: Direction, force?: boolean): void {
         if (this.isBeingBeamed()) {
             direction = Direction.DOWN
         }
@@ -209,22 +215,30 @@ export abstract class Piece extends Phaser.GameObjects.Container {
         this.location = newLocation
         this.scene.board.updateLocation(this, oldLocation, newLocation, this.actualAngle, this.actualAngle)
 
-        this.tween = this.scene.tweens.add({
-            onComplete: () => this.onMoveComplete(),
-            props: {
-                x: {
-                    duration: this.getMoveDuration(),
-                    ease: "Quad.easeInOut",
-                    value: newLocation.x * BLOCK_SIZE
-                },
-                y: {
-                    duration: this.getMoveDuration(),
-                    ease: "Quad.easeInOut",
-                    value: newLocation.y * BLOCK_SIZE
-                }
-            },
+        const props: any = {}
+        if (direction !== Direction.DOWN) {
+            props.x = {
+                duration: this.getMoveDuration(),
+                ease: "Quad.easeInOut",
+                value: newLocation.x * BLOCK_SIZE
+            }
+        } else {
+            props.y = {
+                duration: this.getMoveDuration(),
+                ease: "Quad.easeInOut",
+                value: newLocation.y * BLOCK_SIZE
+            }
+        }
+
+        const tween = this.scene.tweens.add({
+            onComplete: () => !force && this.onMoveComplete(),
+            props,
             targets: this
         })
+
+        if (!force) {
+            this.tween = tween
+        }
     }
 
     private onMoveComplete() {
