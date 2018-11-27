@@ -94,7 +94,7 @@ export abstract class Piece extends Phaser.GameObjects.Container {
 
         const oldAngle = this.actualAngle
         const rawAngle = direction === RotateDirection.CLOCKWISE ? this.actualAngle + 90 : this.actualAngle - 90
-        const newAngle = rawAngle < -180 || rawAngle > 180 ? Phaser.Math.Angle.WrapDegrees(rawAngle) : rawAngle
+        const newAngle = rawAngle < -270 || rawAngle > 180 ? Phaser.Math.Angle.WrapDegrees(rawAngle) : rawAngle
 
         if (!this.scene.board.canPieceMoveTo(this, this.location.x, this.location.y, newAngle)) {
             log("can't rotate")
