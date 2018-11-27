@@ -146,7 +146,6 @@ export abstract class Piece extends Phaser.GameObjects.Container {
     }
 
     public setBeingBeamed(isBeingBeamed: boolean, beamLeft: number = 0, beamRight: number = 0) {
-        const wasBeingBeamed = this.beingBeamed
         this.beingBeamed = isBeingBeamed
         const blocks = this.getBlocks()
         const locations = this.getBlockLocations()
@@ -160,10 +159,6 @@ export abstract class Piece extends Phaser.GameObjects.Container {
         } else {
             each(blocks, (block) => block.setBeingBeamed(false))
         }
-
-        if (!wasBeingBeamed && isBeingBeamed && this.tween && this.tween.isPlaying()) {
-            this.move(Direction.DOWN, true)
-        }
     }
 
     protected abstract build(): void
@@ -172,7 +167,7 @@ export abstract class Piece extends Phaser.GameObjects.Container {
         return this.level.speed / (this.isBeingBeamed() ? 4 : 1)
     }
 
-    private move(direction?: Direction, force?: boolean): void {
+    private move(direction?: Direction): void {
         if (this.isBeingBeamed()) {
             direction = Direction.DOWN
         }
@@ -230,15 +225,11 @@ export abstract class Piece extends Phaser.GameObjects.Container {
             }
         }
 
-        const tween = this.scene.tweens.add({
-            onComplete: () => !force && this.onMoveComplete(),
+        this.tween = this.scene.tweens.add({
+            onComplete: () => this.onMoveComplete(),
             props,
             targets: this
         })
-
-        if (!force) {
-            this.tween = tween
-        }
     }
 
     private onMoveComplete() {
