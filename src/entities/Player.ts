@@ -121,6 +121,10 @@ export class Player extends Phaser.GameObjects.Container {
     }
 
     public update(time: number, delta: number, currentPiece?: Piece) {
+        if (!this.active) {
+            return
+        }
+
         if (this.controller.left!.isDown()) {
             this.body.setAccelerationX(this.controller.left!.getMagnitude() * -PLAYER_MOVEMENT_ACCELERATION_SCALE)
         } else if (this.controller.right!.isDown()) {

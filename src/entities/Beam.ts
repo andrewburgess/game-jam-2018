@@ -102,6 +102,10 @@ export class Beam extends Phaser.GameObjects.Sprite {
     }
 
     public update(time: number, delta: number) {
+        if (!this.active) {
+            return
+        }
+
         super.update(time, delta)
         this.anims.update(time, delta)
 
