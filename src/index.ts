@@ -3,9 +3,12 @@ import * as Phaser from "phaser"
 import Game from "./scenes/Game"
 import GameSettings from "./scenes/GameSettings"
 import GameUI from "./scenes/GameUI"
+import LevelComplete from "./scenes/LevelComplete"
+import LevelFail from "./scenes/LevelFail"
 import LevelStart from "./scenes/LevelStart"
 import Loading from "./scenes/Loading"
 import Menu from "./scenes/Menu"
+import Winner from "./scenes/Winner"
 
 const GameConfiguration: GameConfig = {
     backgroundColor: "#000000",
@@ -13,7 +16,7 @@ const GameConfiguration: GameConfig = {
     input: {
         gamepad: true
     },
-    scene: [Loading, Menu, Game, GameSettings, GameUI, LevelStart],
+    scene: [Loading, Menu, Game, GameSettings, GameUI, LevelComplete, LevelFail, LevelStart, Winner],
     width: 1000
 }
 

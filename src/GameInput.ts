@@ -23,6 +23,7 @@ export default class UnifiedController implements IUnifiedController {
     public actionLB?: VirtualKey
     public actionRB?: VirtualKey
     public settings?: VirtualKey
+    public space?: VirtualKey
 
     private plugin: Phaser.Input.InputPlugin
 
@@ -39,6 +40,7 @@ export default class UnifiedController implements IUnifiedController {
         this.actionLB = new VirtualKey(plugin.keyboard.addKey("LEFT"))
         this.actionRB = new VirtualKey(plugin.keyboard.addKey("RIGHT"))
         this.settings = new VirtualKey(plugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC))
+        this.space = new VirtualKey(plugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE))
 
         // NOTE(tristan): web browsers can't detect many types of gamepads automatically; have to press a button first to register it.
         this.plugin.gamepad.once(

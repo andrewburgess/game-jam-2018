@@ -175,5 +175,28 @@ Get building`,
             }
         ],
         width: 29
+    }),
+    [2]: merge({}, LevelDefaults, {
+        budget: 5000,
+        description: `Outpost Z492 needs basic life support
+systems installed.
+
+Get building`,
+        height: 17,
+        platforms: [
+            {
+                cells: "####### ##  ##",
+                width: 4,
+                x: 3,
+                y: 12
+            },
+            {
+                cells: " ## ##  #",
+                width: 3,
+                x: 12,
+                y: 9
+            }
+        ],
+        width: 29
     })
 }

@@ -81,13 +81,13 @@ export default class LevelStart extends Phaser.Scene {
             })
         )
 
-        const begin = this.add
-            .image(0, 480, Assets.BeginButton)
-            .setInteractive()
-            .setOrigin(0, 0)
+        const buttonContainer = this.add.container(500, 620)
+        const begin = this.add.image(0, 0, Assets.ButtonBackground).setInteractive()
         begin.once("pointerup", () => this.startGame())
-        container.add(begin)
-        begin.setPosition(400 - begin.width / 2, begin.y)
+        buttonContainer.add(begin)
+        buttonContainer.add(
+            this.add.text(0, 0, "BEGIN", { fill: "#ffffff", font: "48px Share Tech Mono" }).setOrigin(0.5)
+        )
     }
 
     public update() {

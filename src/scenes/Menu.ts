@@ -36,9 +36,10 @@ class Menu extends Phaser.Scene {
         log("create", data)
 
         this.add.image(this.centerX(), this.centerY(), Assets.Title)
-        const gameButton = this.add.image(0, 0, Assets.GameButton).setInteractive()
+        const gameButton = this.add.image(0, 0, Assets.ButtonBackground).setInteractive()
+        const startText = this.add.text(0, 0, "START", { fill: "#00dd00", font: "48px Righteous" }).setOrigin(0.5)
 
-        this.add.container(this.centerX(), this.centerY() * 1.4, [gameButton])
+        this.add.container(this.centerX(), this.centerY() * 1.4, [gameButton, startText])
 
         this.controller = new UnifiedController(this.input)
 

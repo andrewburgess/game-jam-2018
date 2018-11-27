@@ -208,7 +208,13 @@ export default class Game extends Phaser.Scene {
             this.activateNextPiece()
         } else {
             log("you winner")
-            throw new Error("winner winner winner")
+            setTimeout(() => {
+                this.scene.pause()
+                this.scene.stop(Scenes.GameUI)
+                this.scene.launch(Scenes.LevelComplete, {
+                    level: this.config.level
+                })
+            }, 1000)
         }
     }
 
@@ -227,9 +233,14 @@ export default class Game extends Phaser.Scene {
             newBudget < 0 ||
             !this.board.canPieceMoveTo(this.currentPiece, this.currentPiece.location.x, this.currentPiece.location.y)
         ) {
-            // The player loses!
             log("you loser")
-            throw new Error("loser loser loser")
+            setTimeout(() => {
+                this.scene.pause()
+                this.scene.stop(Scenes.GameUI)
+                this.scene.launch(Scenes.LevelFail, {
+                    level: this.config.level
+                })
+            }, 1000)
         }
 
         this.registry.set(Data.BUDGET, newBudget)
