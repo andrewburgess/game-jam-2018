@@ -164,7 +164,7 @@ export abstract class Piece extends Phaser.GameObjects.Container {
     protected abstract build(): void
 
     private getMoveDuration() {
-        return this.level.speed / (this.isBeingBeamed() ? 4 : 1)
+        return this.isBeingBeamed() ? 100 : this.level.speed
     }
 
     private move(direction?: Direction): void {
