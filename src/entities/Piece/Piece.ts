@@ -195,7 +195,9 @@ export abstract class Piece extends Phaser.GameObjects.Container {
         if (!canMoveToNewLocation && direction === Direction.DOWN) {
             // If we can't move and we also can't move down anymore, then it is considered "settled", and we can
             // activate the next piece on the board
-            this.tween!.stop()
+            if (this.tween) {
+                this.tween.stop()
+            }
             this.scene.onPieceSettled()
             return
         }
