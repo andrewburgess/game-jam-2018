@@ -152,7 +152,7 @@ const LevelDefaults = {
         maximum: 100,
         regenerationRate: 10
     },
-    height: 17,
+    height: 16,
     speed: 500,
     width: 29,
     zoom: 1
@@ -160,43 +160,225 @@ const LevelDefaults = {
 
 export const Levels: { [key: string]: ILevel } = {
     [1]: merge({}, LevelDefaults, {
-        budget: 4000,
-        description: `Outpost X417 needs basic life support
-systems installed.
-
-Get building`,
-        height: 17,
+        beam: {
+            consumptionRate: 50
+        },
+        budget: 2000,
+        description: `Establish a forward operating base at Output X417`,
+        height: 9,
         platforms: [
             {
-                cells: " ## ##  #",
-                width: 3,
-                x: 8,
-                y: 9
-            }
-        ],
-        width: 29
-    }),
-    [2]: merge({}, LevelDefaults, {
-        budget: 5000,
-        description: `Outpost Z492 needs basic life support
-systems installed.
-
-Get building`,
-        height: 17,
-        platforms: [
-            {
-                cells: "####### ##  ##",
-                width: 4,
-                x: 3,
-                y: 12
+                cells: "## #",
+                width: 2,
+                x: 2,
+                y: 6
             },
             {
-                cells: " ## ##  #",
-                width: 3,
-                x: 12,
-                y: 9
+                cells: "### ",
+                width: 2,
+                x: 9,
+                y: 6
             }
         ],
-        width: 29
+        width: 13,
+        zoom: 1.4
+    }),
+    [2]: merge({}, LevelDefaults, {
+        budget: 3600,
+        description: `Set up supply depots for the Ares Sector`,
+        height: 11,
+        platforms: [
+            {
+                cells: "####",
+                width: 1,
+                x: 2,
+                y: 6
+            },
+            {
+                cells: "####",
+                width: 1,
+                x: 13,
+                y: 6
+            },
+            {
+                cells: "####",
+                width: 4,
+                x: 6,
+                y: 8
+            }
+        ],
+        speed: 450,
+        width: 16,
+        zoom: 1.2
+    }),
+    [3]: merge({}, LevelDefaults, {
+        budget: 8000,
+        description: `Command wants a communications base`,
+        height: 13,
+        platforms: [
+            {
+                cells: "########### ##   #    #  ",
+                width: 5,
+                x: 5,
+                y: 8
+            },
+            {
+                cells: "##### ##    #  ",
+                width: 5,
+                x: 10,
+                y: 8
+            }
+        ],
+        speed: 300,
+        width: 20,
+        zoom: 1.15
+    }),
+    [4]: merge({}, LevelDefaults, {
+        ammo: {
+            maximum: 3,
+            regenerationInterval: 5000
+        },
+        beam: {
+            consumptionRate: 50,
+            maximum: 100,
+            regenerationRate: 5
+        },
+        budget: 6000,
+        description: `Galactic disturbances are affecting beam and impulse
+weapon effectiveness...
+
+or something, the story is kind of thin at this point,
+just use your imagination`,
+        height: 12,
+        platforms: [
+            {
+                cells: "#######  #  ",
+                width: 3,
+                x: 3,
+                y: 8
+            },
+            {
+                cells: "#### ## ",
+                width: 4,
+                x: 13,
+                y: 5
+            }
+        ],
+        speed: 300,
+        width: 17,
+        zoom: 1.15
+    }),
+    [5]: merge({}, LevelDefaults, {
+        budget: 8000,
+        description: `This one is quick! Hope you're ready`,
+        height: 11,
+        platforms: [
+            {
+                cells: "####",
+                width: 2,
+                x: 1,
+                y: 5
+            },
+            {
+                cells: "####",
+                width: 2,
+                x: 6,
+                y: 7
+            },
+            {
+                cells: "####",
+                width: 2,
+                x: 11,
+                y: 4
+            },
+            {
+                cells: "####",
+                width: 2,
+                x: 16,
+                y: 8
+            },
+            {
+                cells: "####",
+                width: 2,
+                x: 20,
+                y: 5
+            },
+            {
+                cells: "####",
+                width: 2,
+                x: 24,
+                y: 10
+            }
+        ],
+        speed: 150,
+        width: 28,
+        zoom: 1
+    }),
+    [6]: merge({}, LevelDefaults, {
+        ammo: {
+            maximum: 10,
+            regenerationInterval: 2000
+        },
+        beam: {
+            consumptionRate: 20
+        },
+        budget: 20000,
+        description: `Hey, glad you're still playing!
+
+This is the last one!`,
+        height: 19,
+        platforms: [
+            {
+                cells: "### # ",
+                width: 2,
+                x: 3,
+                y: 7
+            },
+            {
+                cells: "######  ",
+                width: 4,
+                x: 5,
+                y: 11
+            },
+            {
+                cells: "###",
+                width: 3,
+                x: 6,
+                y: 15
+            },
+            {
+                cells: "##### #  #  ",
+                width: 3,
+                x: 14,
+                y: 8
+            },
+            {
+                cells: "######  ##  ",
+                width: 6,
+                x: 14,
+                y: 14
+            },
+            {
+                cells: "### # ",
+                width: 3,
+                x: 22,
+                y: 9
+            },
+            {
+                cells: "###  #",
+                width: 3,
+                x: 26,
+                y: 4
+            },
+            {
+                cells: "#####  # ",
+                width: 3,
+                x: 27,
+                y: 12
+            }
+        ],
+        speed: 300,
+        width: 33,
+        zoom: 0.9
     })
 }

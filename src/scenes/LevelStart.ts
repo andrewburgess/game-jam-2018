@@ -45,39 +45,39 @@ export default class LevelStart extends Phaser.Scene {
                 .setLineWidth(2)
         )
         container.add(
-            this.add.text(50, 140, `BUDGET:      $${this.level.budget}`, {
+            this.add.text(50, 130, `BUDGET:      $${this.level.budget}`, {
                 fill: "#ffffff",
-                font: "28px Share Tech Mono"
+                font: "26px Share Tech Mono"
             })
         )
         container.add(
-            this.add.text(50, 180, `BEAM RATE:   ${this.level.beam.consumptionRate} GW`, {
+            this.add.text(50, 160, `BEAM RATE:   ${this.level.beam.consumptionRate} GW`, {
                 fill: "#ffffff",
-                font: "28px Share Tech Mono"
+                font: "26px Share Tech Mono"
             })
         )
         container.add(
-            this.add.text(50, 210, `BEAM REGEN:  ${this.level.beam.regenerationRate} GW`, {
+            this.add.text(50, 190, `BEAM REGEN:  ${this.level.beam.regenerationRate} GW`, {
                 fill: "#ffffff",
-                font: "28px Share Tech Mono"
+                font: "26px Share Tech Mono"
             })
         )
         container.add(
-            this.add.text(50, 260, `MAX AMMO:    ${this.level.ammo.maximum}`, {
+            this.add.text(50, 240, `MAX AMMO:    ${this.level.ammo.maximum}`, {
                 fill: "#ffffff",
-                font: "28px Share Tech Mono"
+                font: "26px Share Tech Mono"
             })
         )
         container.add(
-            this.add.text(50, 290, `AMMO RELOAD: ${this.level.ammo.regenerationInterval / 1000}s`, {
+            this.add.text(50, 270, `AMMO RELOAD: ${this.level.ammo.regenerationInterval / 1000}s`, {
                 fill: "#ffffff",
-                font: "28px Share Tech Mono"
+                font: "26px Share Tech Mono"
             })
         )
         container.add(
-            this.add.text(50, 360, this.level.description, {
+            this.add.text(50, 340, this.level.description, {
                 fill: "#ffffff",
-                font: "24px Share Tech Mono"
+                font: "22px Share Tech Mono"
             })
         )
 
