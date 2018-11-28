@@ -45,6 +45,7 @@ export class Projectiles extends Phaser.GameObjects.Container {
         })
 
         const worldTop: Phaser.Physics.Arcade.Sprite = this.game.physics.add.staticSprite(16, -16, "world_top")
+        worldTop.setVisible(false)
         worldTop.setSize(this.game.physics.world.bounds.width, worldTop.height)
 
         this.game.physics.add.overlap(
