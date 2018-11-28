@@ -23,7 +23,7 @@ export default class UnifiedController implements IUnifiedController {
     public actionLB?: VirtualKey
     public actionRB?: VirtualKey
     public settings?: VirtualKey
-    public space?: VirtualKey
+    public enter?: VirtualKey
 
     private plugin: Phaser.Input.InputPlugin
 
@@ -32,15 +32,15 @@ export default class UnifiedController implements IUnifiedController {
 
         this.plugin = plugin
 
-        this.up = new VirtualKey(plugin.keyboard.addKey("W"))
-        this.down = new VirtualKey(plugin.keyboard.addKey("S"))
-        this.left = new VirtualKey(plugin.keyboard.addKey("A"))
-        this.right = new VirtualKey(plugin.keyboard.addKey("D"))
-        this.actionA = new VirtualKey(plugin.keyboard.addKey("SPACE"))
-        this.actionLB = new VirtualKey(plugin.keyboard.addKey("LEFT"))
-        this.actionRB = new VirtualKey(plugin.keyboard.addKey("RIGHT"))
+        this.up = new VirtualKey(plugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP))
+        this.down = new VirtualKey(plugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN))
+        this.left = new VirtualKey(plugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT))
+        this.right = new VirtualKey(plugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT))
+        this.actionA = new VirtualKey(plugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE))
+        this.actionLB = new VirtualKey(plugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.CTRL))
+        this.actionRB = new VirtualKey(plugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE))
         this.settings = new VirtualKey(plugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC))
-        this.space = new VirtualKey(plugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE))
+        this.enter = new VirtualKey(plugin.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER))
 
         // NOTE(tristan): web browsers can't detect many types of gamepads automatically; have to press a button first to register it.
         this.plugin.gamepad.once(
@@ -55,6 +55,10 @@ export default class UnifiedController implements IUnifiedController {
         log("constructed")
     }
 
+    public reset(): any {
+        this.plugin.keyboard.shutdown()
+    }
+
     private initGamepadButtons(pad: Phaser.Input.Gamepad.Gamepad) {
         this.actionA!.setGamepadButton(pad.buttons[0])
         this.actionLB!.setGamepadButton(pad.buttons[4])
@@ -64,6 +68,7 @@ export default class UnifiedController implements IUnifiedController {
         this.right!.setGamepadButton(pad.buttons[15])
         this.up!.setGamepadButton(pad.buttons[12])
         this.settings!.setGamepadButton(pad.buttons[9])
+        this.enter!.setGamepadButton(pad.buttons[0])
     }
 
     private initGamepadAxisRanges(pad: Phaser.Input.Gamepad.Gamepad) {

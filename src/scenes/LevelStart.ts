@@ -11,6 +11,7 @@ import Game, { IGameInitialization } from "./Game"
 const log = debug(`game:scenes:${Scenes.LevelStart}`)
 
 export default class LevelStart extends Phaser.Scene {
+    private clicked: boolean
     private controller: UnifiedController
     private level: ILevel
 
@@ -24,6 +25,8 @@ export default class LevelStart extends Phaser.Scene {
 
     public create(config: IGameInitialization) {
         log("create")
+
+        this.clicked = false
 
         this.level = Levels[config.level]
         this.controller = new UnifiedController(this.input)
@@ -90,13 +93,20 @@ export default class LevelStart extends Phaser.Scene {
         )
     }
 
-    public update() {
-        if (this.controller.actionA!.isUniquelyDown()) {
+    public update(time: number, delta: number) {
+        if (!this.scene.isActive(Scenes.LevelStart)) {
+            return
+        }
+
+        super.update(time, delta)
+
+        if (!this.clicked && (this.controller.actionA!.isDown() || this.controller.enter!.isDown())) {
             this.startGame()
         }
     }
 
     private startGame() {
+        this.clicked = true
         const game = this.scene.get(Scenes.Game) as Game
         game.begin()
 

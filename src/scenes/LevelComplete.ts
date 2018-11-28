@@ -11,6 +11,7 @@ import { IGameInitialization } from "./Game"
 const log = debug(`game:scenes:${Scenes.LevelComplete}`)
 
 export default class LevelComplete extends Phaser.Scene {
+    private clicked: boolean
     private config: IGameInitialization
     private controller: UnifiedController
 
@@ -25,6 +26,7 @@ export default class LevelComplete extends Phaser.Scene {
     public create(config: IGameInitialization) {
         log("create")
 
+        this.clicked = false
         this.config = config
         this.controller = new UnifiedController(this.input)
 
@@ -61,7 +63,20 @@ export default class LevelComplete extends Phaser.Scene {
         )
     }
 
+    public update(time: number, delta: number) {
+        if (!this.scene.isActive(Scenes.LevelComplete)) {
+            return
+        }
+
+        super.update(time, delta)
+
+        if (!this.clicked && (this.controller.actionA!.isDown() || this.controller.enter!.isDown())) {
+            this.onClick()
+        }
+    }
+
     private onClick() {
+        this.clicked = true
         this.cameras.main.fade(500, 0, 0, 0, true)
         this.cameras.main.once("camerafadeoutcomplete", () => {
             this.scene.stop(Scenes.Game)

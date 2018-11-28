@@ -112,7 +112,6 @@ export default class Game extends Phaser.Scene {
             this.cameras.main.centerY - boardHeight / 2,
             this.level
         )
-        this.controller = new UnifiedController(this.input)
 
         this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, Assets.Background)
 
@@ -157,6 +156,7 @@ export default class Game extends Phaser.Scene {
         this.scene.launch(Scenes.LevelStart, {
             level: config.level
         })
+        this.scene.pause()
     }
 
     public update(time: number, delta: number) {
@@ -179,6 +179,8 @@ export default class Game extends Phaser.Scene {
     }
 
     public begin() {
+        this.scene.resume()
+        this.controller = new UnifiedController(this.input)
         this.scene.launch(Scenes.GameUI, {
             level: this.config.level
         } as IGameInitialization)
@@ -221,6 +223,7 @@ export default class Game extends Phaser.Scene {
             this.registry.set(Data.SCORE, currentScore + currentBudget)
             setTimeout(() => {
                 this.musicSounds.stopAllSounds()
+                this.controller.reset()
                 this.scene.pause()
                 this.scene.stop(Scenes.GameUI)
                 this.scene.launch(Scenes.LevelComplete, {
@@ -246,6 +249,7 @@ export default class Game extends Phaser.Scene {
             log("you loser")
             setTimeout(() => {
                 this.musicSounds.stopAllSounds()
+                this.controller.reset()
                 this.scene.pause()
                 this.scene.stop(Scenes.GameUI)
                 this.scene.launch(Scenes.LevelFail, {
