@@ -136,7 +136,7 @@ export default class Game extends Phaser.Scene {
         }
         const volumeSettings: VolumeSettings = {
             fxSounds: 1,
-            musicSounds: 0.8,
+            musicSounds: 0.4,
             muted: false
         }
         if (volumeSettingsRaw) {
