@@ -17,7 +17,7 @@ import { Scenes } from "./"
 const log = debug(`game:scenes:${Scenes.Game}`)
 
 const list: Shape[] = []
-const PIECE_PRICE = 500
+const PIECE_PRICE = 400
 
 export interface IGameInitialization {
     level: number
@@ -185,7 +185,7 @@ export default class Game extends Phaser.Scene {
 
         const boardHeight = this.level.height * BLOCK_SIZE
         const boardWidth = this.level.width * BLOCK_SIZE
-        this.player = new Player(this, boardWidth / 2, boardHeight + 40)
+        this.player = new Player(this, boardWidth / 2, boardHeight + 70)
         this.board.add(this.player)
 
         this.spawnNextPiece()
@@ -215,6 +215,10 @@ export default class Game extends Phaser.Scene {
             this.activateNextPiece()
         } else {
             log("you winner")
+            const currentScore = this.registry.get(Data.SCORE) as number
+            const currentBudget = this.registry.get(Data.BUDGET) as number
+
+            this.registry.set(Data.SCORE, currentScore + currentBudget)
             setTimeout(() => {
                 this.scene.pause()
                 this.scene.stop(Scenes.GameUI)
@@ -234,12 +238,10 @@ export default class Game extends Phaser.Scene {
 
         this.currentPiece = this.nextPiece
         const newBudget = (this.registry.get(Data.BUDGET) as number) - PIECE_PRICE
+        this.registry.set(Data.BUDGET, newBudget)
 
         this.nextPiece = undefined
-        if (
-            newBudget < 0 ||
-            !this.board.canPieceMoveTo(this.currentPiece, this.currentPiece.location.x, this.currentPiece.location.y)
-        ) {
+        if (!this.board.canPieceMoveTo(this.currentPiece, this.currentPiece.location.x, this.currentPiece.location.y)) {
             log("you loser")
             setTimeout(() => {
                 this.scene.pause()
@@ -248,10 +250,9 @@ export default class Game extends Phaser.Scene {
                     level: this.config.level
                 })
             }, 1000)
+        } else {
+            this.currentPiece.onActivate()
         }
-
-        this.registry.set(Data.BUDGET, newBudget)
-        this.currentPiece.onActivate()
     }
 
     private spawnNextPiece() {

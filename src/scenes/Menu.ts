@@ -87,6 +87,7 @@ class Menu extends Phaser.Scene {
     }
 
     private startGame() {
+        this.registry.set(Data.SCORE, 0)
         this.tweens.add({
             duration: 500,
             ease: "Linear",

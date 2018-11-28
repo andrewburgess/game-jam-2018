@@ -4,5 +4,6 @@ export enum Data {
     BEAM_CURRENT = "beam-current",
     BEAM_MAX = "beam-maximum",
     BUDGET = "budget",
+    SCORE = "score",
     VOLUME = "volume"
 }
