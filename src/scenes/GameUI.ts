@@ -105,7 +105,7 @@ export default class GameUI extends Phaser.Scene {
             const max: number = this.registry.get(Data.BEAM_MAX)
             this.drawBeamResources(data / max)
         } else if (key === Data.BUDGET) {
-            this.budgetText.setText(`${data < 0 ? "-" : ""}$${data}`)
+            this.budgetText.setText(`${data < 0 ? "-" : ""}$${Math.abs(data)}`)
             this.budgetText.setPosition(this.cameras.main.centerX - this.budgetText.width / 2, this.budgetText.y)
 
             if (data < 0) {

@@ -47,7 +47,7 @@ export default class Winner extends Phaser.Scene {
 
         container.add(
             this.add
-                .text(400, 300, `SCORE: ${score < 0 ? "-" : ""}$${score}`, {
+                .text(400, 300, `SCORE: ${score < 0 ? "-" : ""}$${Math.abs(score)}`, {
                     fill: "#ffffff",
                     font: "48px Share Tech Mono"
                 })
