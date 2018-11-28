@@ -164,7 +164,10 @@ export const Levels: { [key: string]: ILevel } = {
             consumptionRate: 50
         },
         budget: 2000,
-        description: `Establish a forward operating base at Output X417`,
+        description: `Establish a forward operating base at Output X417
+
+Fill in the blueprints on the platforms to complete
+your mission`,
         height: 9,
         platforms: [
             {
