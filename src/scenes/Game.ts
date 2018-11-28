@@ -220,6 +220,7 @@ export default class Game extends Phaser.Scene {
 
             this.registry.set(Data.SCORE, currentScore + currentBudget)
             setTimeout(() => {
+                this.musicSounds.stopAllSounds()
                 this.scene.pause()
                 this.scene.stop(Scenes.GameUI)
                 this.scene.launch(Scenes.LevelComplete, {
@@ -244,6 +245,7 @@ export default class Game extends Phaser.Scene {
         if (!this.board.canPieceMoveTo(this.currentPiece, this.currentPiece.location.x, this.currentPiece.location.y)) {
             log("you loser")
             setTimeout(() => {
+                this.musicSounds.stopAllSounds()
                 this.scene.pause()
                 this.scene.stop(Scenes.GameUI)
                 this.scene.launch(Scenes.LevelFail, {

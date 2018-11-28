@@ -54,6 +54,13 @@ export class SoundGroup {
         this.sounds[0].play()
     }
 
+    public stopAllSounds() {
+        this.sounds.forEach((sound) => {
+            sound.removeAllListeners()
+            sound.stop()
+        })
+    }
+
     public setMuted(newMuted: boolean) {
         for (const sound of this.sounds) {
             sound.mute = newMuted
