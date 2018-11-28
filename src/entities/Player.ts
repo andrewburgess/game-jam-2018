@@ -12,7 +12,6 @@ import { Projectiles } from "./Projectiles"
 const log = debug("game:entities:Player")
 const PLAYER_MAX_VELOCITY = 550
 const PLAYER_MOVEMENT_ACCELERATION_SCALE = 1500
-const PLAYER_PROJECTILES_STARTING_RESOURCES = 20
 
 export class Player extends Phaser.GameObjects.Container {
     public beam: Beam
